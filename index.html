@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:230 TDBA:208-->
+<!--TDBV:233 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -257,9 +257,9 @@ button:focus { outline: none; }
 .perf #bg i { display: none; }
 @-webkit-keyframes spin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.perf .tile { background: #181c22; }
+.perf .tile { background: #181c22; overflow: visible; }
 .perf *, .perf *:before, .perf *:after { -webkit-box-shadow: none !important; box-shadow: none !important; -webkit-transition: none !important; transition: none !important; text-shadow: none !important; }
-.fpsb { position: relative; height: 70px; margin: 10px 20px 4px; border-radius: 14px; background: #14171c; border: 1px solid #2f353e; overflow: hidden; }
+.fpsb { position: relative; height: 70px; margin: 10px 20px 4px; background: #14171c; border: 1px solid #2f353e; }
 .fpsb i { position: absolute; left: 0; top: 15px; width: 40px; height: 40px; border-radius: 50%; background: #d8dde6; }
 .xin { -webkit-flex: 1; flex: 1; min-width: 0; height: 50px; border-radius: 25px; border: 1px solid #2f353e; background: #14171c; color: #eceff3; font-size: 18px; padding: 0 18px; margin-right: 10px; -webkit-user-select: text; user-select: text; outline: none; }
 /* ---- 2.17 TEST : animations, fonds, Claude ---- */
@@ -1193,7 +1193,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("230", 10) || 0, UI_NAME = "2.30 (beta) TEST".charAt(0) === "_" ? "?" : "2.30 (beta) TEST";
+  var UI_CODE = parseInt("233", 10) || 0, UI_NAME = "2.33 (beta) TEST".charAt(0) === "_" ? "?" : "2.33 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1815,11 +1815,31 @@ button:focus { outline: none; }
   function perfApply() { var c = document.documentElement.className.replace(/\bperf\b/g, "").replace(/\s+$/, ""); document.documentElement.className = PERF ? (c ? c + " perf" : "perf") : c; }
   perfApply();
   if (!xGet("ico", 1)) { document.documentElement.classList.add("noico"); }
+  var labRes = "";
+  function labRun() {
+    var o = document.createElement("div"), tx, ball, n = 0, t0 = Date.now(), last = t0, worst = 0, raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    o.style.cssText = "position:fixed;left:0;top:0;right:0;bottom:0;z-index:3000;background:#000;color:#fff;text-align:center;font:bold 24px/1.4 sans-serif";
+    tx = document.createElement("div"); tx.style.cssText = "padding-top:150px"; tx.textContent = "Test à vide en cours…";
+    ball = document.createElement("div"); ball.style.cssText = "position:absolute;left:0;top:300px;width:40px;height:40px;border-radius:20px;background:#d8dde6";
+    o.appendChild(tx); o.appendChild(ball); document.body.appendChild(o);
+    function f() {
+      var now = Date.now();
+      n++; if (now - last > worst) { worst = now - last; } last = now;
+      ball.style.webkitTransform = "translate3d(" + Math.round(((now % 2000) / 2000) * 880) + "px,0,0)";
+      if (now - t0 < 6000) { return raf(f); }
+      labRes = "Test à vide (écran noir, rien d'autre) : " + Math.round(n * 1000 / (now - t0)) + " images/s, pire image " + worst + " ms.";
+      document.body.removeChild(o);
+      if ($("labR")) { $("labR").textContent = labRes; }
+    }
+    raf(f);
+  }
   function dispDraw() {
     var h = '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (PERF ? " on" : "") + '" data-x="perf">Mode léger : ' + (PERF ? "oui" : "non") + '</button></div>';
     h += '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (ICO ? " on" : "") + '" data-x="ico">Animations d\'icônes : ' + (ICO ? "oui" : "non") + '</button></div>';
     h += '<p class="note" style="margin-bottom:10px">Le mode léger supprime les ombres, les transparences, les halos et les animations pour que la tablette reste fluide. Compare avec « non » grâce au test ci-dessous.</p>';
     h += '<div class="xrow2"><span style="font-size:20px;font-weight:bold">Fluidité : <span id="fpsV">…</span> images/s · pire image <span id="fpsW">…</span> ms</span></div><div class="fpsb"><i id="fpsS"></i></div><p class="note">Même mesure que le bandeau des versions TEST (pire image : la plus longue pause des 5 dernières secondes). La bille doit glisser sans saccade. Autour de 60 images/s : parfait. Moins de 20 : la tablette peine.</p>';
+    h += '<div class="xrow2" style="margin-top:6px"><button type="button" class="xbtn sm" data-x="lab">Test à vide (6 s)</button><span class="note" id="labR" style="margin-left:6px">' + esc(labRes) + '</span></div>';
+    h += '<p class="note">Le test à vide affiche un écran noir : si la tablette y reste à 30 images/s, c\'est la tablette elle-même qui plafonne, pas l\'interface.</p>';
     $("xB").innerHTML = h; fpsStart();
   }
   function fpsStart() {
@@ -1966,6 +1986,7 @@ button:focus { outline: none; }
     while (t && t !== this && !(t.getAttribute && t.getAttribute("data-x"))) { t = t.parentNode; }
     if (!t || t === this) { return; }
     a = t.getAttribute("data-x"); v = t.getAttribute("data-a");
+    if (a === "lab") { labRun(); return; }
     if (a === "perf" || a === "ico") { dispClick(a); return; }
     if (a === "wall") { PREF.wall = v; xSet("pref", PREF); prefApply(); wallDraw(); }
     else if (a === "fx") { PREF.fx = PREF.fx ? 0 : 1; xSet("pref", PREF); prefApply(); wallDraw(); }
