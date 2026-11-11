@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:223 TDBA:208-->
+<!--TDBV:224 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -304,14 +304,6 @@ button:focus { outline: none; }
 .cm.a { float: left; background: #232830; border-bottom-left-radius: 6px; }
 .cm.s { float: left; background: transparent; border: 1px dashed #2f353e; color: #8f98a5; font-size: 14px; padding: 5px 12px; }
 .cm.e { float: left; background: transparent; color: #ff7a70; font-size: 15px; }
-#nowIco, #hIco { position: relative; }
-.cdr { display: block; width: 100%; height: 100%; -webkit-animation: cdr 12s ease-in-out infinite; animation: cdr 12s ease-in-out infinite; }
-.rd { position: absolute; top: 70%; width: 4px; height: 9%; margin-left: -2px; border-radius: 2px; background: #4aa8ff; opacity: 0; -webkit-backface-visibility: hidden; -webkit-animation: rdrop 1.8s linear infinite; animation: rdrop 1.8s linear infinite; }
-@-webkit-keyframes rdrop { 0% { opacity: 0; -webkit-transform: translate3d(0,0,0); } 20% { opacity: 1; } 100% { opacity: 0; -webkit-transform: translate3d(0,330%,0); } }
-@keyframes rdrop { 0% { opacity: 0; transform: translate3d(0,0,0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate3d(0,330%,0); } }
-@-webkit-keyframes cdr { 0% { -webkit-transform: translate3d(0,0,0); } 50% { -webkit-transform: translate3d(4%,0,0); } 100% { -webkit-transform: translate3d(0,0,0); } }
-@keyframes cdr { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(4%,0,0); } 100% { transform: translate3d(0,0,0); } }
-.noico .rd, .noico .cdr { -webkit-animation: none; animation: none; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
  <div id="nav">
@@ -1167,7 +1159,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("223", 10) || 0, UI_NAME = "2.23 (beta) TEST".charAt(0) === "_" ? "?" : "2.23 (beta) TEST";
+  var UI_CODE = parseInt("224", 10) || 0, UI_NAME = "2.24 (beta) TEST".charAt(0) === "_" ? "?" : "2.24 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1456,7 +1448,7 @@ button:focus { outline: none; }
     partly: wsvg('<circle cx="17" cy="17" r="7" fill="' + SUN + '"/>' + spinG(line("M17 4v3M5 17h3M8.5 8.5l2 2M25.5 8.5l-2 2", SUN, 3), 17, 17, "60s") + drift(cloud("translate(7 8) scale(.82)"), 3, "14s")),
     partlyNight: wsvg('<path d="M22 5a10 10 0 1 0 9 14 8 8 0 0 1-9-14z" fill="' + MOON + '"/>' + twinkle(38, 10, "0s") + drift(cloud("translate(7 8) scale(.82)"), 3, "14s")),
     cloud: wsvg(drift(cloud("translate(8 -4) scale(.8)", CLD2), -3, "18s") + drift(cloud("translate(-1 4)"), 3, "14s")),
-    rain: '<span class="cdr">' + wsvg(cloud("translate(0 -3)")) + '</span><i class="rd" style="left:31%"></i><i class="rd" style="left:48%;-webkit-animation-delay:.6s;animation-delay:.6s"></i><i class="rd" style="left:65%;-webkit-animation-delay:1.2s;animation-delay:1.2s"></i>',
+    rain: wsvg(drift(cloud("translate(0 -3)"), 1.5, "12s") + drop("M16 37l-2 5", RAIN, 3.2, "0s") + drop("M24 37l-2 5", RAIN, 3.2, "0.6s") + drop("M32 37l-2 5", RAIN, 3.2, "1.2s")),
     storm: wsvg(drift(cloud("translate(0 -3)", CLD2), 1.5, "12s") + '<path d="M26 28l-8 11h6l-3 9 10-13h-6z" fill="' + BOLT + '">' + op("1;1;1;.1;1;.15;1;1", "7.2s") + "</path>"),
     snow: wsvg(drift(cloud("translate(0 -3)"), 1.5, "12s") + flake(16, 38, "0s") + flake(24, 38, "1.6s") + flake(32, 38, "3.2s")),
     fog: wsvg(drift(line("M9 16h30", FOG, 3), 4, "12s") + drift(line("M6 24h36", FOG, 3), -4, "14s") + drift(line("M10 32h28", FOG, 3), 4, "16s") + drift(line("M15 40h18", FOG, 3), -3, "10s"))
