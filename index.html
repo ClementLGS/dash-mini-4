@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:207 TDBA:207-->
+<!--TDBV:208 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -162,10 +162,11 @@ button:focus { outline: none; }
 .w7X span { -webkit-flex: 1 1 0; flex: 1 1 0; min-width: 0; margin: 0 1px; text-align: center; }
 
 .sfw { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; }
-.sf { width: 50%; padding: 0 8px 8px 0; box-sizing: border-box; }
-.sf label { display: block; font-size: 12px; color: #8f98a5; margin-bottom: 3px; }
-.sf input { width: 100%; height: 38px; box-sizing: border-box; padding: 0 10px; font-size: 16px; color: #eceff3; background: rgba(15,17,20,0.8); border: 1px solid #2f353e; border-radius: 8px; }
-.sbar { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; margin: 2px 0 12px; }
+.sf { width: 33.333%; padding: 0 8px 5px 0; box-sizing: border-box; }
+.sf label { display: block; font-size: 11px; color: #8f98a5; margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
+.sf input { width: 100%; height: 32px; box-sizing: border-box; padding: 0 10px; font-size: 16px; color: #eceff3; background: rgba(15,17,20,0.8); border: 1px solid #2f353e; border-radius: 8px; }
+.sbar { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; margin: 0 0 6px; }
+.sbar .pw { height: 40px; padding: 0 16px; font-size: 15px; }
 .sbar .pw { height: 44px; margin-right: 10px; }
 #err { margin-left: 14px; height: 34px; padding: 0 14px; font-weight: bold; font-size: 14px; background: #262b33; display: none; }
 #dbg { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 50; background: #0f1114; padding: 14px 18px; -webkit-flex-direction: column; flex-direction: column; font-size: 13px; }
@@ -329,7 +330,7 @@ button:focus { outline: none; }
    </section>
 
   </div>
-  <div class="ver" id="ver">Version 2.07 (beta) (11/11/2026)</div>
+  <div class="ver" id="ver">Version 2.08 (beta) (11/11/2026)</div>
  </div>
 </div>
 
@@ -366,7 +367,7 @@ button:focus { outline: none; }
 
   /* ---------- réglages ---------- */
   var DEF = { airzone: "192.168.1.68:3000", system: "1", zone: "1", lat: "44.9", lon: "-0.72", ical: "",
-              lum: "BE:68:15:03:63:08", lum2: "", tyregion: "eu", tyid: "", tysecret: "", tydevice: "", tycode: "switch_1", tyname: "Lego", wxurl: "", updurl: "" };
+              lum: "BE:68:15:03:63:08", lum2: "", tyregion: "eu", tyid: "", tysecret: "", tydevice: "", tycode: "switch_1", tyname: "Lego", wxurl: "", updurl: "https://raw.githubusercontent.com/ClementLGS/dash-mini-4/main" };
   /*TESTCFG*/
   function cfg() {
     var o = {}, k, s = {};
@@ -996,7 +997,7 @@ button:focus { outline: none; }
   function drawDbg() {
     var h = "", i, l, k;
     h += "<h3>État</h3>";
-    h += "<p>Page : " + (UI_NAME === "?" ? "2.07 (beta)" : UI_NAME) + ", ouverte depuis " + Math.round((Date.now() - T0) / 60000) + " min</p>";
+    h += "<p>Page : " + (UI_NAME === "?" ? "2.08 (beta)" : UI_NAME) + ", ouverte depuis " + Math.round((Date.now() - T0) / 60000) + " min</p>";
     h += "<p>Clim : " + (S.linked ? '<span class="ok">liée</span>' : '<span class="e">non liée</span>') + ", " + stt("clim") + "</p>";
     h += "<p>Météo : " + stt("wx") + "</p>";
     h += "<p>Agenda : " + stt("ag") + "</p>";
@@ -1083,14 +1084,14 @@ button:focus { outline: none; }
   })();
 
   /* ---------------- réglages (appli autonome) ---------------- */
-  var SETF = [["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
+  var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
-    ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""], ["updurl", "Adresse des mises à jour (dossier en ligne)", ""]];
-  var UI_CODE = parseInt("207", 10) || 0, UI_NAME = "2.07 (beta)".charAt(0) === "_" ? "?" : "2.07 (beta)";
+    ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
+  var UI_CODE = parseInt("208", 10) || 0, UI_NAME = "2.08 (beta)".charAt(0) === "_" ? "?" : "2.08 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
-    if (r.indexOf("ok:") === 0) { say("Interface mise à jour, rechargement…"); setTimeout(function () { window.location.reload(); }, 900); return; }
+    if (r.indexOf("ok:") === 0) { say("Interface mise à jour, rechargement…"); setTimeout(function () { if (window.Native.reloadUi) { window.Native.reloadUi(); } else { window.location.href = "file:///data/data/com.clement.tableaudebord/files/www/index.html"; } }, 900); return; }
     if (r.indexOf("err:needapk") === 0) { return doApk ? doApk() : say("Cette interface demande une nouvelle appli : mets à jour l'appli d'abord."); }
     say("Mise à jour impossible : " + r.substr(4));
   }
@@ -1129,13 +1130,13 @@ button:focus { outline: none; }
     var h, i, c, f;
     if (!window.LOCAL) { $("setB").innerHTML = '<p class="msg">Les réglages ne sont disponibles que dans l\'appli autonome (en mode PC, ils sont dans les fichiers du relais).</p>'; return; }
     c = window.LOCAL.cfg();
-    h = '<div class="sbar"><button type="button" class="pw" id="setSave"><span class="bw">Enregistrer</span></button><button type="button" class="pw" id="setImp"><span class="bw">Importer</span></button><button type="button" class="pw" id="setUpd"><span class="bw">Mettre à jour</span></button></div><div class="note" id="setMsg" style="margin:-6px 0 12px">Import : glisse ical.txt et tuya.txt sur la tablette (n\'importe où). Version actuelle : ' + UI_NAME + '.</div>';
+    h = '<div class="sbar"><button type="button" class="pw" id="setSave"><span class="bw">Enregistrer</span></button><button type="button" class="pw" id="setImp"><span class="bw">Importer</span></button><button type="button" class="pw" id="setUpd"><span class="bw">Mettre à jour</span></button><button type="button" class="pw" id="setReset"><span class="bw">Interface d\'origine</span></button></div><div class="note" id="setMsg" style="margin:0 0 8px">Import : glisse ical.txt et tuya.txt sur la tablette (n\'importe où). Version actuelle : ' + UI_NAME + '.</div>';
     h += '<div class="sfw">';
     for (i = 0; i < SETF.length; i++) {
       f = SETF[i];
       h += '<div class="sf"><label for="sf_' + f[0] + '">' + esc(f[1]) + '</label><input id="sf_' + f[0] + '" type="' + (f[2] || "text") + '" value="' + esc(c[f[0]]).replace(/"/g, "&quot;") + '" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>';
     }
-    h += '</div><div class="sbar" style="margin-top:6px"><button type="button" class="pw" id="setReset"><span class="bw">Revenir à l\'interface d\'origine</span></button></div>';
+    h += '</div>';
     $("setB").innerHTML = h;
     $("setSave").onclick = function () {
       var o = {}, k;
@@ -1144,7 +1145,7 @@ button:focus { outline: none; }
       catch (e) { $("setMsg").textContent = "Enregistrement impossible : " + e; }
     };
     $("setUpd").onclick = function () { updRun(false, function (m) { $("setMsg").textContent = m; }); };
-    $("setReset").onclick = function () { try { window.Native.otaClear(); } catch (e) { } $("setMsg").textContent = "Interface d\'origine rétablie, rechargement…"; setTimeout(function () { window.location.reload(); }, 700); };
+    $("setReset").onclick = function () { try { window.Native.otaClear(); } catch (e) { } $("setMsg").textContent = "Interface d\'origine rétablie, rechargement…"; setTimeout(function () { if (window.Native.reloadUi) { window.Native.reloadUi(); } else { window.location.href = "file:///android_asset/index.html"; } }, 700); };
     $("setImp").onclick = function () {
       var t, got = [], lines, k, kv, map = { id: "tyid", secret: "tysecret", device: "tydevice", region: "tyregion", code: "tycode", name: "tyname" };
       try {
