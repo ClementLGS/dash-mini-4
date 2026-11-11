@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:236 TDBA:208-->
+<!--TDBV:238 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -338,7 +338,7 @@ button:focus { outline: none; }
 @-webkit-keyframes wfk{0%{opacity:0;-webkit-transform:translate3d(0,-70%,0)}50%{opacity:1}100%{opacity:0;-webkit-transform:translate3d(100%,420%,0)}}
 @keyframes wfk{0%{opacity:0;transform:translate3d(0,-70%,0)}50%{opacity:1}100%{opacity:0;transform:translate3d(100%,420%,0)}}
 .noico .wl, .noico .rd, .noico .wst, .noico .wfk { -webkit-animation: none; animation: none; }
-.ico2 .wl { -webkit-animation: none; animation: none; }
+.ico2 .wl { -webkit-animation: none; animation: none; -webkit-backface-visibility: visible; backface-visibility: visible; }
 .ico2 .rd, .ico2 .wfk, .ico2 .wst { -webkit-animation-timing-function: steps(4); animation-timing-function: steps(4); }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
@@ -1195,7 +1195,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("236", 10) || 0, UI_NAME = "2.36 (beta) TEST".charAt(0) === "_" ? "?" : "2.36 (beta) TEST";
+  var UI_CODE = parseInt("238", 10) || 0, UI_NAME = "2.38 (beta) TEST".charAt(0) === "_" ? "?" : "2.38 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
