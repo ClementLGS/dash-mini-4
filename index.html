@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:220 TDBA:208-->
+<!--TDBV:221 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -266,6 +266,44 @@ button:focus { outline: none; }
 .perf *, .perf *:before, .perf *:after { -webkit-box-shadow: none !important; box-shadow: none !important; -webkit-transition: none !important; transition: none !important; text-shadow: none !important; }
 .fpsb { position: relative; height: 70px; margin: 10px 20px 4px; border-radius: 14px; background: #14171c; border: 1px solid #2f353e; overflow: hidden; }
 .fpsb i { position: absolute; left: 0; top: 15px; width: 40px; height: 40px; border-radius: 50%; background: #d8dde6; }
+.xin { -webkit-flex: 1; flex: 1; min-width: 0; height: 50px; border-radius: 25px; border: 1px solid #2f353e; background: #14171c; color: #eceff3; font-size: 18px; padding: 0 18px; margin-right: 10px; -webkit-user-select: text; user-select: text; outline: none; }
+/* ---- 2.17 TEST : animations, fonds, Claude ---- */
+@-webkit-keyframes pg{from{opacity:0;-webkit-transform:translate3d(0,10px,0)}to{opacity:1;-webkit-transform:translate3d(0,0,0)}}
+@keyframes pg{from{opacity:0;transform:translate3d(0,10px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@-webkit-keyframes pop{0%{-webkit-transform:scale(1.07)}100%{-webkit-transform:scale(1)}}
+@keyframes pop{0%{transform:scale(1.07)}100%{transform:scale(1)}}
+@-webkit-keyframes msgin{from{opacity:0;-webkit-transform:translate3d(0,8px,0)}to{opacity:1;-webkit-transform:translate3d(0,0,0)}}
+@keyframes msgin{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+.fxon .page.on { -webkit-animation: pg .22s ease-out; animation: pg .22s ease-out; }
+.fxon .nb, .fxon .go, .fxon .pw, .fxon .sb, .fxon .hb, .fxon .mi, .fxon .mb, .fxon .xbtn { -webkit-transition: -webkit-transform .08s, background-color .15s, border-color .15s; transition: transform .08s, background-color .15s, border-color .15s; }
+.fxon .nb:active, .fxon .go:active, .fxon .pw:active, .fxon .sb:active, .fxon .hb:active, .fxon .mi:active, .fxon .mb:active, .fxon .xbtn:active { -webkit-transform: scale(.95); transform: scale(.95); }
+.fxon .cBox { -webkit-transition: border-color .5s; transition: border-color .5s; }
+.fxon .cm { -webkit-animation: msgin .2s ease-out; animation: msgin .2s ease-out; }
+/* fonds d'écran */
+#bg { -webkit-transition: opacity .3s; transition: opacity .3s; }
+.w-aurore { background: radial-gradient(ellipse at 15% 0%, rgba(52,190,140,.30), rgba(0,0,0,0) 55%), radial-gradient(ellipse at 90% 30%, rgba(130,90,220,.26), rgba(0,0,0,0) 55%), #091217; }
+.w-crepuscule { background: linear-gradient(170deg, #1a1230 0%, #2d1a40 45%, #4a2438 100%); }
+.w-ocean { background: linear-gradient(180deg, #07121b 0%, #0b2a3b 100%); }
+.w-foret { background: linear-gradient(180deg, #08120d 0%, #12301f 100%); }
+.w-braise { background: radial-gradient(ellipse at 50% 120%, rgba(210,80,30,.35), rgba(0,0,0,0) 60%), #120a09; }
+.w-minuit { background: #04060a; }
+.w-brume { background: linear-gradient(160deg, #14171c 0%, #262d37 100%); }
+.w-etoiles { background: radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)), radial-gradient(1px 1px at 90px 120px, #cfd8ff, rgba(0,0,0,0)), radial-gradient(1.5px 1.5px at 150px 60px, #fff, rgba(0,0,0,0)), radial-gradient(1px 1px at 60px 170px, #fff, rgba(0,0,0,0)), radial-gradient(1px 1px at 180px 150px, #ffe9c8, rgba(0,0,0,0)), #05070d; background-size: 200px 200px; }
+.w-nuit { background: #0f1114; }
+#bg[class*="w-"]:not(.w-nuit):not(.anim) i { display: none; }
+#bg.anim .al { -webkit-animation: dA 70s ease-in-out infinite; animation: dA 70s ease-in-out infinite; }
+#bg.anim .bl { -webkit-animation: dB 90s ease-in-out infinite; animation: dB 90s ease-in-out infinite; }
+.wpg { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; margin: 0 -6px; }
+.wpi { width: 25%; padding: 6px; }
+.wpi button { width: 100%; background: transparent; border: 0; color: #eceff3; font-size: 14px; font-weight: bold; display: block; }
+.wpi .wp { height: 74px; border-radius: 14px; border: 2px solid #2f353e; margin-bottom: 6px; }
+.wpi.sel .wp { border-color: #d8dde6; }
+.wpi.sel button { color: #fff; }
+.cm { max-width: 78%; margin-bottom: 10px; padding: 10px 16px; border-radius: 18px; font-size: 18px; line-height: 1.35; word-wrap: break-word; -webkit-user-select: text; user-select: text; clear: both; }
+.cm.u { float: right; background: #d8dde6; color: #14171c; border-bottom-right-radius: 6px; }
+.cm.a { float: left; background: #232830; border-bottom-left-radius: 6px; }
+.cm.s { float: left; background: transparent; border: 1px dashed #2f353e; color: #8f98a5; font-size: 14px; padding: 5px 12px; }
+.cm.e { float: left; background: transparent; color: #ff7a70; font-size: 15px; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
  <div id="nav">
@@ -304,7 +342,7 @@ button:focus { outline: none; }
      <span class="fx" style="-webkit-align-items:center;align-items:center"><span class="pill" id="cPill" style="margin-right:12px">Connexion…</span>
      <button type="button" class="pw" id="pw" aria-label="Allumer ou éteindre la clim de la chambre"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v9M6.3 6.8a8 8 0 1 0 11.4 0"/></svg><span id="pwt">Marche / arrêt</span></span></button></span>
     </div>
-    <div class="tile cBox">
+    <div class="tile cBox" id="cBox">
      <div class="cRow">
       <button type="button" class="sb" id="dn" aria-label="Baisser la consigne">&minus;</button>
       <div class="temp" id="temp">--<small>°C</small></div>
@@ -324,7 +362,7 @@ button:focus { outline: none; }
 
    <section class="page" id="p-app">
     <div class="ttl"><span class="fx" style="-webkit-align-items:center;align-items:center"><button type="button" class="bk" id="agBack" style="display:none" aria-label="Retour à la bibliothèque">&lsaquo; Autre</button><h2 id="appT">Autre</h2></span><span class="note" id="libNote">Bibliothèque de modules</span></div>
-    <div id="libV" class="lib"><div class="mod"><button type="button" class="mi on" data-mod="agenda"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Agenda</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="minuteur"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.500" r="7"/><path d="M12 9.500v4l2.500 1.500M9.500 3h5"/></svg><span>Minuteur</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="reveil"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.500 1.500M4 6l3-2.500M20 6l-3-2.500"/></svg><span>Réveil</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="musique"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></svg><span>Musique</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="reglages"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.400 15a1.650 1.650 0 0 0 .330 1.820l.060.060a2 2 0 1 1-2.830 2.830l-.060-.060a1.650 1.650 0 0 0-1.820-.330 1.650 1.650 0 0 0-1 1.510V21a2 2 0 0 1-4 0v-.090A1.650 1.650 0 0 0 9 19.400a1.650 1.650 0 0 0-1.820.330l-.060.060a2 2 0 1 1-2.830-2.830l.060-.060A1.650 1.650 0 0 0 4.680 15a1.650 1.650 0 0 0-1.510-1H3a2 2 0 0 1 0-4h.090A1.650 1.650 0 0 0 4.600 9a1.650 1.650 0 0 0-.330-1.820l-.060-.060a2 2 0 1 1 2.830-2.830l.060.060A1.650 1.650 0 0 0 9 4.680a1.650 1.650 0 0 0 1-1.510V3a2 2 0 0 1 4 0v.090a1.650 1.650 0 0 0 1 1.510 1.650 1.650 0 0 0 1.820-.330l.060-.060a2 2 0 1 1 2.830 2.830l-.060.060A1.650 1.650 0 0 0 19.400 9a1.650 1.650 0 0 0 1.510 1H21a2 2 0 0 1 0 4h-.090a1.650 1.650 0 0 0-1.510 1z"/></svg><span>Réglages</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="taches"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.500l2 2 3.500-4M4 14.500l2 2 3.500-4M13 7h7M13 15h7"/></svg><span>Tâches</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="meteo7"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 11a3.500 3.500 0 0 0 1 7z"/></svg><span>Météo semaine</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="prises"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v5M15 3v5M6.500 8h11v3.500a5.500 5.500 0 0 1-11 0zM12 17v4"/></svg><span>Prises</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="volets"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16M5 8h14M5 12h14M5 16h14M12 16v4"/></svg><span>Volets</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="tv"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>TV</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="debug"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="8" height="11" rx="4"/><path d="M12 8V5M9 5l1.500 1.500M15 5l-1.500 1.500M4 12h4M16 12h4M5 19l3-2M19 19l-3-2M5 7l3 2M19 7l-3 2"/></svg><span>Debug</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="affichage"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span>Affichage</span></span></button></div></div>
+    <div id="libV" class="lib"><div class="mod"><button type="button" class="mi on" data-mod="agenda"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Agenda</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="minuteur"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.500" r="7"/><path d="M12 9.500v4l2.500 1.500M9.500 3h5"/></svg><span>Minuteur</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="reveil"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.500 1.500M4 6l3-2.500M20 6l-3-2.500"/></svg><span>Réveil</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="claude"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/></svg><span>Claude</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="reglages"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.400 15a1.650 1.650 0 0 0 .330 1.820l.060.060a2 2 0 1 1-2.830 2.830l-.060-.060a1.650 1.650 0 0 0-1.820-.330 1.650 1.650 0 0 0-1 1.510V21a2 2 0 0 1-4 0v-.090A1.650 1.650 0 0 0 9 19.400a1.650 1.650 0 0 0-1.820.330l-.060.060a2 2 0 1 1-2.830-2.830l.060-.060A1.650 1.650 0 0 0 4.680 15a1.650 1.650 0 0 0-1.510-1H3a2 2 0 0 1 0-4h.090A1.650 1.650 0 0 0 4.600 9a1.650 1.650 0 0 0-.330-1.820l-.060-.060a2 2 0 1 1 2.830-2.830l.060.060A1.650 1.650 0 0 0 9 4.680a1.650 1.650 0 0 0 1-1.510V3a2 2 0 0 1 4 0v.090a1.650 1.650 0 0 0 1 1.510 1.650 1.650 0 0 0 1.820-.330l.060-.060a2 2 0 1 1 2.830 2.830l-.060.060A1.650 1.650 0 0 0 19.400 9a1.650 1.650 0 0 0 1.510 1H21a2 2 0 0 1 0 4h-.090a1.650 1.650 0 0 0-1.510 1z"/></svg><span>Réglages</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="taches"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.500l2 2 3.500-4M4 14.500l2 2 3.500-4M13 7h7M13 15h7"/></svg><span>Tâches</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="meteo7"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 11a3.500 3.500 0 0 0 1 7z"/></svg><span>Météo semaine</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="prises"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v5M15 3v5M6.500 8h11v3.500a5.500 5.500 0 0 1-11 0zM12 17v4"/></svg><span>Prises</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="volets"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16M5 8h14M5 12h14M5 16h14M12 16v4"/></svg><span>Volets</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="fonds"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M3.5 17l5-4.5 4 3.5 3-2.5 5 4.5"/></svg><span>Fonds</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="debug"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="8" height="11" rx="4"/><path d="M12 8V5M9 5l1.500 1.500M15 5l-1.500 1.500M4 12h4M16 12h4M5 19l3-2M19 19l-3-2M5 7l3 2M19 7l-3 2"/></svg><span>Debug</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="affichage"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span>Affichage</span></span></button></div></div>
     <div class="note" id="libMsg" style="margin-top:8px;min-height:18px">Les modules grisés sont des emplacements libres : dis-moi lesquels créer.</div>
     <div id="wxV" style="display:none;-webkit-flex:1;flex:1;min-height:0;-webkit-flex-direction:column;flex-direction:column">
      <div class="tile agT"><p class="msg" id="w7Msg">Chargement de la météo de la semaine…</p>
@@ -1083,7 +1121,7 @@ button:focus { outline: none; }
     sh("libV", lib); sh("agV", ag); sh("wxV", wx); sh("setV", st); sh("xV", x);
     $("libMsg").style.display = lib ? "block" : "none";
     $("agBack").style.display = lib ? "none" : "block";
-    $("appT").textContent = ag ? "Agenda" : (wx ? "Météo de la semaine" : (st ? "Réglages" : (x ? "Affichage" : "Autre")));
+    $("appT").textContent = ag ? "Agenda" : (wx ? "Météo de la semaine" : (st ? "Réglages" : (x ? XNAME[xMod] : "Autre")));
     $("libNote").style.display = lib ? "block" : "none";
     if (wx && W7) { drawW7(); }
     if (st) { drawSet(); }
@@ -1107,7 +1145,7 @@ button:focus { outline: none; }
           var k = b.getAttribute("data-mod");
           if (k === "agenda") { appView("agenda"); return; }
           if (k === "reglages") { appView("set"); return; }
-          if (k === "affichage") { xOpen(); return; }
+          if (k === "affichage" || k === "claude" || k === "fonds") { xOpen(k); return; }
           if (k === "meteo7") { appView("wx7"); loadW7(); return; }
           if (k === "debug") { openDbg(); return; }
           $("libMsg").textContent = "« " + b.getElementsByTagName("span")[0].textContent + " » : emplacement libre, module pas encore créé.";
@@ -1121,7 +1159,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("220", 10) || 0, UI_NAME = "2.20 (beta)".charAt(0) === "_" ? "?" : "2.20 (beta)";
+  var UI_CODE = parseInt("221", 10) || 0, UI_NAME = "2.21 (beta) TEST".charAt(0) === "_" ? "?" : "2.21 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1642,6 +1680,7 @@ button:focus { outline: none; }
   function drawMode() {
     var bs = $("modes").getElementsByTagName("button"), i;
     for (i = 0; i < bs.length; i++) { bs[i].className = "mb" + (i === S.mode ? " sel" : ""); bs[i].disabled = !S.linked || modeBusy; }
+    $("cBox").style.borderColor = S.linked && S.mode >= 0 ? MODES[S.mode].c : "";
     $("hMode").textContent = S.linked && S.mode >= 0 ? "Mode " + MODES[S.mode].t.toLowerCase().replace(".", "") : " ";
   }
   function drawTemp() {
@@ -1758,15 +1797,147 @@ button:focus { outline: none; }
     }
     raf(f);
   }
-  function xDraw() { dispDraw(); }
-  function xOpen() { appView("x"); xDraw(); }
+  function dispClick(a) {
+    if (a === "perf") { PERF = PERF ? 0 : 1; xSet("perf", PERF); perfApply(); dispDraw(); }
+    if (a === "ico") { ICO = ICO ? 0 : 1; xSet("ico", ICO); document.documentElement.classList[ICO ? "remove" : "add"]("noico"); if (wxLast) { drawWeather(wxLast); } dispDraw(); }
+  }
+
+  /* =============== 2.17 TEST : fonds d'écran, animations, Claude =============== */
+  var WALLS = [["nuit", "Nuit"], ["aurore", "Aurore"], ["crepuscule", "Crépuscule"], ["ocean", "Océan"], ["foret", "Forêt"], ["braise", "Braise"], ["brume", "Brume"], ["etoiles", "Étoiles"], ["minuit", "Minuit"]];
+  var PREF = xGet("pref", { wall: "nuit", anim: 0, fx: 0 });
+  var XNAME = { affichage: "Affichage", claude: "Claude", fonds: "Fonds d'écran" }, xMod = "affichage";
+  function prefApply() {
+    $("bg").className = "w-" + PREF.wall + (PREF.anim ? " anim" : "");
+    document.documentElement.classList[PREF.fx ? "add" : "remove"]("fxon");
+  }
+  prefApply();
+  function p2(n) { return n < 10 ? "0" + n : "" + n; }
+
+  /* --- Claude --- */
+  var CL = { msgs: [], ui: [], busy: false };
+  var CL_TOOLS = [
+    { name: "set_lights", description: "Allume, éteint ou règle les lumières de la chambre. target : 'all' (tout), 'led' (LED Bluetooth, couleur et luminosité possibles) ou 'lego' (relais Lego, tout ou rien).",
+      input_schema: { type: "object", properties: { target: { type: "string", enum: ["all", "led", "lego"] }, on: { type: "boolean" }, brightness: { type: "integer", description: "0 à 100, LED seulement" }, color: { type: "array", items: { type: "integer" }, description: "[r,g,b] de 0 à 255, LED seulement" } }, required: ["target", "on"] } },
+    { name: "set_clim", description: "Règle la climatisation de la chambre : allumer ou éteindre et/ou consigne en °C (de 18 à 30, pas de 0,5).",
+      input_schema: { type: "object", properties: { on: { type: "boolean" }, setpoint: { type: "number" } } } }
+  ];
+  function clModel() { return window.Native.cfgGet("claudemodel") || "claude-haiku-5-5"; }
+  function clSys() {
+    var d = new Date(), i, L, ls = [];
+    if (LUM) { for (i = 0; i < LUM.lights.length; i++) { L = LUM.lights[i]; ls.push(L.name + " : " + (L.on ? "allumé" + (L.kind !== "switch" ? " " + L.bright + " %" : "") : "éteint")); } }
+    return "Tu es l'assistant du tableau de bord de la chambre de Clément, affiché sur une petite tablette. Réponds en français, en une ou deux phrases courtes, sans mise en forme. Utilise les outils quand il demande une action (lumières, clim) puis confirme brièvement. Il est " + p2(d.getHours()) + ":" + p2(d.getMinutes()) + ". Clim : " + (S.linked ? (S.on ? "en marche" : "éteinte") + ", consigne " + fmt(S.temp) + "°, " + $("room").textContent : "injoignable") + ". Lumières : " + (ls.length ? ls.join(", ") : "inconnues") + ".";
+  }
+  function clTool(name, a) {
+    var i, L, n = 0, cmd, ok;
+    a = a || {};
+    if (name === "set_lights") {
+      if (!LUM) { return "lumières pas encore chargées"; }
+      if (a.target === "all" && !a.color && a.brightness === undefined) { lumAll(!!a.on); return "ok"; }
+      for (i = 0; i < LUM.lights.length; i++) {
+        L = LUM.lights[i];
+        if (a.target === "led" && L.kind === "switch") { continue; }
+        if (a.target === "lego" && L.kind !== "switch") { continue; }
+        cmd = { id: L.id, on: !!a.on };
+        if (L.kind !== "switch" && a.on) {
+          if (a.color && a.color.length === 3) { cmd.color = [Math.max(0, Math.min(255, a.color[0] | 0)), Math.max(0, Math.min(255, a.color[1] | 0)), Math.max(0, Math.min(255, a.color[2] | 0))]; }
+          if (typeof a.brightness === "number") { cmd.bright = Math.max(0, Math.min(100, Math.round(a.brightness))); }
+        }
+        lumCmd(cmd); n++;
+      }
+      return n ? "ok" : "aucune lumière correspondante";
+    }
+    if (name === "set_clim") {
+      if (!S.linked) { return "clim injoignable"; }
+      if (typeof a.setpoint === "number") { setT(a.setpoint); }
+      if (typeof a.on === "boolean" && a.on !== S.on) { power(); }
+      return "ok";
+    }
+    return "outil inconnu";
+  }
+  function clAdd(r, t) { CL.ui.push({ r: r, t: t }); if (CL.ui.length > 40) { CL.ui.shift(); } clRender(); }
+  function clRender() {
+    var m = $("cMsgs"), h = "", i;
+    if (!m) { return; }
+    for (i = 0; i < CL.ui.length; i++) { h += '<div class="cm ' + CL.ui[i].r + '">' + esc(CL.ui[i].t) + '</div>'; }
+    if (CL.busy) { h += '<div class="cm s">Claude réfléchit…</div>'; }
+    if (!h) { h = '<p class="msg">Demande-moi quelque chose : « mets une ambiance calme », « j\'ai trop chaud », « éteins tout »…</p>'; }
+    m.innerHTML = h + '<div style="clear:both"></div>'; m.scrollTop = m.scrollHeight;
+  }
+  function clSend(text) {
+    var key = window.Native.cfgGet("claudekey");
+    text = (text || "").replace(/^\s+|\s+$/g, "");
+    if (!text || CL.busy) { return; }
+    if (!key) { clAdd("e", "Il manque la clé API (voir en haut)."); return; }
+    if (!window.LOCAL || !window.LOCAL.postJson) { clAdd("e", "Claude ne marche que dans l'appli autonome."); return; }
+    if (CL.msgs.length > 24) { CL.msgs = []; }
+    CL.msgs.push({ role: "user", content: text }); clAdd("u", text); CL.busy = true; clRender();
+    clRound(0, key);
+  }
+  function clRound(n, key) {
+    var body = { model: clModel(), max_tokens: 400, system: clSys(), tools: CL_TOOLS, messages: CL.msgs };
+    window.LOCAL.postJson("https://api.anthropic.com/v1/messages", { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" }, JSON.stringify(body), 45000, function (err, st, tx) {
+      var j = null, c, i, res = [], txt = "", names = [];
+      function fail(m) { CL.busy = false; CL.msgs.pop(); clAdd("e", m); }
+      if (err) { return fail("Claude injoignable (Internet ?) : " + err); }
+      try { j = JSON.parse(tx); } catch (e) { j = null; }
+      if (st < 200 || st >= 300 || !j || !j.content) {
+        if (st === 401) { return fail("Clé API refusée : vérifie-la."); }
+        if (st === 429) { return fail("Trop de demandes, réessaie dans un instant."); }
+        return fail("Erreur Claude " + st + (j && j.error && j.error.message ? " : " + j.error.message : ""));
+      }
+      c = j.content; CL.msgs.push({ role: "assistant", content: c });
+      for (i = 0; i < c.length; i++) {
+        if (c[i].type === "text") { txt += c[i].text; }
+        if (c[i].type === "tool_use") { res.push({ type: "tool_result", tool_use_id: c[i].id, content: clTool(c[i].name, c[i].input) }); names.push(c[i].name === "set_clim" ? "clim" : "lumières"); }
+      }
+      if (txt) { clAdd("a", txt); }
+      if (res.length) { clAdd("s", "Action : " + names.join(", ")); }
+      if (res.length && j.stop_reason === "tool_use" && n < 4) { CL.msgs.push({ role: "user", content: res }); return clRound(n + 1, key); }
+      CL.busy = false; clRender();
+    });
+  }
+  function clDraw() {
+    var key = window.Native.cfgGet("claudekey"), h = "", mod = clModel();
+    if (!key) {
+      h += '<p class="msg" style="margin-bottom:10px">Pour parler à Claude, il faut une clé API (console.anthropic.com, avec quelques euros de crédit : une phrase coûte une fraction de centime). Elle reste sur la tablette.</p>';
+      h += '<div class="xrow2"><input id="cKey" class="xin" type="password" placeholder="Clé API (sk-ant-…)"><button type="button" class="xbtn" style="margin-right:0" data-x="ckey">Enregistrer</button></div>';
+      $("xB").innerHTML = h; return;
+    }
+    h += '<div id="cMsgs" style="height:calc(100% - 118px);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 0"></div>';
+    h += '<div class="xrow2" style="margin:8px 0 6px"><button type="button" class="xbtn sm" data-x="cq" data-a="Bonne nuit">Bonne nuit</button><button type="button" class="xbtn sm" data-x="cq" data-a="J\'ai trop chaud">J\'ai chaud</button><button type="button" class="xbtn sm" data-x="cq" data-a="Mets une ambiance film">Ambiance film</button><button type="button" class="xbtn sm' + (mod.indexOf("haiku") >= 0 ? " on" : "") + '" data-x="cmod" data-a="claude-haiku-5-5">Rapide</button><button type="button" class="xbtn sm' + (mod.indexOf("sonnet") >= 0 ? " on" : "") + '" data-x="cmod" data-a="claude-sonnet-5-5">Malin</button><button type="button" class="xbtn sm" data-x="cclr">Effacer</button><button type="button" class="xbtn sm bad" style="margin-right:0" data-x="ckeydel">Clé</button></div>';
+    h += '<div class="xrow2" style="margin:0"><input id="cIn" class="xin" type="text" maxlength="300" placeholder="Écris à Claude…"><button type="button" class="xbtn" style="margin-right:0" data-x="csend">Envoyer</button></div>';
+    $("xB").innerHTML = h; clRender();
+  }
+  function wallDraw() {
+    var h = '<div class="wpg">', i;
+    for (i = 0; i < WALLS.length; i++) { h += '<div class="wpi' + (PREF.wall === WALLS[i][0] ? " sel" : "") + '"><button type="button" data-x="wall" data-a="' + WALLS[i][0] + '"><div class="wp w-' + WALLS[i][0] + '"></div>' + WALLS[i][1] + '</button></div>'; }
+    h += '</div><div class="xrow2" style="margin-top:8px"><button type="button" class="xbtn' + (PREF.fx ? " on" : "") + '" data-x="fx">Animations : ' + (PREF.fx ? "oui" : "non") + '</button><button type="button" class="xbtn' + (PREF.anim ? " on" : "") + '" data-x="anim">Fond animé : ' + (PREF.anim ? "oui" : "non") + '</button></div>';
+    h += '<p class="note">En mode léger (Autre > Affichage) les cartes sont unies : le fond ne se voit qu\'entre elles.</p>';
+    h += '<p class="note">Le fond animé fait dériver des halos : c\'est joli mais ça demande plus à la tablette. Si l\'écran devient moins fluide, laisse-le sur « non ».</p>';
+    $("xB").innerHTML = h;
+  }
+  function xDraw() { if (xMod === "claude") { clDraw(); } else if (xMod === "fonds") { wallDraw(); } else { dispDraw(); } }
+  function xOpen(m) { xMod = m || "affichage"; appView("x"); xDraw(); }
   $("xB").onclick = function (ev) {
-    var t = ev.target;
+    var t = ev.target, a, v, e;
     while (t && t !== this && !(t.getAttribute && t.getAttribute("data-x"))) { t = t.parentNode; }
     if (!t || t === this) { return; }
-    if (t.getAttribute("data-x") === "perf") { PERF = PERF ? 0 : 1; xSet("perf", PERF); perfApply(); dispDraw(); }
-    if (t.getAttribute("data-x") === "ico") { ICO = ICO ? 0 : 1; xSet("ico", ICO); document.documentElement.classList[ICO ? "remove" : "add"]("noico"); if (wxLast) { drawWeather(wxLast); } dispDraw(); }
+    a = t.getAttribute("data-x"); v = t.getAttribute("data-a");
+    if (a === "perf" || a === "ico") { dispClick(a); return; }
+    if (a === "wall") { PREF.wall = v; xSet("pref", PREF); prefApply(); wallDraw(); }
+    else if (a === "fx") { PREF.fx = PREF.fx ? 0 : 1; xSet("pref", PREF); prefApply(); wallDraw(); }
+    else if (a === "anim") { PREF.anim = PREF.anim ? 0 : 1; xSet("pref", PREF); prefApply(); wallDraw(); }
+    else if (a === "ckey") { e = $("cKey").value.replace(/\s/g, ""); if (e) { window.Native.cfgSet("claudekey", e); clDraw(); } }
+    else if (a === "ckeydel") { window.Native.cfgSet("claudekey", ""); CL.msgs = []; CL.ui = []; clDraw(); }
+    else if (a === "cq") { clSend(v); }
+    else if (a === "cmod") { window.Native.cfgSet("claudemodel", v); clDraw(); }
+    else if (a === "cclr") { CL.msgs = []; CL.ui = []; clRender(); }
+    else if (a === "csend") { e = $("cIn"); if (e && e.value) { v = e.value; e.value = ""; clSend(v); } }
   };
+  $("xB").onkeydown = function (ev) {
+    if ((ev.keyCode || ev.which) === 13 && ev.target.id === "cIn") { var v = ev.target.value; ev.target.value = ""; clSend(v); }
+  };
+  var lastTV = null;
 
   /* recharge la page après 6 h, quand personne ne touche l'écran */
   var lastTouch = Date.now();
