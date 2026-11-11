@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:220 TDBA:208-->
+<!--TDBV:229 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1121,7 +1121,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("220", 10) || 0, UI_NAME = "2.20 (beta)".charAt(0) === "_" ? "?" : "2.20 (beta)";
+  var UI_CODE = parseInt("229", 10) || 0, UI_NAME = "2.29 (beta)".charAt(0) === "_" ? "?" : "2.29 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1160,7 +1160,7 @@ button:focus { outline: none; }
           say(e3 ? "Téléchargement impossible : " + e3 : "Appuie sur « Installer » dans la fenêtre Android, puis rouvre le tableau de bord.");
         });
       }
-      if (v.ui > UI_CODE) {
+      if (typeof v.ui === "number" && v.ui !== UI_CODE) {
         if (!auto) { say("Téléchargement de la nouvelle interface…"); }
         window.LOCAL.getText(base + "/" + (v.uifile || "index.html") + "?t=" + Date.now(), 60000, function (e2, html) {
           if (e2) { return auto ? 0 : say("Mise à jour impossible : " + e2); }
@@ -1743,16 +1743,22 @@ button:focus { outline: none; }
     var h = '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (PERF ? " on" : "") + '" data-x="perf">Mode léger : ' + (PERF ? "oui" : "non") + '</button></div>';
     h += '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (ICO ? " on" : "") + '" data-x="ico">Animations d\'icônes : ' + (ICO ? "oui" : "non") + '</button></div>';
     h += '<p class="note" style="margin-bottom:10px">Le mode léger supprime les ombres, les transparences, les halos et les animations pour que la tablette reste fluide. Compare avec « non » grâce au test ci-dessous.</p>';
-    h += '<div class="xrow2"><span style="font-size:20px;font-weight:bold">Fluidité : <span id="fpsV">…</span> images/s</span></div><div class="fpsb"><i id="fpsS"></i></div><p class="note">La bille doit glisser sans saccade. Autour de 60 images/s : parfait. Moins de 20 : la tablette peine.</p>';
+    h += '<div class="xrow2"><span style="font-size:20px;font-weight:bold">Fluidité : <span id="fpsV">…</span> images/s · pire image <span id="fpsW">…</span> ms</span></div><div class="fpsb"><i id="fpsS"></i></div><p class="note">Même mesure que le bandeau des versions TEST (pire image : la plus longue pause des 5 dernières secondes). La bille doit glisser sans saccade. Autour de 60 images/s : parfait. Moins de 20 : la tablette peine.</p>';
     $("xB").innerHTML = h; fpsStart();
   }
   function fpsStart() {
-    var n = 0, t0 = Date.now(), raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var n = 0, t0 = Date.now(), last = t0, worst = 0, mins = [], raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (f) { return setTimeout(f, 16); };
     function f() {
-      var now = Date.now(), s = $("fpsS"), v = $("fpsV");
+      var now = Date.now(), s = $("fpsS"), v = $("fpsV"), w = $("fpsW"), i, mn;
       if (!s || !v) { return; }
-      n++;
-      if (now - t0 >= 1000) { v.textContent = Math.round(n * 1000 / (now - t0)); n = 0; t0 = now; }
+      n++; if (now - last > worst) { worst = now - last; } last = now;
+      if (now - t0 >= 1000) {
+        v.textContent = Math.round(n * 1000 / (now - t0));
+        mins.push(worst); if (mins.length > 5) { mins.shift(); }
+        mn = 0; for (i = 0; i < mins.length; i++) { if (mins[i] > mn) { mn = mins[i]; } }
+        if (w) { w.textContent = mn; }
+        n = 0; t0 = now; worst = 0;
+      }
       s.style.webkitTransform = "translate3d(" + Math.round(((now % 2000) / 2000) * 820) + "px,0,0)";
       raf(f);
     }
