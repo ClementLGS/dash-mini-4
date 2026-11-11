@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:239 TDBA:208-->
+<!--TDBV:240 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -402,7 +402,7 @@ button:focus { outline: none; }
     <div class="wRow">
      <div class="tile wNow">
       <p class="msg" id="nowMsg">Chargement de la météo…</p>
-      <div id="nowBox" style="display:none;text-align:center">
+      <div id="nowBox" style="display:none;text-align:center;cursor:pointer">
        <div class="big" id="nowIco" style="margin:0 auto"></div>
        <div class="nowT" id="nowT"></div><div class="nowP" id="nowP"></div><div class="nowD" id="nowD"></div>
       </div>
@@ -1166,12 +1166,19 @@ button:focus { outline: none; }
     }
     $("agBack").onclick = function () { appView("lib"); };
   })();
+  function openW7(day) { w7Day = day || 0; go("app"); appView("wx7"); if (W7) { drawW7(); } loadW7(); }
+  $("fl2").onclick = function (ev) {
+    var t = ev.target;
+    while (t && t !== this && !(t.getAttribute && t.getAttribute("data-d") !== null && t.getAttribute("data-d") !== "")) { t = t.parentNode; }
+    if (t && t !== this) { openW7(parseInt(t.getAttribute("data-d"), 10)); }
+  };
+  $("nowBox").onclick = function () { openW7(0); };
 
   /* ---------------- réglages (appli autonome) ---------------- */
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("239", 10) || 0, UI_NAME = "2.39 (beta)".charAt(0) === "_" ? "?" : "2.39 (beta)";
+  var UI_CODE = parseInt("240", 10) || 0, UI_NAME = "2.40 (beta)".charAt(0) === "_" ? "?" : "2.40 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1507,7 +1514,7 @@ button:focus { outline: none; }
     for (i = 0; i < w.days.length; i++) {
       var d = w.days[i], q = d.date.split("-"), dt = new Date(Number(q[0]), Number(q[1]) - 1, Number(q[2]), 12, 0, 0);
       var left = (d.lo - min) / span * 100, wid = Math.max(10, (d.hi - d.lo) / span * 100);
-      html += '<div class="fr"><span class="fd">' + (i === 0 ? "Auj." : SHORT[dt.getDay()]) + '</span>'
+      html += '<div class="fr" data-d="' + i + '"><span class="fd">' + (i === 0 ? "Auj." : SHORT[dt.getDay()]) + '</span>'
         + '<span class="fi">' + ICONS[wmo(d.code, 1).k] + '</span>'
         + '<span class="fp">' + (d.rain >= 30 ? d.rain + "%" : "") + '</span>'
         + '<span class="fn">' + rnd(d.lo) + '°</span>'
