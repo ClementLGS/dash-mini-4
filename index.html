@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:234 TDBA:208-->
+<!--TDBV:235 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -257,6 +257,8 @@ button:focus { outline: none; }
 .perf #bg i { display: none; }
 .perf .tile { background: #181c22; overflow: visible; }
 .noico .wl, .noico .rd, .noico .wst, .noico .wfk { -webkit-animation: none; animation: none; }
+.ico2 .wl { -webkit-animation: none; animation: none; }
+.ico2 .rd, .ico2 .wfk, .ico2 .wst { -webkit-animation-timing-function: steps(4); animation-timing-function: steps(4); }
 .perf *, .perf *:before, .perf *:after { -webkit-box-shadow: none !important; box-shadow: none !important; -webkit-transition: none !important; transition: none !important; text-shadow: none !important; }
 .fpsb { position: relative; height: 70px; margin: 10px 20px 4px; background: #14171c; border: 1px solid #2f353e; }
 .fpsb i { position: absolute; left: 0; top: 15px; width: 40px; height: 40px; border-radius: 50%; background: #d8dde6; }
@@ -1169,7 +1171,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("234", 10) || 0, UI_NAME = "2.34 (beta)".charAt(0) === "_" ? "?" : "2.34 (beta)";
+  var UI_CODE = parseInt("235", 10) || 0, UI_NAME = "2.35 (beta)".charAt(0) === "_" ? "?" : "2.35 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1492,7 +1494,7 @@ button:focus { outline: none; }
     if (n.hum !== null && n.hum !== undefined) { p2.push("humidité " + rnd(n.hum) + " %"); }
     $("nowD").innerHTML = p1.join(" · ") + (p2.length ? "<br>" + p2.join(" · ") : "");
     $("nowMsg").style.display = "none"; $("nowBox").style.display = "block";
-    $("hIco").innerHTML = ICONS_A[m.k];
+    $("hIco").innerHTML = ICO ? ICONS_A[m.k] : ICONS[m.k];
     $("hT").textContent = rnd(n.temp) + "°";
     $("hP").innerHTML = m.t + "<br>" + rnd(t.hi) + "° / " + rnd(t.lo) + "°";
 
@@ -1782,8 +1784,9 @@ button:focus { outline: none; }
   var PERF = xGet("perf", 1);
   function perfApply() { var c = document.documentElement.className.replace(/\bperf\b/g, "").replace(/\s+$/, ""); document.documentElement.className = PERF ? (c ? c + " perf" : "perf") : c; }
   perfApply();
-  var ICO = xGet("ico", 1);
-  if (!ICO) { document.documentElement.classList.add("noico"); }
+  var ICO = xGet("ico", 2);
+  function icoApply() { var c = document.documentElement.className.replace(/\b(noico|ico2)\b/g, "").replace(/\s+$/, ""); document.documentElement.className = ICO === 0 ? (c ? c + " noico" : "noico") : (ICO === 2 ? (c ? c + " ico2" : "ico2") : c); }
+  icoApply();
   var labRes = "";
   function labRun() {
     var o = document.createElement("div"), tx, ball, n = 0, t0 = Date.now(), last = t0, worst = 0, raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (f) { return setTimeout(f, 16); };
@@ -1803,7 +1806,7 @@ button:focus { outline: none; }
     raf(f);
   }
   function dispDraw() {
-    var h = '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (PERF ? " on" : "") + '" data-x="perf">Mode léger : ' + (PERF ? "oui" : "non") + '</button><button type="button" class="xbtn lg' + (ICO ? " on" : "") + '" data-x="ico" style="margin-left:8px">Animation météo : ' + (ICO ? "oui" : "non") + '</button></div>';
+    var h = '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (PERF ? " on" : "") + '" data-x="perf">Mode léger : ' + (PERF ? "oui" : "non") + '</button><button type="button" class="xbtn lg' + (ICO ? " on" : "") + '" data-x="ico" style="margin-left:8px">Animation météo : ' + ["non", "complète", "légère"][ICO] + '</button></div>';
     h += '<p class="note" style="margin-bottom:10px">Le mode léger supprime les ombres, les transparences, les halos et les animations pour que la tablette reste fluide. Compare avec « non » grâce au test ci-dessous.</p>';
     h += '<div class="xrow2"><span style="font-size:20px;font-weight:bold">Fluidité : <span id="fpsV">…</span> images/s · pire image <span id="fpsW">…</span> ms</span></div><div class="fpsb"><i id="fpsS"></i></div><p class="note">Même mesure que le bandeau des versions TEST (pire image : la plus longue pause des 5 dernières secondes). La bille doit glisser sans saccade. Autour de 60 images/s : parfait. Moins de 20 : la tablette peine.</p>';
     h += '<div class="xrow2" style="margin-top:6px"><button type="button" class="xbtn sm" data-x="lab">Test à vide (6 s)</button><span class="note" id="labR" style="margin-left:6px">' + esc(labRes) + '</span></div>';
@@ -1847,7 +1850,7 @@ button:focus { outline: none; }
     while (t && t !== this && !(t.getAttribute && t.getAttribute("data-x"))) { t = t.parentNode; }
     if (!t || t === this) { return; }
     a = t.getAttribute("data-x"); v = t.getAttribute("data-a");
-    if (a === "ico") { ICO = ICO ? 0 : 1; xSet("ico", ICO); document.documentElement.classList[ICO ? "remove" : "add"]("noico"); dispDraw(); }
+    if (a === "ico") { ICO = ICO === 1 ? 2 : (ICO === 2 ? 0 : 1); xSet("ico", ICO); icoApply(); if (wxLast) { drawWeather(wxLast); } dispDraw(); }
     else if (a === "perf") { PERF = PERF ? 0 : 1; xSet("perf", PERF); perfApply(); dispDraw(); }
     else if (a === "lab") { labRun(); }
     else if (a === "wall") { WALL = v; xSet("wall", WALL); wallApply(); wallDraw(); }
