@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:209 TDBA:208-->
+<!--TDBV:210 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -851,7 +851,7 @@ button:focus { outline: none; }
   window.LOCAL = {
     cfg: cfg, DEF: DEF,
     apkInstall: function (url, cb) { var id = nid(function (st, tx, er) { cb(er || null); }); try { N.apkInstall(id, url); } catch (e) { delete cbs[id]; cb(String(e && e.message || e)); } },
-    getText: function (url, timeout, cb) { http("GET", url, { "User-Agent": "tableau-de-bord" }, "", timeout, function (err, st, tx) { if (err) { return cb(err); } if (st < 200 || st >= 300) { return cb("HTTP " + st); } cb(null, tx); }); },
+    getText: function (url, timeout, cb, extra) { var hd = { "User-Agent": "tableau-de-bord" }, k; if (extra) { for (k in extra) { if (extra.hasOwnProperty(k)) { hd[k] = extra[k]; } } } http("GET", url, hd, "", timeout, function (err, st, tx) { if (err) { return cb(err); } if (st < 200 || st >= 300) { return cb("HTTP " + st); } cb(null, tx); }); },
     reset: function () { wxS = {}; w7S = {}; agS = {}; ty.token = null; ty.state = null; ty.at = 0; lumInit = false; },
     req: function (method, url, body, cb) {
       var path = url.split("?")[0], cmd = null;
@@ -1087,13 +1087,23 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("209", 10) || 0, UI_NAME = "2.09 (beta)".charAt(0) === "_" ? "?" : "2.09 (beta)";
+  var UI_CODE = parseInt("210", 10) || 0, UI_NAME = "2.10 (beta)".charAt(0) === "_" ? "?" : "2.10 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
     if (r.indexOf("ok:") === 0) { say("Interface mise à jour, rechargement…"); setTimeout(function () { if (window.Native.reloadUi) { window.Native.reloadUi(); } else { window.location.href = "file:///data/data/com.clement.tableaudebord/files/www/index.html"; } }, 900); return; }
     if (r.indexOf("err:needapk") === 0) { return doApk ? doApk() : say("Cette interface demande une nouvelle appli : mets à jour l'appli d'abord."); }
     say("Mise à jour impossible : " + r.substr(4));
+  }
+  /* GitHub garde ses fichiers « raw » en cache ~5 min : on interroge l'API pour connaître la dernière version exacte, puis on lit les fichiers à cette version (adresse unique, jamais en cache). */
+  function resolveBase(base, cb) {
+    var m = /^https:\/\/raw\.githubusercontent\.com\/([^\/]+)\/([^\/]+)\/([^\/]+)$/.exec(base);
+    if (!m) { return cb(base); }
+    window.LOCAL.getText("https://api.github.com/repos/" + m[1] + "/" + m[2] + "/commits/" + m[3] + "?t=" + Date.now(), 15000, function (err, sha) {
+      sha = String(sha || "").replace(/\s/g, "");
+      if (err || !/^[0-9a-f]{40}$/.test(sha)) { return cb(base); }
+      cb("https://raw.githubusercontent.com/" + m[1] + "/" + m[2] + "/" + sha);
+    }, { "Accept": "application/vnd.github.sha" });
   }
   function updRun(auto, say) {
     var c = window.LOCAL.cfg(), base = String(c.updurl || "").replace(/\/+$/, ""), code = window.Native.appCode(), t;
@@ -1103,6 +1113,7 @@ button:focus { outline: none; }
       if (!t) { return say("Aucune adresse de mise à jour renseignée, et aucun fichier index.html déposé sur la tablette."); }
       return updUi(t, say, null);
     }
+    resolveBase(base, function (base) {
     window.LOCAL.getText(base + "/version.json?t=" + Date.now(), 15000, function (err, tx) {
       var v;
       if (err) { return auto ? 0 : say("Mise à jour impossible : " + err); }
@@ -1122,6 +1133,7 @@ button:focus { outline: none; }
           updUi(html, auto ? function () {} : say, auto ? function () { var ve = $("ver"); if (ve) { ve.textContent += " · mise à jour disponible"; } } : doApk);
         });
       } else { doApk(); }
+    });
     });
   }
   setTimeout(function () { if (window.LOCAL && window.Native && window.Native.appCode) { updRun(true, function () {}); } }, 30000);
