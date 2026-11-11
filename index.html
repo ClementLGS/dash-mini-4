@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:218 TDBA:208-->
+<!--TDBV:220 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -255,8 +255,15 @@ button:focus { outline: none; }
 /* ---- mode léger (2.18) : pas d'ombres, de transparences, d'animations ni de halos ---- */
 .xbtn { -webkit-flex: none; flex: none; }
 .perf #bg i { display: none; }
+@-webkit-keyframes spin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.clim-on .nb[data-p="clim"] svg, .clim-on .mb.sel svg { -webkit-animation: spin 9s linear infinite; animation: spin 9s linear infinite; }
+.clim-on .mb.sel[data-i="1"] svg { -webkit-animation-duration: 14s; animation-duration: 14s; }
+.clim-on .mb.sel[data-i="3"] svg { -webkit-animation: none; animation: none; }
+.clim-on .mb.sel[data-i="4"] svg { -webkit-animation-duration: 1.3s; animation-duration: 1.3s; }
+.noico .nb svg, .noico .mb svg { -webkit-animation: none !important; animation: none !important; }
 .perf .tile { background: #181c22; }
-.perf *, .perf *:before, .perf *:after { -webkit-box-shadow: none !important; box-shadow: none !important; -webkit-transition: none !important; transition: none !important; -webkit-animation: none !important; animation: none !important; text-shadow: none !important; }
+.perf *, .perf *:before, .perf *:after { -webkit-box-shadow: none !important; box-shadow: none !important; -webkit-transition: none !important; transition: none !important; text-shadow: none !important; }
 .fpsb { position: relative; height: 70px; margin: 10px 20px 4px; border-radius: 14px; background: #14171c; border: 1px solid #2f353e; overflow: hidden; }
 .fpsb i { position: absolute; left: 0; top: 15px; width: 40px; height: 40px; border-radius: 50%; background: #d8dde6; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
@@ -1114,7 +1121,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("218", 10) || 0, UI_NAME = "2.18 (beta)".charAt(0) === "_" ? "?" : "2.18 (beta)";
+  var UI_CODE = parseInt("220", 10) || 0, UI_NAME = "2.20 (beta)".charAt(0) === "_" ? "?" : "2.20 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1390,6 +1397,26 @@ button:focus { outline: none; }
     snow: wsvg(cloud("translate(0 -3)") + line("M16 39v.1M24 42v.1M32 39v.1", ICE, 4.5)),
     fog: wsvg(line("M9 16h30M6 24h36M10 32h28M15 40h18", FOG, 3))
   };
+  function an(type, vals, dur, begin, extra) { return '<animateTransform attributeName="transform" type="' + type + '" values="' + vals + '" dur="' + dur + '" begin="' + (begin || "0s") + '" repeatCount="indefinite" additive="sum"' + (extra || "") + '/>'; }
+  function op(vals, dur, begin) { return '<animate attributeName="opacity" values="' + vals + '" dur="' + dur + '" begin="' + (begin || "0s") + '" repeatCount="indefinite"/>'; }
+  function drift(inner, a, dur) { return "<g>" + an("translate", "0 0;" + a + " 0;0 0", dur) + inner + "</g>"; }
+  function drop(d, c, w, b) { return '<path d="' + d + '" stroke="' + c + '" stroke-width="' + w + '" stroke-linecap="round" opacity="0">' + an("translate", "0 -3;0 7", "0.9s", b) + op("0;1;0", "0.9s", b) + "</path>"; }
+  function flake(x, y, b) { return '<circle cx="' + x + '" cy="' + y + '" r="2.1" fill="' + ICE + '" opacity="0">' + an("translate", "0 -3;2 7", "2.4s", b) + op("0;1;0", "2.4s", b) + "</circle>"; }
+  function spinG(inner, cx, cy, dur) { return "<g>" + an("rotate", "0 " + cx + " " + cy + ";360 " + cx + " " + cy, dur) + inner + "</g>"; }
+  function twinkle(x, y, b) { return '<circle cx="' + x + '" cy="' + y + '" r="1.3" fill="#fff" opacity=".3">' + op(".2;1;.2", "2.6s", b) + "</circle>"; }
+  var ICONS_A = {
+    sun: wsvg('<circle cx="24" cy="24" r="9" fill="' + SUN + '"><animate attributeName="r" values="9;10.2;9" dur="4s" repeatCount="indefinite"/></circle>' + spinG(line(RAYS, SUN, 3), 24, 24, "40s")),
+    moon: wsvg('<path d="M31 7a17 17 0 1 0 10 25 14 14 0 0 1-10-25z" fill="' + MOON + '"/>' + twinkle(12, 11, "0s") + twinkle(40, 36, "1.1s") + twinkle(8, 38, "1.8s")),
+    partly: wsvg('<circle cx="17" cy="17" r="7" fill="' + SUN + '"/>' + spinG(line("M17 4v3M5 17h3M8.5 8.5l2 2M25.5 8.5l-2 2", SUN, 3), 17, 17, "30s") + drift(cloud("translate(7 8) scale(.82)"), 3, "7s")),
+    partlyNight: wsvg('<path d="M22 5a10 10 0 1 0 9 14 8 8 0 0 1-9-14z" fill="' + MOON + '"/>' + twinkle(38, 10, "0s") + drift(cloud("translate(7 8) scale(.82)"), 3, "7s")),
+    cloud: wsvg(drift(cloud("translate(8 -4) scale(.8)", CLD2), -3, "9s") + drift(cloud("translate(-1 4)"), 3, "7s")),
+    rain: wsvg(drift(cloud("translate(0 -3)"), 1.5, "6s") + drop("M16 37l-2 5", RAIN, 3.2, "0s") + drop("M24 37l-2 5", RAIN, 3.2, "0.3s") + drop("M32 37l-2 5", RAIN, 3.2, "0.6s")),
+    storm: wsvg(drift(cloud("translate(0 -3)", CLD2), 1.5, "6s") + '<path d="M26 28l-8 11h6l-3 9 10-13h-6z" fill="' + BOLT + '">' + op("1;1;1;.1;1;.15;1;1", "3.6s") + "</path>"),
+    snow: wsvg(drift(cloud("translate(0 -3)"), 1.5, "6s") + flake(16, 38, "0s") + flake(24, 38, "0.8s") + flake(32, 38, "1.6s")),
+    fog: wsvg(drift(line("M9 16h30", FOG, 3), 4, "6s") + drift(line("M6 24h36", FOG, 3), -4, "7s") + drift(line("M10 32h28", FOG, 3), 4, "8s") + drift(line("M15 40h18", FOG, 3), -3, "5s"))
+  };
+  var ICO = xGet("ico", 1), wxLast = null;
+  function wic(k) { return ICO ? ICONS_A[k] : ICONS[k]; }
   function wmo(code, day) {
     var n = Number(code), night = (day === 0);
     if (n === 0) { return { k: night ? "moon" : "sun", t: night ? "Ciel dégagé" : "Ensoleillé" }; }
@@ -1410,7 +1437,8 @@ button:focus { outline: none; }
   var wxOk = false;
   function drawWeather(w) {
     var n = w.now, m = wmo(n.code, n.day), t = w.days[0], i;
-    $("nowIco").innerHTML = ICONS[m.k];
+    wxLast = w;
+    $("nowIco").innerHTML = wic(m.k);
     $("nowT").textContent = rnd(n.temp) + "°";
     $("nowP").textContent = m.t;
     var p1 = ["Max " + rnd(t.hi) + "° · Min " + rnd(t.lo) + "°"];
@@ -1420,7 +1448,7 @@ button:focus { outline: none; }
     if (n.hum !== null && n.hum !== undefined) { p2.push("humidité " + rnd(n.hum) + " %"); }
     $("nowD").innerHTML = p1.join(" · ") + (p2.length ? "<br>" + p2.join(" · ") : "");
     $("nowMsg").style.display = "none"; $("nowBox").style.display = "block";
-    $("hIco").innerHTML = ICONS[m.k];
+    $("hIco").innerHTML = wic(m.k);
     $("hT").textContent = rnd(n.temp) + "°";
     $("hP").innerHTML = m.t + "<br>" + rnd(t.hi) + "° / " + rnd(t.lo) + "°";
 
@@ -1629,6 +1657,7 @@ button:focus { outline: none; }
   }
   function drawClim() {
     var txt, cls, i, ps = [$("cPill"), $("hPill")];
+    document.documentElement.classList[S.linked && S.on ? "add" : "remove"]("clim-on");
     if (!S.linked) { txt = "Injoignable"; cls = "pill bad"; }
     else { txt = S.on ? "En marche" : "Éteinte"; cls = "pill" + (S.on ? " on" : ""); }
     for (i = 0; i < 2; i++) { ps[i].textContent = txt; ps[i].className = cls; }
@@ -1709,8 +1738,10 @@ button:focus { outline: none; }
   var PERF = xGet("perf", 1);
   function perfApply() { var c = document.documentElement.className.replace(/\bperf\b/g, "").replace(/\s+$/, ""); document.documentElement.className = PERF ? (c ? c + " perf" : "perf") : c; }
   perfApply();
+  if (!xGet("ico", 1)) { document.documentElement.classList.add("noico"); }
   function dispDraw() {
     var h = '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (PERF ? " on" : "") + '" data-x="perf">Mode léger : ' + (PERF ? "oui" : "non") + '</button></div>';
+    h += '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (ICO ? " on" : "") + '" data-x="ico">Animations d\'icônes : ' + (ICO ? "oui" : "non") + '</button></div>';
     h += '<p class="note" style="margin-bottom:10px">Le mode léger supprime les ombres, les transparences, les halos et les animations pour que la tablette reste fluide. Compare avec « non » grâce au test ci-dessous.</p>';
     h += '<div class="xrow2"><span style="font-size:20px;font-weight:bold">Fluidité : <span id="fpsV">…</span> images/s</span></div><div class="fpsb"><i id="fpsS"></i></div><p class="note">La bille doit glisser sans saccade. Autour de 60 images/s : parfait. Moins de 20 : la tablette peine.</p>';
     $("xB").innerHTML = h; fpsStart();
@@ -1734,6 +1765,7 @@ button:focus { outline: none; }
     while (t && t !== this && !(t.getAttribute && t.getAttribute("data-x"))) { t = t.parentNode; }
     if (!t || t === this) { return; }
     if (t.getAttribute("data-x") === "perf") { PERF = PERF ? 0 : 1; xSet("perf", PERF); perfApply(); dispDraw(); }
+    if (t.getAttribute("data-x") === "ico") { ICO = ICO ? 0 : 1; xSet("ico", ICO); document.documentElement.classList[ICO ? "remove" : "add"]("noico"); if (wxLast) { drawWeather(wxLast); } dispDraw(); }
   };
 
   /* recharge la page après 6 h, quand personne ne touche l'écran */
