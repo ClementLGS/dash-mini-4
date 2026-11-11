@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:231 TDBA:208-->
+<!--TDBV:232 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -255,9 +255,9 @@ button:focus { outline: none; }
 /* ---- mode léger (2.18) : pas d'ombres, de transparences, d'animations ni de halos ---- */
 .xbtn { -webkit-flex: none; flex: none; }
 .perf #bg i { display: none; }
-.perf .tile { background: #181c22; }
+.perf .tile { background: #181c22; overflow: visible; }
 .perf *, .perf *:before, .perf *:after { -webkit-box-shadow: none !important; box-shadow: none !important; -webkit-transition: none !important; transition: none !important; text-shadow: none !important; }
-.fpsb { position: relative; height: 70px; margin: 10px 20px 4px; border-radius: 14px; background: #14171c; border: 1px solid #2f353e; overflow: hidden; }
+.fpsb { position: relative; height: 70px; margin: 10px 20px 4px; background: #14171c; border: 1px solid #2f353e; }
 .fpsb i { position: absolute; left: 0; top: 15px; width: 40px; height: 40px; border-radius: 50%; background: #d8dde6; }
 .w-aurore { background: radial-gradient(ellipse at 15% 0%, rgba(52,190,140,.30), rgba(0,0,0,0) 55%), radial-gradient(ellipse at 90% 30%, rgba(130,90,220,.26), rgba(0,0,0,0) 55%), #091217; }
 .w-crepuscule { background: linear-gradient(170deg, #1a1230 0%, #2d1a40 45%, #4a2438 100%); }
@@ -275,6 +275,44 @@ button:focus { outline: none; }
 .wpi.sel .wp { border-color: #d8dde6; }
 .wpi.sel button { color: #fff; }
 #bg[class*="w-"]:not(.w-nuit) i { display: none; }
+#nowIco, #hIco { position: relative; }
+.rd { position: absolute; top: 73.8%; width: 6.7%; height: 18%; margin-left: -3.3%; border-radius: 4px; background: #4aa8ff; opacity: 0; -webkit-backface-visibility: hidden; -webkit-animation: rdrop 1.8s linear infinite; animation: rdrop 1.8s linear infinite; }
+@-webkit-keyframes rdrop { 0% { opacity: 0; -webkit-transform: translate3d(0,-17%,0) rotate(22deg); } 50% { opacity: 1; } 100% { opacity: 0; -webkit-transform: translate3d(0,100%,0) rotate(22deg); } }
+@keyframes rdrop { 0% { opacity: 0; transform: translate3d(0,-17%,0) rotate(22deg); } 50% { opacity: 1; } 100% { opacity: 0; transform: translate3d(0,100%,0) rotate(22deg); } }
+@-webkit-keyframes cdr { 0% { -webkit-transform: translate3d(0,0,0); } 50% { -webkit-transform: translate3d(3%,0,0); } 100% { -webkit-transform: translate3d(0,0,0); } }
+@keyframes cdr { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(3%,0,0); } 100% { transform: translate3d(0,0,0); } }
+.wl { position: absolute; left: 0; top: 0; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.wl svg { display: block; width: 100%; height: 100%; }
+.wsp { -webkit-transform-origin: 50% 50%; transform-origin: 50% 50%; -webkit-animation: wsp 60s linear infinite; animation: wsp 60s linear infinite; }
+.wpu { -webkit-transform-origin: 50% 50%; transform-origin: 50% 50%; -webkit-animation: wpu 8s ease-in-out infinite; animation: wpu 8s ease-in-out infinite; }
+.wst { position: absolute; width: 2.8%; height: 2.8%; border-radius: 50%; background: #fff; opacity: .2; -webkit-backface-visibility: hidden; -webkit-animation: wst 5.2s ease-in-out infinite; animation: wst 5.2s ease-in-out infinite; }
+.wfk { position: absolute; top: 72%; width: 4.4%; height: 4.4%; margin-left: -2.2%; border-radius: 50%; background: #cfe8ff; opacity: 0; -webkit-backface-visibility: hidden; -webkit-animation: wfk 4.8s linear infinite; animation: wfk 4.8s linear infinite; }
+.wfl { -webkit-animation: wfl 7.2s linear infinite; animation: wfl 7.2s linear infinite; }
+.wdp3 { -webkit-animation: wdp3 12s ease-in-out infinite; animation: wdp3 12s ease-in-out infinite; }
+@-webkit-keyframes wdp3{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(3%,0,0)}100%{-webkit-transform:translate3d(0,0,0)}}
+@keyframes wdp3{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(3%,0,0)}100%{transform:translate3d(0,0,0)}}
+.wdm3 { -webkit-animation: wdm3 12s ease-in-out infinite; animation: wdm3 12s ease-in-out infinite; }
+@-webkit-keyframes wdm3{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(-3%,0,0)}100%{-webkit-transform:translate3d(0,0,0)}}
+@keyframes wdm3{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-3%,0,0)}100%{transform:translate3d(0,0,0)}}
+.wdp8 { -webkit-animation: wdp8 12s ease-in-out infinite; animation: wdp8 12s ease-in-out infinite; }
+@-webkit-keyframes wdp8{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(8%,0,0)}100%{-webkit-transform:translate3d(0,0,0)}}
+@keyframes wdp8{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(8%,0,0)}100%{transform:translate3d(0,0,0)}}
+.wdm8 { -webkit-animation: wdm8 12s ease-in-out infinite; animation: wdm8 12s ease-in-out infinite; }
+@-webkit-keyframes wdm8{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(-8%,0,0)}100%{-webkit-transform:translate3d(0,0,0)}}
+@keyframes wdm8{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-8%,0,0)}100%{transform:translate3d(0,0,0)}}
+.wdm6 { -webkit-animation: wdm6 12s ease-in-out infinite; animation: wdm6 12s ease-in-out infinite; }
+@-webkit-keyframes wdm6{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(-6%,0,0)}100%{-webkit-transform:translate3d(0,0,0)}}
+@keyframes wdm6{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-6%,0,0)}100%{transform:translate3d(0,0,0)}}
+@-webkit-keyframes wsp{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
+@keyframes wsp{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@-webkit-keyframes wpu{0%{-webkit-transform:scale(1)}50%{-webkit-transform:scale(1.13)}100%{-webkit-transform:scale(1)}}
+@keyframes wpu{0%{transform:scale(1)}50%{transform:scale(1.13)}100%{transform:scale(1)}}
+@-webkit-keyframes wst{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
+@keyframes wst{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
+@-webkit-keyframes wfl{0%{opacity:1}40%{opacity:1}45%{opacity:.1}50%{opacity:1}58%{opacity:.15}64%{opacity:1}100%{opacity:1}}
+@keyframes wfl{0%{opacity:1}40%{opacity:1}45%{opacity:.1}50%{opacity:1}58%{opacity:.15}64%{opacity:1}100%{opacity:1}}
+@-webkit-keyframes wfk{0%{opacity:0;-webkit-transform:translate3d(0,-70%,0)}50%{opacity:1}100%{opacity:0;-webkit-transform:translate3d(100%,420%,0)}}
+@keyframes wfk{0%{opacity:0;transform:translate3d(0,-70%,0)}50%{opacity:1}100%{opacity:0;transform:translate3d(100%,420%,0)}}
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
  <div id="nav">
@@ -1130,7 +1168,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("231", 10) || 0, UI_NAME = "2.31 (beta)".charAt(0) === "_" ? "?" : "2.31 (beta)";
+  var UI_CODE = parseInt("232", 10) || 0, UI_NAME = "2.32 (beta)".charAt(0) === "_" ? "?" : "2.32 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1408,6 +1446,20 @@ button:focus { outline: none; }
   };
   var wxLast = null;
   function wic(k) { return ICONS[k]; }
+  function wl(inner, cls, st) { return '<span class="wl ' + (cls || "") + '"' + (st ? ' style="' + st + '"' : "") + '>' + wsvg(inner) + "</span>"; }
+  function wdot(cls, st) { return '<i class="' + cls + '" style="' + st + '"></i>'; }
+  function ad(d, dl) { return "-webkit-animation-duration:" + d + "s;animation-duration:" + d + "s;" + (dl ? "-webkit-animation-delay:" + dl + "s;animation-delay:" + dl + "s;" : ""); }
+  var ICONS_A = {
+    sun: wl('<circle cx="24" cy="24" r="9" fill="' + SUN + '"/>', "wpu", ad(8)) + wl(line(RAYS, SUN, 3), "wsp", ad(80)),
+    moon: wl('<path d="M31 7a17 17 0 1 0 10 25 14 14 0 0 1-10-25z" fill="' + MOON + '"/>') + wdot("wst", "left:24%;top:21%;" + ad(5.2)) + wdot("wst", "left:82%;top:73%;" + ad(5.2, 2.2)) + wdot("wst", "left:16%;top:78%;" + ad(5.2, 3.6)),
+    partly: wl('<circle cx="17" cy="17" r="7" fill="' + SUN + '"/>') + wl(line("M17 4v3M5 17h3M8.5 8.5l2 2M25.5 8.5l-2 2", SUN, 3), "wsp", "-webkit-transform-origin:35.4% 35.4%;transform-origin:35.4% 35.4%;" + ad(60)) + wl(cloud("translate(7 8) scale(.82)"), "wdp3", ad(14)),
+    partlyNight: wl('<path d="M22 5a10 10 0 1 0 9 14 8 8 0 0 1-9-14z" fill="' + MOON + '"/>') + wdot("wst", "left:79%;top:21%;" + ad(5.2)) + wl(cloud("translate(7 8) scale(.82)"), "wdp3", ad(14)),
+    cloud: wl(cloud("translate(8 -4) scale(.8)", CLD2), "wdm3", ad(18)) + wl(cloud("translate(-1 4)"), "wdp3", ad(14)),
+    rain: wl(cloud("translate(0 -3)"), "wdp3", ad(12)) + wdot("rd", "left:31.2%") + wdot("rd", "left:47.9%;" + ad(1.8, 0.6)) + wdot("rd", "left:64.6%;" + ad(1.8, 1.2)),
+    storm: wl(cloud("translate(0 -3)", CLD2), "wdp3", ad(12)) + wl('<path d="M26 28l-8 11h6l-3 9 10-13h-6z" fill="' + BOLT + '"/>', "wfl", ad(7.2)),
+    snow: wl(cloud("translate(0 -3)"), "wdp3", ad(12)) + wdot("wfk", "left:33.3%;" + ad(4.8)) + wdot("wfk", "left:50%;" + ad(4.8, 1.6)) + wdot("wfk", "left:66.7%;" + ad(4.8, 3.2)),
+    fog: wl(line("M9 16h30", FOG, 3), "wdp8", ad(12)) + wl(line("M6 24h36", FOG, 3), "wdm8", ad(14)) + wl(line("M10 32h28", FOG, 3), "wdp8", ad(16)) + wl(line("M15 40h18", FOG, 3), "wdm6", ad(10))
+  };
   function wmo(code, day) {
     var n = Number(code), night = (day === 0);
     if (n === 0) { return { k: night ? "moon" : "sun", t: night ? "Ciel dégagé" : "Ensoleillé" }; }
@@ -1439,7 +1491,7 @@ button:focus { outline: none; }
     if (n.hum !== null && n.hum !== undefined) { p2.push("humidité " + rnd(n.hum) + " %"); }
     $("nowD").innerHTML = p1.join(" · ") + (p2.length ? "<br>" + p2.join(" · ") : "");
     $("nowMsg").style.display = "none"; $("nowBox").style.display = "block";
-    $("hIco").innerHTML = wic(m.k);
+    $("hIco").innerHTML = ICONS_A[m.k];
     $("hT").textContent = rnd(n.temp) + "°";
     $("hP").innerHTML = m.t + "<br>" + rnd(t.hi) + "° / " + rnd(t.lo) + "°";
 
@@ -1729,10 +1781,30 @@ button:focus { outline: none; }
   var PERF = xGet("perf", 1);
   function perfApply() { var c = document.documentElement.className.replace(/\bperf\b/g, "").replace(/\s+$/, ""); document.documentElement.className = PERF ? (c ? c + " perf" : "perf") : c; }
   perfApply();
+  var labRes = "";
+  function labRun() {
+    var o = document.createElement("div"), tx, ball, n = 0, t0 = Date.now(), last = t0, worst = 0, raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    o.style.cssText = "position:fixed;left:0;top:0;right:0;bottom:0;z-index:3000;background:#000;color:#fff;text-align:center;font:bold 24px/1.4 sans-serif";
+    tx = document.createElement("div"); tx.style.cssText = "padding-top:150px"; tx.textContent = "Test à vide en cours…";
+    ball = document.createElement("div"); ball.style.cssText = "position:absolute;left:0;top:300px;width:40px;height:40px;border-radius:20px;background:#d8dde6";
+    o.appendChild(tx); o.appendChild(ball); document.body.appendChild(o);
+    function f() {
+      var now = Date.now();
+      n++; if (now - last > worst) { worst = now - last; } last = now;
+      ball.style.webkitTransform = "translate3d(" + Math.round(((now % 2000) / 2000) * 880) + "px,0,0)";
+      if (now - t0 < 6000) { return raf(f); }
+      labRes = "Test à vide (écran noir, rien d'autre) : " + Math.round(n * 1000 / (now - t0)) + " images/s, pire image " + worst + " ms.";
+      document.body.removeChild(o);
+      if ($("labR")) { $("labR").textContent = labRes; }
+    }
+    raf(f);
+  }
   function dispDraw() {
     var h = '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (PERF ? " on" : "") + '" data-x="perf">Mode léger : ' + (PERF ? "oui" : "non") + '</button></div>';
     h += '<p class="note" style="margin-bottom:10px">Le mode léger supprime les ombres, les transparences, les halos et les animations pour que la tablette reste fluide. Compare avec « non » grâce au test ci-dessous.</p>';
     h += '<div class="xrow2"><span style="font-size:20px;font-weight:bold">Fluidité : <span id="fpsV">…</span> images/s · pire image <span id="fpsW">…</span> ms</span></div><div class="fpsb"><i id="fpsS"></i></div><p class="note">Même mesure que le bandeau des versions TEST (pire image : la plus longue pause des 5 dernières secondes). La bille doit glisser sans saccade. Autour de 60 images/s : parfait. Moins de 20 : la tablette peine.</p>';
+    h += '<div class="xrow2" style="margin-top:6px"><button type="button" class="xbtn sm" data-x="lab">Test à vide (6 s)</button><span class="note" id="labR" style="margin-left:6px">' + esc(labRes) + '</span></div>';
+    h += '<p class="note">Le test à vide affiche un écran noir : si la tablette y reste à 30 images/s, c\'est la tablette elle-même qui plafonne, pas l\'interface.</p>';
     $("xB").innerHTML = h; fpsStart();
   }
   function fpsStart() {
@@ -1773,6 +1845,7 @@ button:focus { outline: none; }
     if (!t || t === this) { return; }
     a = t.getAttribute("data-x"); v = t.getAttribute("data-a");
     if (a === "perf") { PERF = PERF ? 0 : 1; xSet("perf", PERF); perfApply(); dispDraw(); }
+    else if (a === "lab") { labRun(); }
     else if (a === "wall") { WALL = v; xSet("wall", WALL); wallApply(); wallDraw(); }
   };
 
