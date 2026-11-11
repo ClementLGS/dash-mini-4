@@ -1,0 +1,1625 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f1114">
+<title>Tableau de bord chambre</title>
+<!--TDBV:207 TDBA:207-->
+<style>
+/* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; background: #0f1114; }
+body { color: #eceff3; font-family: Roboto, "Droid Sans", "Helvetica Neue", Arial, sans-serif; font-size: 15px; line-height: 1.35; overflow: hidden; -webkit-user-select: none; user-select: none; -webkit-text-size-adjust: 100%; }
+button { font: inherit; color: inherit; -webkit-appearance: none; appearance: none; cursor: pointer; padding: 0; }
+.fx { display: -webkit-flex; display: flex; }
+#app { height: 100%; display: -webkit-flex; display: flex; }
+
+/* ---- menu latéral ---- */
+#nav { width: 128px; -webkit-flex: none; flex: none; background: #14171c; border-right: 1px solid #232830; padding: 8px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
+.nb { -webkit-flex: 1 1 0; flex: 1 1 0; min-height: 0; margin-bottom: 8px; border-radius: 14px; border: 2px solid transparent; background: #232830; font-size: 16px; font-weight: bold; text-align: center; display: block; }
+.nb:last-child { margin-bottom: 0; }
+.nb svg { width: 26px; height: 26px; margin-bottom: 4px; display: block; }
+.nb small { display: block; font-size: 12px; font-weight: normal; color: #8f98a5; margin-top: 2px; }
+.nb.sel { background: #262b33; border-color: #b9c2d0; }
+.nb:active { background: #2f353e; }
+.bw { display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; width: 100%; box-sizing: border-box; }
+.pw .bw { -webkit-flex-direction: row; flex-direction: row; }
+.lbulb .bw { height: 100%; }
+button, .nb, .mi, .lbulb { outline: none; -webkit-tap-highlight-color: rgba(0,0,0,0); }
+button:focus { outline: none; }
+
+/* ---- contenu ---- */
+#main { -webkit-flex: 1; flex: 1; min-width: 0; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
+#top { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; padding: 8px 20px; border-bottom: 1px solid #232830; min-height: 72px; }
+#clock { font-size: 50px; line-height: 1; font-weight: bold; color: #d8dde6; letter-spacing: 0.02em; }
+#date { margin-left: 18px; font-size: 17px; color: #8f98a5; }
+#hw { margin-left: auto; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
+#hIco { width: 42px; height: 42px; margin-right: 8px; }
+#hIco svg, .big svg, .fi svg { width: 100%; height: 100%; display: block; }
+#hT { font-size: 36px; font-weight: bold; line-height: 1; margin-right: 10px; }
+#hP { font-size: 13px; color: #8f98a5; line-height: 1.3; }
+#pages { -webkit-flex: 1; flex: 1; min-height: 0; position: relative; }
+.page { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding: 14px 20px 22px; -webkit-flex-direction: column; flex-direction: column; }
+.page.on { display: -webkit-flex; display: flex; }
+.ttl { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; min-height: 48px; margin-bottom: 10px; }
+.ttl h2 { margin: 0; font-size: 24px; }
+.tile { background: rgba(26,30,36,0.5); border: 1px solid #2f353e; border-radius: 20px; min-height: 0; overflow: hidden; }
+.muted { color: #8f98a5; }
+.note { font-size: 13px; color: #8f98a5; }
+.pill { padding: 5px 12px; border-radius: 999px; border: 1px solid #2f353e; font-size: 13px; color: #8f98a5; white-space: nowrap; }
+.pill.on { color: #14171c; background: #d8dde6; border-color: #d8dde6; font-weight: bold; }
+.pill.bad { color: #ff7a70; border-color: #ff7a70; }
+.pw { height: 52px; padding: 0 22px; border-radius: 26px; background: #232830; border: 1px solid #2f353e; color: #eceff3; font-size: 16px; font-weight: bold; display: block; }
+.pw svg { width: 22px; height: 22px; margin-right: 8px; }
+.pw.on { background: #d8dde6; border-color: #d8dde6; color: #14171c; }
+.pw:disabled { opacity: 0.6; }
+
+/* ---- page clim ---- */
+.cBox { -webkit-flex: 1; flex: 1; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
+.cRow { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
+.sb { width: 92px; height: 92px; border-radius: 50%; background: #232830; border: 1px solid #2f353e; font-size: 52px; line-height: 86px; text-align: center; color: #eceff3; }
+.sb:active { background: #d8dde6; color: #14171c; }
+.sb:disabled { opacity: 0.4; }
+.temp { min-width: 270px; margin: 0 26px; text-align: center; font-size: 110px; line-height: 1; font-weight: bold; color: #b9c2d0; white-space: nowrap; }
+.temp small { font-size: 34px; color: #8f98a5; font-weight: normal; }
+#room { margin-top: 8px; font-size: 15px; min-height: 20px; }
+.modes { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; margin-top: 12px; }
+.mb { -webkit-flex: 1 1 0; flex: 1 1 0; height: 62px; margin-right: 8px; border-radius: 14px; background: rgba(26,30,36,0.5); border: 2px solid #2f353e; font-size: 15px; font-weight: bold; display: block; }
+.mb:last-child { margin-right: 0; }
+.mb svg { width: 24px; height: 24px; display: block; margin-bottom: 2px; }
+.mb.sel { background: #262b33; border-color: #b9c2d0; }
+.mb:disabled { opacity: 0.5; }
+#info { -webkit-flex: none; flex: none; margin-top: 8px; text-align: center; min-height: 18px; }
+
+/* ---- accueil ---- */
+.hRow { -webkit-flex: 1; flex: 1; min-height: 0; display: -webkit-flex; display: flex; }
+.hClim { -webkit-flex: 1 1 0; flex: 1 1 0; margin-right: 14px; padding: 18px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; text-align: center; }
+.hClim .t { font-size: 84px; line-height: 1; font-weight: bold; color: #b9c2d0; margin: 10px 0; }
+.hClim .t small { font-size: 28px; color: #8f98a5; font-weight: normal; }
+.hl { -webkit-flex: 1; flex: 1; min-height: 0; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
+.hl h3 { margin: 0 0 14px; font-size: 20px; }
+.hlr { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; -webkit-justify-content: center; justify-content: center; margin-bottom: 16px; }
+.hb { width: 150px; height: 150px; border-radius: 75px; margin: 0 10px 12px; border: 3px solid #2f353e; background: rgba(26,30,36,0.5); color: #5b636f; display: block; font-size: 15px; font-weight: bold; }
+.hb svg { width: 52px; height: 52px; display: block; margin-bottom: 4px; }
+.hb small { font-size: 13px; font-weight: normal; }
+.hb:disabled { opacity: 0.6; }
+.hCast { -webkit-flex: 1 1 0; flex: 1 1 0; padding: 12px 18px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
+.hCast { -webkit-flex: 1 1 0; flex: 1 1 0; padding: 12px 18px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
+.go { margin-top: 12px; height: 46px; padding: 0 20px; border-radius: 23px; background: #232830; border: 1px solid #2f353e; font-size: 15px; font-weight: bold; }
+
+/* ---- prévisions ---- */
+.fl { -webkit-flex: 1; flex: 1; min-height: 0; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
+.fr { -webkit-flex: 1 1 0; flex: 1 1 0; min-height: 0; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; border-top: 1px solid #2f353e; font-size: 16px; }
+.fr:first-child { border-top: 0; }
+.fd { width: 52px; font-weight: bold; -webkit-flex: none; flex: none; }
+.fi { width: 34px; height: 34px; -webkit-flex: none; flex: none; margin-right: 8px; }
+.fp { width: 40px; text-align: right; color: #6fb3d9; font-size: 13px; -webkit-flex: none; flex: none; margin-right: 6px; }
+.fn { width: 36px; text-align: right; color: #8f98a5; -webkit-flex: none; flex: none; }
+.fh { width: 36px; text-align: right; -webkit-flex: none; flex: none; }
+.fb { -webkit-flex: 1; flex: 1; min-width: 20px; height: 6px; border-radius: 3px; background: #2f353e; position: relative; margin: 0 10px; }
+.fb i { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: -webkit-linear-gradient(left, #6fb3d9, #d8dde6); background: linear-gradient(90deg, #6fb3d9, #d8dde6); }
+
+/* ---- météo ---- */
+.wRow { -webkit-flex: 1; flex: 1; min-height: 0; display: -webkit-flex; display: flex; }
+.wNow { -webkit-flex: 1 1 0; flex: 1 1 0; margin-right: 14px; padding: 18px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; text-align: center; }
+.big { width: 130px; height: 130px; }
+.nowT { font-size: 76px; line-height: 1; font-weight: bold; margin-top: 6px; }
+.nowP { font-size: 20px; margin-top: 4px; }
+.nowD { font-size: 14px; color: #8f98a5; margin-top: 6px; }
+.wCast { -webkit-flex: 1 1 0; flex: 1 1 0; padding: 12px 18px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
+.msg { margin: 0; color: #8f98a5; }
+.msg.bad { color: #ff7a70; }
+
+/* ---- lumières / appareils ---- */
+.lumL { -webkit-flex: 1; flex: 1; min-height: 0; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
+.ltabs { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; margin-bottom: 6px; }
+.ltab { height: 46px; padding: 0 24px; margin-right: 10px; border-radius: 23px; background: rgba(26,30,36,0.5); border: 2px solid #2f353e; font-size: 16px; font-weight: bold; }
+.ltab.sel { background: #262b33; border-color: #b9c2d0; }
+.lbody { -webkit-flex: 1; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; display: -webkit-flex; display: flex; -webkit-align-items: flex-start; align-items: flex-start; -webkit-justify-content: space-around; justify-content: space-around; padding: 0 10px; }
+.lbody > .lcol { margin-top: auto; margin-bottom: auto; min-width: 0; }
+.lbulb { width: 290px; height: 290px; width: -webkit-calc(100vh - 350px); width: calc(100vh - 350px); height: -webkit-calc(100vh - 350px); height: calc(100vh - 350px); max-width: 290px; max-height: 290px; min-width: 130px; min-height: 130px; border-radius: 50%; -webkit-flex: none; flex: none; border: 4px solid #2f353e; background: rgba(26,30,36,0.5); color: #5b636f; display: block; text-align: center; }
+.lbulb svg { width: 104px; height: 104px; display: block; }
+.lbulb b { font-size: 34px; margin-top: 8px; }
+.lbulb:disabled { opacity: 0.6; }
+.lcol { display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
+.lcap { color: #8f98a5; font-size: 14px; margin-bottom: 10px; }
+.lseg { display: -webkit-flex; display: flex; width: 340px; max-width: 100%; margin-bottom: 3vh; }
+.sgb { -webkit-flex: 1; flex: 1; height: 7vh; max-height: 46px; min-height: 30px; margin-right: 5px; border-radius: 6px; background: #232830; border: 0; }
+.sgb.o { background: #d8dde6; }
+.sgb:disabled { opacity: 0.6; }
+.lcg { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; width: 340px; max-width: 100%; }
+.sw { width: 9vh; height: 9vh; max-width: 62px; max-height: 62px; min-width: 38px; min-height: 38px; border-radius: 50%; border: 3px solid #2f353e; margin: 0 12px 1.8vh 0; }
+.sw.sel { border-color: #fff; }
+.sw:disabled { opacity: 0.6; }
+@media (max-aspect-ratio: 1/1) { .lbody { -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; } .lbody > .lcol { margin-top: 0; margin-bottom: 14px; } .lbulb { width: 230px; height: 230px; min-width: 0; min-height: 0; } }
+@media (max-width: 900px) { .w7k { padding: 0 11px; font-size: 14px; margin-right: 5px; } }
+@media (max-height: 640px) { .lbulb svg { width: 64px; height: 64px; } .lbulb b { font-size: 24px; } .lcap { margin-bottom: 4px; font-size: 13px; } .ltab { height: 38px; } .pw { height: 44px; } #top { min-height: 56px; padding: 4px 20px; } #clock { font-size: 40px; } .ttl { min-height: 38px; margin-bottom: 4px; } .ttl h2 { font-size: 20px; } .page { padding: 8px 20px 18px; } }
+.soon { -webkit-flex: 1; flex: 1; border: 2px dashed #2f353e; border-radius: 20px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; text-align: center; padding: 20px; }
+.soon p { max-width: 460px; margin: 14px 0 0; color: #8f98a5; font-size: 16px; }
+
+/* ---- météo de la semaine (Autre) ---- */
+.w7D { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; }
+.w7d { -webkit-flex: 1 1 0; flex: 1 1 0; min-width: 0; margin-right: 5px; padding: 5px 0 4px; border-radius: 12px; border: 2px solid transparent; background: transparent; text-align: center; color: #eceff3; }
+.w7d:last-child { margin-right: 0; }
+.w7d .l { display: block; font-size: 12px; font-weight: bold; color: #8f98a5; }
+.w7d .i { display: block; width: 30px; height: 30px; margin: 2px auto; }
+.w7d .i svg { width: 100%; height: 100%; display: block; }
+.w7d .m { display: block; font-size: 14px; font-weight: bold; }
+.w7d .m small { font-size: 13px; color: #8f98a5; font-weight: normal; }
+.w7d.sel { background: #262b33; border-color: #b9c2d0; }
+.w7K { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; margin-top: 8px; }
+.w7k { height: 40px; padding: 0 16px; margin: 0 8px 4px 0; border-radius: 18px; background: rgba(26,30,36,0.5); border: 2px solid #2f353e; font-size: 15px; font-weight: bold; color: #eceff3; }
+.w7k.sel { background: #d8dde6; border-color: #d8dde6; color: #14171c; }
+.w7S { -webkit-flex: none; flex: none; margin-top: 4px; font-size: 17px; line-height: 1.35; color: #eceff3; }
+.w7S span { color: #8f98a5; font-size: 15px; }
+.w7C { -webkit-flex: 1; flex: 1; min-height: 70px; display: -webkit-flex; display: flex; margin-top: 4px; border-bottom: 1px solid #2f353e; }
+.w7c { -webkit-flex: 1 1 0; flex: 1 1 0; min-width: 0; position: relative; margin: 0 1px; }
+.w7c i { position: absolute; left: 12%; right: 12%; bottom: 0; border-radius: 4px 4px 0 0; }
+.w7c b { position: absolute; left: -6px; right: -6px; text-align: center; font-size: 13px; font-weight: bold; color: #d8dde6; }
+.w7c.now i { -webkit-box-shadow: 0 0 0 2px #fff; box-shadow: 0 0 0 2px #fff; }
+.w7X { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; font-size: 12px; color: #8f98a5; height: 16px; line-height: 16px; }
+.w7X span { -webkit-flex: 1 1 0; flex: 1 1 0; min-width: 0; margin: 0 1px; text-align: center; }
+
+.sfw { display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; }
+.sf { width: 50%; padding: 0 8px 8px 0; box-sizing: border-box; }
+.sf label { display: block; font-size: 12px; color: #8f98a5; margin-bottom: 3px; }
+.sf input { width: 100%; height: 38px; box-sizing: border-box; padding: 0 10px; font-size: 16px; color: #eceff3; background: rgba(15,17,20,0.8); border: 1px solid #2f353e; border-radius: 8px; }
+.sbar { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; margin: 2px 0 12px; }
+.sbar .pw { height: 44px; margin-right: 10px; }
+#err { margin-left: 14px; height: 34px; padding: 0 14px; font-weight: bold; font-size: 14px; background: #262b33; display: none; }
+#dbg { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 50; background: #0f1114; padding: 14px 18px; -webkit-flex-direction: column; flex-direction: column; font-size: 13px; }
+#dbg .bar { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; margin-bottom: 8px; }
+#dbg h2 { margin: 0; font-size: 20px; }
+#dbg .cols { -webkit-flex: 1; flex: 1; min-height: 0; display: -webkit-flex; display: flex; }
+#dbg .box { -webkit-flex: 1 1 0; flex: 1 1 0; min-width: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; background: rgba(26,30,36,0.5); border: 1px solid #2f353e; border-radius: 12px; padding: 10px 12px; margin-right: 10px; }
+#dbg .box:last-child { margin-right: 0; }
+#dbg h3 { margin: 10px 0 4px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #8f98a5; }
+#dbg h3:first-child { margin-top: 0; }
+#dbg p { margin: 2px 0; word-wrap: break-word; }
+#dbg .e { color: #ff7a70; font-weight: bold; }
+#dbg .ok { color: #8fd18a; }
+#dbg button { height: 40px; padding: 0 16px; margin-left: 8px; border-radius: 10px; background: #232830; border: 1px solid #2f353e; font-weight: bold; }
+.agT { -webkit-flex: 1 1 0; flex: 1 1 0; padding: 12px 18px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; min-width: 0; }
+.agH { display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; -webkit-align-items: baseline; align-items: baseline; margin-bottom: 6px; }
+.agH h3 { margin: 0; font-size: 12px; font-weight: bold; letter-spacing: 0.08em; text-transform: uppercase; color: #8f98a5; }
+.agH span { font-size: 12px; color: #8f98a5; }
+.agW { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; }
+.wk { -webkit-flex: 1 1 0; flex: 1 1 0; min-width: 0; margin-right: 4px; padding: 6px 0 5px; border: 0; border-radius: 10px; background: transparent; text-align: center; }
+.wk:last-child { margin-right: 0; }
+.wk .l { display: block; font-size: 11px; font-weight: bold; color: #8f98a5; }
+.wk .n { display: block; font-size: 20px; font-weight: bold; line-height: 1.25; }
+.wk .d { display: block; height: 6px; line-height: 6px; }
+.wk .d i { display: inline-block; width: 5px; height: 5px; margin: 0 1px; border-radius: 50%; background: #d8dde6; }
+.wk.today .n { color: #d8dde6; }
+.wk.sel { background: #d8dde6; }
+.wk.sel .l, .wk.sel .n { color: #14171c; }
+.wk.sel .d i { background: #14171c; }
+.agD { -webkit-flex: 1; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; margin-top: 8px; padding-top: 8px; border-top: 1px solid #2f353e; }
+.agD .h { font-size: 13px; font-weight: bold; color: #8f98a5; margin-bottom: 6px; }
+.ev { display: -webkit-flex; display: flex; margin-bottom: 7px; font-size: 16px; line-height: 1.3; }
+.ev b { -webkit-flex: none; flex: none; min-width: 66px; margin-right: 8px; color: #d8dde6; font-weight: bold; }
+.ev span { min-width: 0; word-wrap: break-word; }
+.ev.past { opacity: 0.45; }
+.agN { color: #8f98a5; font-size: 15px; }
+.lib { -webkit-flex: 1; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; -webkit-align-content: flex-start; align-content: flex-start; margin: 0 -5px; }
+.mod { width: 25%; height: 33.3%; min-height: 104px; max-height: 150px; padding: 5px; }
+.mi { width: 100%; height: 100%; border-radius: 18px; border: 2px dashed #2f353e; background: transparent; color: #5b636f; display: block; font-size: 16px; font-weight: bold; }
+.mi svg { width: 38px; height: 38px; margin-bottom: 8px; display: block; }
+.mi.on { border-style: solid; border-color: #d8dde6; background: rgba(26,30,36,0.5); color: #d8dde6; }
+.mi.on:active { background: #262b33; }
+.bk { height: 40px; padding: 0 16px; margin-right: 14px; border-radius: 20px; background: #232830; border: 1px solid #2f353e; font-size: 16px; font-weight: bold; }
+.ver { padding: 6px 4px; }
+.ver { position: absolute; right: 12px; bottom: 3px; font-size: 11px; color: #8f98a5; opacity: 0.5; }
+
+/* tablette tenue en portrait : menu en haut */
+@media (max-aspect-ratio: 1/1) {
+  #app { -webkit-flex-direction: column; flex-direction: column; }
+  #nav { width: auto; height: 84px; -webkit-flex-direction: row; flex-direction: row; border-right: 0; border-bottom: 1px solid #232830; }
+  .nb { margin: 0 6px 0 0; }
+  .nb small { display: none; }
+  .temp { font-size: 76px; min-width: 190px; margin: 0 10px; }
+  .sb { width: 76px; height: 76px; line-height: 70px; }
+  .hRow, .wRow { -webkit-flex-direction: column; flex-direction: column; }
+  .hClim, .wNow { margin: 0 0 12px; }
+  #date { display: none; }
+}
+@-webkit-keyframes dA{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(120px,60px,0)}100%{-webkit-transform:translate3d(0,0,0)}}
+@keyframes dA{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(120px,60px,0)}100%{transform:translate3d(0,0,0)}}
+@-webkit-keyframes dB{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(-140px,-50px,0)}100%{-webkit-transform:translate3d(0,0,0)}}
+@keyframes dB{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-140px,-50px,0)}100%{transform:translate3d(0,0,0)}}
+@-webkit-keyframes tw{0%{opacity:.35}50%{opacity:1}100%{opacity:.35}}@keyframes tw{0%{opacity:.35}50%{opacity:1}100%{opacity:.35}}
+@-webkit-keyframes sx{0%{-webkit-transform:translate3d(0,0,0)}100%{-webkit-transform:translate3d(-1600px,0,0)}}@keyframes sx{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-1600px,0,0)}}
+@-webkit-keyframes mist{0%{-webkit-transform:translate3d(-300px,0,0)}100%{-webkit-transform:translate3d(300px,0,0)}}@keyframes mist{0%{transform:translate3d(-300px,0,0)}100%{transform:translate3d(300px,0,0)}}
+#bg{position:fixed;left:0;top:0;right:0;bottom:0;overflow:hidden;z-index:0}#app{position:relative;z-index:1}
+#bg i{position:absolute;display:block}
+.al{-webkit-animation:dA 70s ease-in-out infinite;animation:dA 70s ease-in-out infinite}
+.bl{-webkit-animation:dB 90s ease-in-out infinite;animation:dB 90s ease-in-out infinite}
+#ban { -webkit-flex: none; flex: none; background: rgba(220, 53, 53, 0.6); border-bottom: 1px solid rgba(255, 120, 120, 0.7); color: #fff; padding: 7px 20px; font-size: 15px; font-weight: bold; line-height: 1.3; }
+#ban span { font-weight: normal; opacity: 0.9; }
+</style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
+<div id="app">
+ <div id="nav">
+  <button type="button" class="nb" data-p="home"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8M5 9.5V21h5v-6h4v6h5V9.5"/></svg>Accueil</span></button>
+  <button type="button" class="nb" data-p="clim"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg>Clim<small id="navSub">--</small></span></button>
+  <button type="button" class="nb" data-p="lum"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>Lumières</span></button>
+  <button type="button" class="nb" data-p="wx"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 11a3.5 3.500 0 0 0 1 7z"/></svg>Météo</span></button>
+  <button type="button" class="nb" data-p="app"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Autre</span></button>
+ </div>
+
+ <div id="main">
+  <div id="ban" style="display:none" role="alert"></div>
+  <div id="top">
+   <div id="clock">--:--</div><div id="date">&nbsp;</div><button type="button" class="pill bad" id="err" aria-label="Voir le diagnostic des erreurs"></button>
+   <div id="hw"><div id="hIco"></div><div id="hT"></div><div id="hP"></div></div>
+  </div>
+
+  <div id="pages">
+
+   <section class="page" id="p-home">
+    <div class="ttl"><h2>Accueil</h2></div>
+    <div class="hRow">
+     <div class="tile hClim">
+      <span class="pill" id="hPill">Connexion…</span>
+      <div class="t" id="hTemp">--<small>°C</small></div>
+      <div class="note" id="hMode">&nbsp;</div>
+      <button type="button" class="pw" id="pw2" aria-label="Allumer ou éteindre la clim de la chambre"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v9M6.3 6.8a8 8 0 1 0 11.4 0"/></svg><span id="pw2t">Marche / arrêt</span></span></button>
+      <button type="button" class="go" data-p="clim">Régler la clim</button>
+     </div>
+     <div class="tile hCast"><div class="hl"><h3>Lumières</h3><div id="hLum" class="hlr"><p class="msg">Chargement…</p></div><button type="button" class="go" data-p="lum">Régler les lumières</button></div><div style="display:none"><p class="msg" id="castMsg1"></p><div class="fl" id="fl1"></div></div></div>
+    </div>
+   </section>
+
+   <section class="page" id="p-clim">
+    <div class="ttl"><h2>Climatisation de la chambre</h2>
+     <span class="fx" style="-webkit-align-items:center;align-items:center"><span class="pill" id="cPill" style="margin-right:12px">Connexion…</span>
+     <button type="button" class="pw" id="pw" aria-label="Allumer ou éteindre la clim de la chambre"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3v9M6.3 6.8a8 8 0 1 0 11.4 0"/></svg><span id="pwt">Marche / arrêt</span></span></button></span>
+    </div>
+    <div class="tile cBox">
+     <div class="cRow">
+      <button type="button" class="sb" id="dn" aria-label="Baisser la consigne">&minus;</button>
+      <div class="temp" id="temp">--<small>°C</small></div>
+      <button type="button" class="sb" id="up" aria-label="Monter la consigne">+</button>
+     </div>
+     <div class="note" id="room"></div>
+    </div>
+    <div class="modes" id="modes"></div>
+    <div class="note" id="info">Le mode est commun à toute la maison.</div>
+   </section>
+
+   <section class="page" id="p-lum">
+    <div class="ttl"><h2>Lumières</h2><div class="fx"><button type="button" class="pw" id="lumAllOff" style="margin-right:10px"><span class="bw">Tout éteindre</span></button><button type="button" class="pw" id="lumAllOn"><span class="bw">Tout allumer</span></button></div></div>
+    <div id="lumL" class="lumL"><p class="msg" id="lumMsg">Chargement des lumières…</p></div>
+   </section>
+
+   <section class="page" id="p-app">
+    <div class="ttl"><span class="fx" style="-webkit-align-items:center;align-items:center"><button type="button" class="bk" id="agBack" style="display:none" aria-label="Retour à la bibliothèque">&lsaquo; Autre</button><h2 id="appT">Autre</h2></span><span class="note" id="libNote">Bibliothèque de modules</span></div>
+    <div id="libV" class="lib"><div class="mod"><button type="button" class="mi on" data-mod="agenda"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Agenda</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="minuteur"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.500" r="7"/><path d="M12 9.500v4l2.500 1.500M9.500 3h5"/></svg><span>Minuteur</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="reveil"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.500 1.500M4 6l3-2.500M20 6l-3-2.500"/></svg><span>Réveil</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="musique"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></svg><span>Musique</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="reglages"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.400 15a1.650 1.650 0 0 0 .330 1.820l.060.060a2 2 0 1 1-2.830 2.830l-.060-.060a1.650 1.650 0 0 0-1.820-.330 1.650 1.650 0 0 0-1 1.510V21a2 2 0 0 1-4 0v-.090A1.650 1.650 0 0 0 9 19.400a1.650 1.650 0 0 0-1.820.330l-.060.060a2 2 0 1 1-2.830-2.830l.060-.060A1.650 1.650 0 0 0 4.680 15a1.650 1.650 0 0 0-1.510-1H3a2 2 0 0 1 0-4h.090A1.650 1.650 0 0 0 4.600 9a1.650 1.650 0 0 0-.330-1.820l-.060-.060a2 2 0 1 1 2.830-2.830l.060.060A1.650 1.650 0 0 0 9 4.680a1.650 1.650 0 0 0 1-1.510V3a2 2 0 0 1 4 0v.090a1.650 1.650 0 0 0 1 1.510 1.650 1.650 0 0 0 1.820-.330l.060-.060a2 2 0 1 1 2.830 2.830l-.060.060A1.650 1.650 0 0 0 19.400 9a1.650 1.650 0 0 0 1.510 1H21a2 2 0 0 1 0 4h-.090a1.650 1.650 0 0 0-1.510 1z"/></svg><span>Réglages</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="taches"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.500l2 2 3.500-4M4 14.500l2 2 3.500-4M13 7h7M13 15h7"/></svg><span>Tâches</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="meteo7"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 11a3.500 3.500 0 0 0 1 7z"/></svg><span>Météo semaine</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="prises"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v5M15 3v5M6.500 8h11v3.500a5.500 5.500 0 0 1-11 0zM12 17v4"/></svg><span>Prises</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="volets"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16M5 8h14M5 12h14M5 16h14M12 16v4"/></svg><span>Volets</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="tv"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>TV</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="debug"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="8" height="11" rx="4"/><path d="M12 8V5M9 5l1.500 1.500M15 5l-1.500 1.500M4 12h4M16 12h4M5 19l3-2M19 19l-3-2M5 7l3 2M19 7l-3 2"/></svg><span>Debug</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="trajets"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.200 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg><span>Trajets</span></span></button></div></div>
+    <div class="note" id="libMsg" style="margin-top:8px;min-height:18px">Les modules grisés sont des emplacements libres : dis-moi lesquels créer.</div>
+    <div id="wxV" style="display:none;-webkit-flex:1;flex:1;min-height:0;-webkit-flex-direction:column;flex-direction:column">
+     <div class="tile agT"><p class="msg" id="w7Msg">Chargement de la météo de la semaine…</p>
+      <div id="w7Box" style="display:none;-webkit-flex:1;flex:1;min-height:0;-webkit-flex-direction:column;flex-direction:column">
+       <div class="w7D" id="w7D"></div><div class="w7K" id="w7K"></div><div class="w7S" id="w7S"></div>
+       <div class="w7C" id="w7C"></div><div class="w7X" id="w7X"></div></div>
+     </div>
+    </div>
+    <div id="setV" style="display:none;-webkit-flex:1;flex:1;min-height:0;-webkit-flex-direction:column;flex-direction:column">
+     <div class="tile agT"><div class="agD" id="setB" style="display:block;border-top:0;margin-top:0;padding-top:0;height:calc(100vh - 215px);-webkit-flex:none;flex:none;overflow-y:auto"></div></div>
+    </div>
+    <div id="agV" style="display:none;-webkit-flex:1;flex:1;min-height:0;-webkit-flex-direction:column;flex-direction:column">
+     <div class="tile agT"><div class="agH"><h3>Agenda</h3><span id="agNote"></span></div>
+      <p class="msg" id="agMsg">Chargement de l'agenda…</p>
+      <div class="agW" id="agW" style="display:none"></div>
+      <div class="agD" id="agD" style="display:none"></div></div>
+    </div>
+   </section>
+
+   <section class="page" id="p-wx">
+    <div class="ttl"><h2>Météo</h2><span class="note" id="wxNote"></span></div>
+    <div class="wRow">
+     <div class="tile wNow">
+      <p class="msg" id="nowMsg">Chargement de la météo…</p>
+      <div id="nowBox" style="display:none;text-align:center">
+       <div class="big" id="nowIco" style="margin:0 auto"></div>
+       <div class="nowT" id="nowT"></div><div class="nowP" id="nowP"></div><div class="nowD" id="nowD"></div>
+      </div>
+     </div>
+     <div class="tile wCast"><p class="msg" id="castMsg2">Chargement…</p><div class="fl" id="fl2" style="display:none"></div></div>
+    </div>
+   </section>
+
+  </div>
+  <div class="ver" id="ver">Version 2.07 (beta) (11/11/2026)</div>
+ </div>
+</div>
+
+<div id="dbg"><div class="bar"><h2>Diagnostic</h2><span><button type="button" id="dbgClr">Vider le journal</button><button type="button" id="dbgX">Fermer</button></span></div>
+ <div class="cols"><div class="box" id="dbgL"></div><div class="box" id="dbgR"></div></div></div>
+
+<script>
+/* ===== Moteur local (appli Android) : remplace le relais Python. ES5 uniquement. =====
+   Activé seulement si l'appli fournit window.Native (pont Java). Sinon la page parle au relais (mode PC). */
+(function () {
+  "use strict";
+  if (!window.Native) { return; }
+  var N = window.Native, cbs = {}, seq = 0, START = Date.now();
+  var TMIN = 18, TMAX = 30, MODES = [2, 3, 4, 5, 7];
+  var AG_TTL = 300000, WX_TTL = 900000, LUM_UUID_NOTE = "fff3";
+
+  window.__nat = function (id, status, body, err) { var f = cbs[id]; if (f) { delete cbs[id]; f(status, body, err); } };
+  function nid(f) { seq++; cbs[seq] = f; return seq; }
+  function E(s, m) { return { s: s, m: m }; }
+  function http(method, url, headers, body, timeout, cb) {   /* cb(err, status, texte) */
+    var id = nid(function (st, tx, er) { if (er) { cb(er); } else { cb(null, st, tx); } });
+    try { N.http(id, method, url, JSON.stringify(headers || {}), body === null || body === undefined ? "" : body, timeout || 10000); }
+    catch (e) { delete cbs[id]; cb(String(e && e.message || e)); }
+  }
+  function getJson(url, timeout, cb) {
+    http("GET", url, { "User-Agent": "tableau-de-bord" }, "", timeout, function (err, st, tx) {
+      var j;
+      if (err) { return cb(err); }
+      if (st < 200 || st >= 300) { return cb("HTTP " + st); }
+      try { j = JSON.parse(tx); } catch (e) { return cb("réponse illisible"); }
+      cb(null, j);
+    });
+  }
+
+  /* ---------- réglages ---------- */
+  var DEF = { airzone: "192.168.1.68:3000", system: "1", zone: "1", lat: "44.9", lon: "-0.72", ical: "",
+              lum: "BE:68:15:03:63:08", lum2: "", tyregion: "eu", tyid: "", tysecret: "", tydevice: "", tycode: "switch_1", tyname: "Lego", wxurl: "", updurl: "" };
+  /*TESTCFG*/
+  function cfg() {
+    var o = {}, k, s = {};
+    try { s = JSON.parse(N.cfgGet("cfg") || "{}") || {}; } catch (e) { s = {}; }
+    for (k in DEF) { if (DEF.hasOwnProperty(k)) { o[k] = (s[k] !== undefined && s[k] !== null && String(s[k]) !== "") ? String(s[k]).replace(/^\s+|\s+$/g, "") : DEF[k]; } }
+    return o;
+  }
+
+  /* ---------- cache générique avec file d'attente ---------- */
+  function cached(store, ttl, fetchFn, cb) {   /* cb(err, data, at) */
+    if (store.data && Date.now() - store.at <= ttl) { return cb(null, store.data, store.at); }
+    if (store.wait) { store.wait.push(cb); return; }
+    store.wait = [cb];
+    fetchFn(function (err, data) {
+      var w = store.wait, i;
+      store.wait = null;
+      if (!err) { store.data = data; store.at = Date.now(); }
+      else if (!store.data) { store.fail = err; }
+      for (i = 0; i < w.length; i++) { if (!err || store.data) { w[i](null, store.data, store.at); } else { w[i](err); } }
+    });
+  }
+
+  /* ---------- Airzone ---------- */
+  function az(method, body, cb) {
+    var c = cfg();
+    http(method, "http://" + c.airzone + "/api/v1/hvac", { "Content-Type": "application/json", "Accept": "*/*" }, JSON.stringify(body), 6000, function (err, st, tx) {
+      var j = null, m;
+      if (err) { return cb(E(502, "boîtier Airzone injoignable")); }
+      try { j = JSON.parse(tx || "{}"); } catch (e) { j = null; }
+      if (st >= 200 && st < 300) { return j ? cb(null, j) : cb(E(502, "réponse Airzone illisible")); }
+      m = "HTTP " + st; try { m = j.errors[0].error; } catch (e2) {}
+      cb(E(502, String(m)));
+    });
+  }
+  function readZone(zone, cb) {
+    var c = cfg();
+    az("POST", { systemID: parseInt(c.system, 10) || 1, zoneID: zone || parseInt(c.zone, 10) || 1 }, function (err, j) {
+      if (err) { return cb(err); }
+      if (!j.data || !j.data[0]) { return cb(E(502, "réponse Airzone inattendue")); }
+      cb(null, j.data[0]);
+    });
+  }
+  function view(z) {
+    return { name: z.name, on: !!z.on, mode: z.mode, setpoint: z.setpoint, roomTemp: z.roomTemp, humidity: z.humidity,
+             minTemp: z.minTemp, maxTemp: z.maxTemp, master: z.master_zoneID };
+  }
+  function applyClim(cmd, cb) {
+    var c = cfg(), sys = parseInt(c.system, 10) || 1, zid = parseInt(c.zone, 10) || 1, k, n = 0, ok = { on: 1, setpoint: 1, mode: 1 };
+    for (k in cmd) { if (cmd.hasOwnProperty(k)) { n++; if (!ok[k]) { return cb(E(400, "commande inconnue")); } } }
+    if (!n) { return cb(E(400, "commande inconnue")); }
+    readZone(null, function (err, z) {
+      var clean = {}, has = false, sp, lo, hi, step2, body, master;
+      if (err) { return cb(err); }
+      if ("mode" in cmd && MODES.indexOf(cmd.mode) < 0) { return cb(E(400, "mode inconnu")); }
+      if ("setpoint" in cmd) {
+        sp = parseFloat(cmd.setpoint);
+        lo = Math.max(TMIN, parseFloat(z.minTemp !== undefined ? z.minTemp : TMIN));
+        hi = Math.min(TMAX, parseFloat(z.maxTemp !== undefined ? z.maxTemp : TMAX));
+        if (isNaN(sp) || sp < lo || sp > hi || Math.round(sp * 2) !== sp * 2) { return cb(E(400, "consigne hors limites (" + lo + " à " + hi + ", par 0,5)")); }
+        clean.setpoint = sp; has = true;
+      }
+      if ("on" in cmd) { clean.on = cmd.on ? 1 : 0; has = true; }
+      function finish() {
+        function fin2() { readZone(null, function (e3, z3) { if (e3) { return cb(e3); } cb(null, view(z3)); }); }
+        if (!has) { return fin2(); }
+        body = { systemID: sys, zoneID: zid };
+        for (k in clean) { if (clean.hasOwnProperty(k)) { body[k] = clean[k]; } }
+        az("PUT", body, function (e2) { if (e2) { return cb(e2); } fin2(); });
+      }
+      if ("mode" in cmd) {
+        master = z.master_zoneID || zid;
+        az("PUT", { systemID: sys, zoneID: master, mode: cmd.mode }, function (e1) { if (e1) { return cb(e1); } finish(); });
+      } else { finish(); }
+    });
+  }
+
+  /* ---------- Météo ---------- */
+  var wxS = {}, w7S = {};
+  /* Android 4.4 ne sait pas faire les chiffrements TLS (GCM) exigés par Open-Meteo : on essaie le HTTP simple d'abord, puis HTTPS. */
+  function wxJson(qs, to, cb) {
+    var c = cfg(), bases = c.wxurl ? [c.wxurl] : ["http://api.open-meteo.com/v1/forecast", "https://api.open-meteo.com/v1/forecast"], k = 0, first = null;
+    (function next() {
+      getJson(bases[k] + qs, to, function (err, j) {
+        if (!err) { return cb(null, j); }
+        if (first === null) { first = err; }
+        k++;
+        if (k < bases.length) { return next(); }
+        cb(first);
+      });
+    })();
+  }
+  function fetchWeather(cb) {
+    var c = cfg(), url = "?latitude=" + encodeURIComponent(c.lat) + "&longitude=" + encodeURIComponent(c.lon)
+      + "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m,is_day"
+      + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+      + "&timezone=Europe%2FParis&forecast_days=5";
+    wxJson(url, 12000, function (err, j) {
+      var d, cu, days = [], i;
+      if (err) { return cb(err); }
+      try {
+        d = j.daily; cu = j.current;
+        for (i = 0; i < d.time.length; i++) { days.push({ date: d.time[i], code: d.weather_code[i], hi: d.temperature_2m_max[i], lo: d.temperature_2m_min[i], rain: d.precipitation_probability_max[i] || 0 }); }
+        if (!days.length || cu.temperature_2m === null || cu.temperature_2m === undefined) { return cb("réponse météo incomplète"); }
+        cb(null, { now: { temp: cu.temperature_2m, feel: cu.apparent_temperature, code: cu.weather_code, wind: cu.wind_speed_10m, hum: cu.relative_humidity_2m, day: cu.is_day === undefined ? 1 : cu.is_day, time: cu.time }, days: days });
+      } catch (e) { cb("réponse météo incomplète"); }
+    });
+  }
+  function r1(v, nd) { if (v === null || v === undefined) { return null; } var p = nd === undefined ? 1 : Math.pow(10, nd); return Math.round(v * p) / p; }
+  function fetchWeather7(cb) {
+    var c = cfg(), url = "?latitude=" + encodeURIComponent(c.lat) + "&longitude=" + encodeURIComponent(c.lon)
+      + "&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,uv_index_max,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant"
+      + "&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation_probability,precipitation,wind_speed_10m,wind_gusts_10m,uv_index,weather_code"
+      + "&timezone=Europe%2FParis&forecast_days=7";
+    wxJson(url, 15000, function (err, j) {
+      var d, h, hours = {}, days = [], i, day, hh;
+      function g(a, k, nd) { var v = a && a[k]; return (v === null || v === undefined) ? null : (nd === undefined ? v : r1(v, nd)); }
+      if (err) { return cb(err); }
+      try {
+        d = j.daily; h = j.hourly;
+        for (i = 0; i < h.time.length; i++) {
+          day = h.time[i].substr(0, 10); hh = parseInt(h.time[i].substr(11, 2), 10);
+          if (!hours[day]) { hours[day] = []; }
+          hours[day].push({ h: hh, t: g(h.temperature_2m, i, 1), feel: g(h.apparent_temperature, i, 1), hum: g(h.relative_humidity_2m, i), pp: g(h.precipitation_probability, i),
+            mm: g(h.precipitation, i, 1), wind: g(h.wind_speed_10m, i), gust: g(h.wind_gusts_10m, i), uv: g(h.uv_index, i, 1), code: g(h.weather_code, i) });
+        }
+        for (i = 0; i < d.time.length; i++) {
+          day = d.time[i];
+          days.push({ date: day, code: g(d.weather_code, i), hi: g(d.temperature_2m_max, i, 1), lo: g(d.temperature_2m_min, i, 1), fhi: g(d.apparent_temperature_max, i, 1), flo: g(d.apparent_temperature_min, i, 1),
+            sunrise: (d.sunrise[i] || "").substr(11, 5), sunset: (d.sunset[i] || "").substr(11, 5), uv: g(d.uv_index_max, i, 1), mm: g(d.precipitation_sum, i, 1), pp: g(d.precipitation_probability_max, i),
+            wind: g(d.wind_speed_10m_max, i), gust: g(d.wind_gusts_10m_max, i), wdir: g(d.wind_direction_10m_dominant, i), hours: hours[day] || [] });
+        }
+        if (!days.length || !days[0].hours.length) { return cb("réponse météo détaillée incomplète"); }
+        cb(null, { days: days });
+      } catch (e) { cb("réponse météo détaillée incomplète"); }
+    });
+  }
+  function withMeta(fn, store, cb) {
+    cached(store, WX_TTL, fn, function (err, data, at) {
+      var o = {}, k;
+      if (err) { return cb(E(502, "météo indisponible : " + String(err))); }
+      for (k in data) { if (data.hasOwnProperty(k)) { o[k] = data[k]; } }
+      o.updated = at; o.stale = (Date.now() - at) > WX_TTL * 2;
+      cb(null, o);
+    });
+  }
+
+  /* ---------- Agenda (iCal) : dates « naïves » = millisecondes lues comme des champs UTC ---------- */
+  var agS = {}, DAY = 86400000, HOUR = 3600000;
+  function mkd(y, m, d, h, mi, s) { return Date.UTC(y, m - 1, d, h || 0, mi || 0, s || 0); }
+  function F(ms) { var t = new Date(ms); return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate(), h: t.getUTCHours(), mi: t.getUTCMinutes(), s: t.getUTCSeconds(), wd: (t.getUTCDay() + 6) % 7 }; }
+  function dayStart(ms) { return Math.floor(ms / DAY) * DAY; }
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+  function iso(ms) { var f = F(ms); return f.y + "-" + pad2(f.m) + "-" + pad2(f.d); }
+  function dim(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+  function lastSunday(y, m) { var d = mkd(y, m, dim(y, m)), wd = F(d).wd; return d - ((wd + 1) % 7) * DAY; }
+  function utcToParis(u) { var y = F(u).y, s = lastSunday(y, 3) + HOUR, e = lastSunday(y, 10) + HOUR; return u + ((u >= s && u < e) ? 2 : 1) * HOUR; }
+  function parisToUtc(l) { var y = F(l).y, s = lastSunday(y, 3) + 2 * HOUR, e = lastSunday(y, 10) + 3 * HOUR; return l - ((l >= s && l < e) ? 2 : 1) * HOUR; }
+  function unesc(s) { return s.replace(/\\[nN]/g, " ").replace(/\\,/g, ",").replace(/\;/g, ";").replace(/\\\\/g, "\\"); }
+  function parseDt(val, params) {
+    val = val.replace(/^\s+|\s+$/g, "");
+    var y, m, d, utc;
+    if (params.VALUE === "DATE" || val.length === 8) { return { k: "date", v: mkd(+val.substr(0, 4), +val.substr(4, 2), +val.substr(6, 2)) }; }
+    utc = val.charAt(val.length - 1) === "Z";
+    val = val.replace(/Z$/, "");
+    y = +val.substr(0, 4); m = +val.substr(4, 2); d = +val.substr(6, 2);
+    if (isNaN(y) || isNaN(m) || isNaN(d)) { throw new Error("date illisible"); }
+    return { k: utc ? "utc" : "local", v: mkd(y, m, d, +val.substr(9, 2), +val.substr(11, 2), +val.substr(13, 2)), tz: params.TZID };
+  }
+  function specUtc(sp) { return sp.k === "utc" ? sp.v : (sp.k === "local" ? parisToUtc(sp.v) : sp.v); }
+  function parseDur(v) {
+    var m = /^([+-])?P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/.exec(v.replace(/^\s+|\s+$/g, ""));
+    if (!m) { return null; }
+    return (m[1] === "-" ? -1 : 1) * (((+m[2] || 0) * 7 + (+m[3] || 0)) * DAY + (+m[4] || 0) * HOUR + (+m[5] || 0) * 60000 + (+m[6] || 0) * 1000);
+  }
+  function parseIcs(text) {
+    var lines, i, line, cur = null, out = [], head, val, parts, params, j, kv, evs = [], p, ev, n, pr;
+    text = text.replace(/\r?\n[ \t]/g, "");
+    lines = text.split(/\r?\n/);
+    for (i = 0; i < lines.length; i++) {
+      line = lines[i];
+      if (line === "BEGIN:VEVENT") { cur = []; }
+      else if (line === "END:VEVENT") { if (cur) { out.push(cur); } cur = null; }
+      else if (cur && line.indexOf(":") >= 0) {
+        head = line.substr(0, line.indexOf(":")); val = line.substr(line.indexOf(":") + 1);
+        parts = head.split(";"); params = {};
+        for (j = 1; j < parts.length; j++) { if (parts[j].indexOf("=") >= 0) { kv = parts[j].split("="); params[kv[0].toUpperCase()] = kv.slice(1).join("=").replace(/"/g, ""); } }
+        cur.push([parts[0].toUpperCase(), params, val]);
+      }
+    }
+    for (i = 0; i < out.length; i++) {
+      ev = { uid: "", title: "", status: "", rr: null, ex: [], rid: null, s: null, e: null, dur: null };
+      try {
+        for (j = 0; j < out[i].length; j++) {
+          n = out[i][j][0]; pr = out[i][j][1]; val = out[i][j][2];
+          if (n === "UID") { ev.uid = val; }
+          else if (n === "SUMMARY") { ev.title = unesc(val).replace(/^\s+|\s+$/g, ""); }
+          else if (n === "STATUS") { ev.status = val.toUpperCase(); }
+          else if (n === "DTSTART") { ev.s = parseDt(val, pr); }
+          else if (n === "DTEND") { ev.e = parseDt(val, pr); }
+          else if (n === "DURATION") { ev.dur = parseDur(val); }
+          else if (n === "RRULE") { ev.rr = {}; p = val.split(";"); for (kv = 0; kv < p.length; kv++) { if (p[kv].indexOf("=") >= 0) { ev.rr[p[kv].split("=")[0]] = p[kv].split("=").slice(1).join("="); } } }
+          else if (n === "EXDATE") { p = val.split(","); for (kv = 0; kv < p.length; kv++) { if (p[kv].replace(/\s/g, "")) { ev.ex.push(parseDt(p[kv], pr)); } } }
+          else if (n === "RECURRENCE-ID") { ev.rid = parseDt(val, pr); }
+        }
+      } catch (e) { continue; }
+      if (ev.s) { evs.push(ev); }
+    }
+    return evs;
+  }
+  var WDN = { MO: 0, TU: 1, WE: 2, TH: 3, FR: 4, SA: 5, SU: 6 };
+  function byday(rr) {
+    var out = [], items = (rr.BYDAY || "").split(","), i, m;
+    for (i = 0; i < items.length; i++) { m = /^([+-]?\d+)?(MO|TU|WE|TH|FR|SA|SU)$/.exec(items[i].replace(/\s/g, "")); if (m) { out.push([m[1] ? parseInt(m[1], 10) : null, WDN[m[2]]]); } }
+    return out;
+  }
+  function monthCands(y, m, rr, start) {
+    var nd = dim(y, m), days = {}, bd = byday(rr), i, j, n, wds, d, v, tod = start - dayStart(start), res = [], arr, k, s;
+    if (bd.length) {
+      for (i = 0; i < bd.length; i++) {
+        n = bd[i][0]; wds = [];
+        for (d = 1; d <= nd; d++) { if (F(mkd(y, m, d)).wd === bd[i][1]) { wds.push(d); } }
+        if (n === null) { for (j = 0; j < wds.length; j++) { days[wds[j]] = 1; } }
+        else if (n > 0 && n <= wds.length) { days[wds[n - 1]] = 1; }
+        else if (n < 0 && -n <= wds.length) { days[wds[wds.length + n]] = 1; }
+      }
+    } else if (rr.BYMONTHDAY) {
+      s = rr.BYMONTHDAY.split(",");
+      for (i = 0; i < s.length; i++) { v = parseInt(s[i], 10); d = v > 0 ? v : nd + v + 1; if (d >= 1 && d <= nd) { days[d] = 1; } }
+    } else if (F(start).d <= nd) { days[F(start).d] = 1; }
+    arr = [];
+    for (k in days) { if (days.hasOwnProperty(k)) { arr.push(parseInt(k, 10)); } }
+    arr.sort(function (a, b) { return a - b; });
+    for (i = 0; i < arr.length; i++) { res.push(mkd(y, m, arr[i]) + tod); }
+    return res;
+  }
+  function expand(ev, lo, hi) {
+    var sp = ev.s, start = sp.k === "date" ? sp.v : sp.v, rr = ev.rr, out = [], freq, step, count, until = null, u, bd, n = 0, k, base, cands, first, ws, wds, i, j, idx, months, y, ms, c, fs = F(start), tod = start - dayStart(start), okwd, w, mm;
+    if (!rr) { if (lo <= start && start <= hi) { out.push(start); } return out; }
+    freq = rr.FREQ || ""; step = Math.max(1, parseInt(rr.INTERVAL || "1", 10) || 1);
+    count = rr.COUNT ? parseInt(rr.COUNT, 10) : null;
+    if (rr.UNTIL) {
+      u = parseDt(rr.UNTIL, {});
+      if (u.k === "date") { until = u.v + DAY - 1000; }
+      else if (u.k === "utc" && sp.k === "local") { until = utcToParis(u.v); }
+      else { until = u.v; }
+    }
+    bd = byday(rr);
+    for (k = 0; k < 60000; k++) {
+      if (freq === "DAILY") {
+        base = start + k * step * DAY; okwd = !bd.length;
+        for (j = 0; j < bd.length; j++) { if (bd[j][1] === F(base).wd) { okwd = true; } }
+        cands = okwd ? [base] : []; first = base;
+      } else if (freq === "WEEKLY") {
+        ws = dayStart(start) - fs.wd * DAY + 7 * k * step * DAY;
+        wds = []; for (j = 0; j < bd.length; j++) { if (wds.indexOf(bd[j][1]) < 0) { wds.push(bd[j][1]); } }
+        wds.sort(function (a, b) { return a - b; });
+        if (!wds.length) { wds = [fs.wd]; }
+        cands = []; for (j = 0; j < wds.length; j++) { cands.push(ws + wds[j] * DAY + tod); }
+        first = ws;
+      } else if (freq === "MONTHLY" || freq === "YEARLY") {
+        if (freq === "MONTHLY") { idx = fs.y * 12 + (fs.m - 1) + k * step; months = [[Math.floor(idx / 12), idx % 12 + 1]]; }
+        else { y = fs.y + k * step; months = []; mm = (rr.BYMONTH || String(fs.m)).split(","); for (j = 0; j < mm.length; j++) { months.push([y, parseInt(mm[j], 10)]); } }
+        cands = [];
+        for (j = 0; j < months.length; j++) { cands = cands.concat(monthCands(months[j][0], months[j][1], rr, start)); }
+        cands.sort(function (a, b) { return a - b; });
+        first = mkd(months[0][0], months[0][1], 1);
+      } else { return out; }
+      for (i = 0; i < cands.length; i++) {
+        c = cands[i];
+        if (c < start) { continue; }
+        if (until !== null && c > until) { return out; }
+        if (count !== null && n >= count) { return out; }
+        n++;
+        if (c >= lo && c <= hi) { out.push(c); }
+      }
+      if (first > hi) { return out; }
+    }
+    return out;
+  }
+  function agendaView(evs, nowUtc) {
+    var today = dayStart(utcToParis(nowUtc || Date.now())), keys = [], days = [], i, ws = today, overrides = {}, ev, sp, allday, dur, nd, exs, lo, hi, bases, b, key, d, pl, ex, j, res = [], idx;
+    for (i = 0; i < 7; i++) { keys.push(today + i * DAY); days.push([]); }
+    for (i = 0; i < evs.length; i++) { ev = evs[i]; if (ev.rid) { overrides[ev.uid + "|" + (ev.rid.k === "date" ? "d" : "t") + (ev.rid.k === "date" ? ev.rid.v : specUtc(ev.rid))] = 1; } }
+    for (i = 0; i < evs.length; i++) {
+      ev = evs[i];
+      if (ev.status === "CANCELLED") { continue; }
+      sp = ev.s; allday = sp.k === "date";
+      if (allday) { nd = (ev.e && ev.e.k === "date") ? Math.round((ev.e.v - sp.v) / DAY) : (ev.dur ? Math.round(ev.dur / DAY) : 1); dur = Math.max(1, nd) * DAY; }
+      else { dur = ev.e ? (specUtc(ev.e) - specUtc(sp)) : (ev.dur || 0); }
+      exs = {};
+      for (j = 0; j < ev.ex.length; j++) { ex = ev.ex[j]; exs[(ex.k === "date" ? "d" : "t") + (ex.k === "date" ? ex.v : specUtc(ex))] = 1; }
+      lo = ws - ((allday ? Math.floor(dur / DAY) : 0) + 2) * DAY; hi = ws + 9 * DAY;
+      bases = expand(ev, lo, hi);
+      for (b = 0; b < bases.length; b++) {
+        if (allday) { key = "d" + dayStart(bases[b]); } else { key = "t" + specUtc({ k: sp.k, v: bases[b], tz: sp.tz }); }
+        if (exs[key] || (!ev.rid && overrides[ev.uid + "|" + key])) { continue; }
+        if (allday) {
+          for (d = 0; d < 7; d++) { if (dayStart(bases[b]) <= keys[d] && keys[d] < dayStart(bases[b]) + dur) { days[d].push({ time: "Journée", title: ev.title || "Sans titre", startMs: 0, allDay: true }); } }
+        } else {
+          pl = utcToParis(parseInt(key.substr(1), 10));
+          idx = keys.indexOf(dayStart(pl));
+          if (idx >= 0) { days[idx].push({ time: pad2(F(pl).h) + ":" + pad2(F(pl).mi), title: ev.title || "Sans titre", startMs: parseInt(key.substr(1), 10), allDay: false }); }
+        }
+      }
+    }
+    for (i = 0; i < 7; i++) { days[i].sort(function (a, b) { return a.startMs - b.startMs; }); res.push({ key: iso(keys[i]), events: days[i] }); }
+    return res;
+  }
+  function icalUrl() { var u = cfg().ical; if (/^webcal:\/\//i.test(u)) { u = "https://" + u.substr(9); } return u; }
+  function fetchAgenda(cb) {
+    http("GET", icalUrl(), { "User-Agent": "tableau-de-bord-chambre" }, "", 20000, function (err, st, tx) {
+      if (err) { return cb(err); }
+      if (st < 200 || st >= 300) { return cb("HTTP " + st); }
+      if (tx.indexOf("BEGIN:VCALENDAR") < 0) { return cb("ce n'est pas un agenda iCal (lien incorrect ?)"); }
+      try { cb(null, parseIcs(tx)); } catch (e) { cb("agenda illisible"); }
+    });
+  }
+  function agenda(cb) {
+    if (!icalUrl()) { return cb(null, { configured: false }); }
+    cached(agS, AG_TTL, fetchAgenda, function (err, evs, at) {
+      if (err) { return cb(E(502, "agenda indisponible : " + String(err))); }
+      cb(null, { configured: true, updated: at, stale: (Date.now() - at) > AG_TTL * 4, days: agendaView(evs) });
+    });
+  }
+
+  /* ---------- Lumières Bluetooth (ELK-BLEDOM) ---------- */
+  var LIGHTS = [], lumInit = false;
+  function hex2(n) { return (n < 16 ? "0" : "") + n.toString(16); }
+  function frame(i, sub, a, b, c) { return ["7e", "00", hex2(i), hex2(sub), hex2(a || 0), hex2(b || 0), hex2(c || 0), "00", "ef"].join(""); }
+  function lightsInit() {
+    var c = cfg(), st = {}, i, L, d;
+    LIGHTS = [{ id: "l1", name: "LED", addr: c.lum, on: false, color: [255, 255, 255], bright: 100, assumed: false, known: false }];
+    if (c.lum2) { LIGHTS.push({ id: "l2", name: "Lumière 2", addr: c.lum2, on: false, color: [255, 255, 255], bright: 100, assumed: false, known: false }); }
+    try { st = JSON.parse(N.cfgGet("lumstate") || "{}") || {}; } catch (e) { st = {}; }
+    for (i = 0; i < LIGHTS.length; i++) {
+      L = LIGHTS[i]; d = st[L.id] || {};
+      if (d.color && d.color.length === 3) { L.color = [d.color[0] & 255, d.color[1] & 255, d.color[2] & 255]; }
+      if (typeof d.bright === "number" && d.bright >= 0 && d.bright <= 100) { L.bright = d.bright; }
+      if (typeof d.on === "boolean") { L.on = d.on; L.assumed = true; }
+    }
+    lumInit = true;
+  }
+  function stateSave() {
+    var o = {}, i, L;
+    for (i = 0; i < LIGHTS.length; i++) { L = LIGHTS[i]; if (L.known || L.assumed) { o[L.id] = { color: L.color, bright: L.bright, on: L.on }; } }
+    try { N.cfgSet("lumstate", JSON.stringify(o)); } catch (e) {}
+  }
+  function bleOk() { try { return !!N.bleAvailable(); } catch (e) { return false; } }
+  function lumSend(L, frames, cb) {
+    if (!bleOk()) { return cb(E(501, "Bluetooth basse consommation indisponible sur cette tablette")); }
+    var id = nid(function (st, tx, er) { if (er) { cb(E(502, er)); } else { cb(null); } });
+    try { N.bleWrite(id, L.addr, frames.join(","), 30000); } catch (e) { delete cbs[id]; cb(E(502, String(e && e.message || e))); }
+  }
+
+  /* ---------- Relais Tuya (cloud) ---------- */
+  var TY_HOSTS = { eu: "openapi.tuyaeu.com", "eu-w": "openapi-weaz.tuyaeu.com", us: "openapi.tuyaus.com", "us-e": "openapi-ueaz.tuyaus.com", "in": "openapi.tuyain.com", sg: "openapi-sg.iotbing.com", cn: "openapi.tuyacn.com" };
+  var ty = { token: null, exp: 0, base: null, state: null, at: 0 };
+  function tyCfg() {
+    var c = cfg(), miss = [];
+    if (!c.tyid && !c.tysecret && !c.tydevice) { return null; }
+    if (!c.tyid) { miss.push("id"); } if (!c.tysecret) { miss.push("secret"); } if (!c.tydevice) { miss.push("device"); }
+    return { region: (c.tyregion || "eu").toLowerCase(), id: c.tyid, secret: c.tysecret, device: c.tydevice, code: c.tycode || "switch_1", name: c.tyname || "Lego", miss: miss };
+  }
+  function tyCall(base, c, method, path, body, token, cb) {
+    var t = String(Date.now()), data = body !== undefined && body !== null ? JSON.stringify(body) : "", heads = {}, shead = "", sts, payload;
+    if (data) { heads["Content-type"] = "application/json"; heads["Signature-Headers"] = "Content-type"; shead = "Content-type:application/json\n"; }
+    sts = method + "\n" + N.sha256Hex(data) + "\n" + shead + "\n" + path;
+    payload = c.id + (token || "") + t + sts;
+    heads.client_id = c.id; heads.sign = String(N.hmacSha256Hex(c.secret, payload)).toUpperCase(); heads.t = t; heads.sign_method = "HMAC-SHA256";
+    if (token) { heads.access_token = token; } else { heads.secret = c.secret; }
+    http(method, base + path, heads, data, 12000, function (err, st, tx) {
+      var j;
+      if (err) { return cb("Tuya injoignable (Internet ?) : " + err); }
+      try { j = JSON.parse(tx); } catch (e) { return cb("Tuya : erreur HTTP " + st); }
+      cb(null, j);
+    });
+  }
+  function tyToken(c, force, cb) {
+    var bases, h0, last = "pas de réponse", i = 0;
+    if (ty.token && !force && Date.now() < ty.exp - 60000) { return cb(null, ty.token, ty.base); }
+    h0 = TY_HOSTS[c.region] || TY_HOSTS.eu;
+    bases = ["https://" + h0]; if (h0 !== TY_HOSTS.eu) { bases.push("https://" + TY_HOSTS.eu); } if (h0 !== TY_HOSTS["eu-w"]) { bases.push("https://" + TY_HOSTS["eu-w"]); }
+    (function next() {
+      if (i >= bases.length) { return cb("Tuya refuse la connexion : " + last + " (vérifie Access ID, Access Secret et la région dans les réglages)"); }
+      var b = bases[i++];
+      tyCall(b, c, "GET", "/v1.0/token?grant_type=1", null, null, function (err, r) {
+        if (err) { last = err; return next(); }
+        if (r.success) { ty.token = r.result.access_token; ty.exp = Date.now() + (parseInt(r.result.expire_time, 10) || 7200) * 1000; ty.base = b; return cb(null, ty.token, b); }
+        last = String(r.msg || JSON.stringify(r)); next();
+      });
+    })();
+  }
+  function tyApi(c, method, path, body, cb, attempt) {
+    attempt = attempt || 1;
+    tyToken(c, attempt === 2, function (err, token, base) {
+      if (err) { return cb(err); }
+      tyCall(base, c, method, path, body, token, function (e2, r) {
+        if (e2) { return cb(e2); }
+        if (r.success) { return cb(null, r); }
+        if (attempt === 1 && (String(r.msg || "").toLowerCase().indexOf("token") >= 0 || r.code === 1010 || r.code === 1011)) { return tyApi(c, method, path, body, cb, 2); }
+        cb("Tuya : " + (r.msg || JSON.stringify(r)));
+      });
+    });
+  }
+  function tyRead(c, cb) {
+    tyApi(c, "GET", "/v1.0/devices/" + c.device + "/status", null, function (err, r) {
+      var i, it, res;
+      if (err) { return cb(err); }
+      res = r.result || [];
+      for (i = 0; i < res.length; i++) { if (res[i].code === c.code) { ty.state = !!res[i].value; ty.at = Date.now(); return cb(null); } }
+      cb("Tuya : la fonction « " + c.code + " » n'existe pas sur cet appareil (voir « code » dans les réglages)");
+    });
+  }
+  function tySet(c, on, cb) {
+    tyApi(c, "POST", "/v1.0/devices/" + c.device + "/commands", { commands: [{ code: c.code, value: !!on }] }, function (err) {
+      if (err) { return cb(err); }
+      ty.state = !!on; ty.at = Date.now(); cb(null);
+    });
+  }
+
+  function lumView(cb) {
+    var out = { available: bleOk(), lights: [] }, i, L, c = tyCfg(), item;
+    if (!lumInit) { lightsInit(); }
+    for (i = 0; i < LIGHTS.length; i++) {
+      L = LIGHTS[i];
+      out.lights.push({ id: L.id, name: L.name, kind: "ble", on: L.on, color: L.color, bright: L.bright, known: L.known, assumed: L.assumed && !L.known, linked: false });
+    }
+    if (!c) { return cb(null, out); }
+    item = { id: "tuya", name: c.name, kind: "switch", on: !!ty.state, known: ty.state !== null, error: "" };
+    out.lights.push(item);
+    if (c.miss.length) { item.error = "réglages Tuya incomplets : il manque " + c.miss.join(", "); return cb(null, out); }
+    if (Date.now() - ty.at > 10000) {
+      tyRead(c, function (err) { if (err) { item.error = String(err); } else { item.on = !!ty.state; item.known = true; } cb(null, out); });
+    } else { cb(null, out); }
+  }
+  function lumApply(cmd, cb) {
+    var c = tyCfg(), L, k, n = 0, i, frames = [], nw = {}, col, b;
+    if (!lumInit) { lightsInit(); }
+    if (cmd.id === "tuya" && c) {
+      for (k in cmd) { if (cmd.hasOwnProperty(k)) { n++; if (k !== "id" && k !== "on") { return cb(E(400, "commande inconnue")); } } }
+      if (n !== 2 || typeof cmd.on !== "boolean") { return cb(E(400, "commande inconnue")); }
+      if (c.miss.length) { return cb(E(502, "réglages Tuya incomplets : il manque " + c.miss.join(", "))); }
+      return tySet(c, cmd.on, function (err) { if (err) { return cb(E(502, String(err))); } lumView(cb); });
+    }
+    for (i = 0; i < LIGHTS.length; i++) { if (LIGHTS[i].id === cmd.id) { L = LIGHTS[i]; } }
+    if (!L) { return cb(E(400, "lumière inconnue")); }
+    for (k in cmd) { if (cmd.hasOwnProperty(k)) { n++; if (k !== "id" && k !== "on" && k !== "color" && k !== "bright") { return cb(E(400, "commande inconnue")); } } }
+    if (n < 2) { return cb(E(400, "commande inconnue")); }
+    if ("color" in cmd) {
+      col = cmd.color;
+      if (!(col && col.length === 3 && typeof col[0] === "number" && typeof col[1] === "number" && typeof col[2] === "number" && col[0] >= 0 && col[1] >= 0 && col[2] >= 0 && col[0] <= 255 && col[1] <= 255 && col[2] <= 255)) { return cb(E(400, "couleur invalide")); }
+      nw.color = col; nw.on = true;
+    }
+    if ("bright" in cmd) {
+      b = cmd.bright;
+      if (typeof b !== "number" || b < 0 || b > 100 || Math.round(b) !== b) { return cb(E(400, "luminosité invalide (0 à 100)")); }
+      nw.bright = b; nw.on = true;
+    }
+    if ("on" in cmd) { if (typeof cmd.on !== "boolean") { return cb(E(400, "« on » doit être vrai ou faux")); } nw.on = cmd.on; }
+    if (nw.on) {
+      frames.push(frame(0x04, 0xF0, 0x00, 0x01, 0xFF));
+      if (nw.color) { frames.push(frame(0x05, 0x03, nw.color[0], nw.color[1], nw.color[2])); }
+      if (nw.bright !== undefined) { frames.push(frame(0x01, nw.bright)); }
+    } else { frames.push(frame(0x04, 0x00, 0x00, 0x00, 0xFF)); }
+    lumSend(L, frames, function (err) {
+      if (err) { return cb(err); }
+      for (k in nw) { if (nw.hasOwnProperty(k)) { L[k] = nw[k]; } }
+      L.known = true; stateSave(); lumView(cb);
+    });
+  }
+
+  /* ---------- routeur ---------- */
+  function debug(cb) {
+    readZone(null, function (err) {
+      cb(null, { uptime_s: Math.round((Date.now() - START) / 1000), airzone: { ok: !err, error: err ? err.m : "" },
+        lumieres: { bleak: bleOk(), n: LIGHTS.length }, mode: "appli autonome",
+        agenda: { configured: !!icalUrl(), age_s: agS.data ? Math.round((Date.now() - agS.at) / 1000) : null },
+        weather: { age_s: wxS.data ? Math.round((Date.now() - wxS.at) / 1000) : null, stale: !!wxS.data && (Date.now() - wxS.at) > WX_TTL * 2 } });
+    });
+  }
+  window.LOCAL = {
+    cfg: cfg, DEF: DEF,
+    apkInstall: function (url, cb) { var id = nid(function (st, tx, er) { cb(er || null); }); try { N.apkInstall(id, url); } catch (e) { delete cbs[id]; cb(String(e && e.message || e)); } },
+    getText: function (url, timeout, cb) { http("GET", url, { "User-Agent": "tableau-de-bord" }, "", timeout, function (err, st, tx) { if (err) { return cb(err); } if (st < 200 || st >= 300) { return cb("HTTP " + st); } cb(null, tx); }); },
+    reset: function () { wxS = {}; w7S = {}; agS = {}; ty.token = null; ty.state = null; ty.at = 0; lumInit = false; },
+    req: function (method, url, body, cb) {
+      var path = url.split("?")[0], cmd = null;
+      function done(err, data) { if (err) { cb(err.s || 502, { error: err.m || String(err) }); } else { cb(200, data); } }
+      try {
+        if (method === "POST") {
+          try { cmd = JSON.parse(body || "{}"); } catch (e) { return cb(400, { error: "commande illisible" }); }
+          if (!cmd || typeof cmd !== "object" || cmd.length !== undefined) { return cb(400, { error: "commande inconnue" }); }
+          if (path === "/api/clim") { return applyClim(cmd, done); }
+          if (path === "/api/lum") { return lumApply(cmd, done); }
+          return cb(404, { error: "introuvable" });
+        }
+        if (path === "/api/clim") { return readZone(null, function (e, z) { done(e, e ? null : view(z)); }); }
+        if (path === "/api/meteo") { return withMeta(fetchWeather, wxS, done); }
+        if (path === "/api/meteo7") { return withMeta(fetchWeather7, w7S, done); }
+        if (path === "/api/agenda") { return agenda(done); }
+        if (path === "/api/lum") { return lumView(done); }
+        if (path === "/api/debug") { return debug(done); }
+        cb(404, { error: "introuvable" });
+      } catch (e) { cb(502, { error: String(e && e.message || e) }); }
+    }
+  };
+})();
+
+</script>
+<script>
+(function () {
+  "use strict";
+  function $(id) { return document.getElementById(id); }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function fmt(t) { return (Math.round(Number(t) * 10) / 10).toFixed(1).replace(".", ","); }
+  function rnd(x) { return Math.round(Number(x)); }
+  function show(el, on) { if (on) { el.style.display = "-webkit-flex"; el.style.display = "flex"; } else { el.style.display = "none"; } }
+
+  var DAYS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+  var SHORT = ["Dim.", "Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam."];
+  var MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+  /* ---------------- codes d'erreur et journal ---------------- */
+  var CODES = {
+    E01: "Pas de réponse : relais du PC injoignable (mode PC) ou opération trop longue.",
+    E02: "Le boîtier Airzone ne répond pas ou refuse l'ordre (vérifie son adresse dans Réglages et que la tablette est sur le même Wi-Fi).",
+    E03: "Ordre refusé (valeur invalide).",
+    E04: "Météo indisponible ou ancienne : Open-Meteo injoignable (Internet ?).",
+    E05: "Réponse illisible ou incomplète reçue.",
+    E06: "Erreur dans le code de la page (à me transmettre).",
+    E07: "Erreur inattendue (voir le journal).",
+    E08: "La requête n'a pas pu partir.",
+    E09: "Accès refusé : la tablette n'est pas sur le réseau local autorisé (mode PC).",
+    E10: "Agenda indisponible : le lien iCal est faux ou périmé, ou pas d'Internet.",
+    E11: "Lumière injoignable. Bluetooth : éteinte, trop loin de la tablette, ou occupée par l'appli LEDBLE (la fermer). Relais Tuya : pas d'Internet ou codes Tuya faux (Réglages).",
+    E12: "Bluetooth indisponible : cette tablette n'a pas le Bluetooth basse consommation (ou bleak absent en mode PC)."
+  };
+  var LOG = [], ACT = { clim: null, wx: null, ag: null, lum: null, js: null }, OKT = { clim: 0, wx: 0, ag: 0, lum: 0 }, T0 = Date.now();
+  function mk(code, msg) { var e = new Error(msg); e.code = code; return e; }
+  function hms(t) { var d = new Date(t); return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); }
+  var AREAS = { clim: ["Clim", "clim"], wx: ["Météo", "meteo"], ag: ["Agenda", "agenda"], lum: ["Lumières", "lum"], js: ["Page", "js"] };
+  function lastMsg(code, what) {
+    var i;
+    for (i = LOG.length - 1; i >= 0; i--) { if (LOG[i].c === code && LOG[i].w === what) { return LOG[i].m; } }
+    return "";
+  }
+  function drawErr() {
+    var c = [], k, b = $("err"), groups = {}, order = [], code, i, txt = [], m, g, ban = $("ban");
+    for (k in ACT) {
+      if (ACT.hasOwnProperty(k) && ACT[k]) {
+        c.push(ACT[k]); code = ACT[k];
+        if (!groups[code]) { groups[code] = []; order.push(code); }
+        groups[code].push(k);
+      }
+    }
+    b.textContent = c.join(" ");
+    b.style.display = c.length ? "block" : "none";
+    for (i = 0; i < order.length; i++) {
+      code = order[i]; g = groups[code];
+      m = lastMsg(code, AREAS[g[0]][1]);
+      txt.push("<b>" + esc(map(g)) + "</b> · " + code + " " + esc((CODES[code] || "").split(/[:.]/)[0]) + (m ? " <span>(" + esc(m.length > 70 ? m.substr(0, 70) + "…" : m) + ")</span>" : ""));
+    }
+    ban.innerHTML = txt.join('<span>  &nbsp;|&nbsp;  </span>');
+    ban.style.display = txt.length ? "block" : "none";
+  }
+  function map(g) { var o = [], i; for (i = 0; i < g.length; i++) { o.push(AREAS[g[i]][0]); } return o.join(", "); }
+  function noteErr(err, what) {
+    var last = LOG.length ? LOG[LOG.length - 1] : null, area = what.indexOf("meteo") === 0 ? "wx" : (what === "agenda" ? "ag" : (what === "lum" ? "lum" : (what === "js" ? "js" : "clim")));
+    if (last && last.c === err.code && last.w === what && last.m === err.message) { last.n++; last.t = Date.now(); }
+    else { LOG.push({ t: Date.now(), c: err.code, w: what, m: err.message, n: 1 }); if (LOG.length > 60) { LOG.shift(); } }
+    ACT[area] = err.code; drawErr();
+  }
+  window.onerror = function (msg, src, line) {
+    noteErr(mk("E06", String(msg) + " (ligne " + line + ")"), "js"); return false;
+  };
+
+  function call(method, url, body, cb) {
+    var x, done = false, what = url.replace("/api/", ""), timer = null;
+    function end(err, data) { if (!done) { done = true; if (timer) { clearTimeout(timer); } if (err) { noteErr(err, what); } cb(err, data); } }
+    function reply(status, j) {
+      var code, msg;
+      if (status >= 200 && status < 300) {
+        if (j && !j.error) { return end(null, j); }
+        return end(mk("E05", "réponse illisible"));
+      }
+      msg = (j && j.error) || ("erreur HTTP " + status);
+      if (status === 403) { code = "E09"; }
+      else if (status === 501) { code = "E12"; }
+      else if (status === 502 && what === "lum") { code = "E11"; }
+      else if (status === 400) { code = "E03"; }
+      else if (status === 502 && what.indexOf("meteo") === 0) { code = "E04"; }
+      else if (status === 502 && what === "agenda") { code = "E10"; }
+      else if (status === 502) { code = "E02"; }
+      else { code = "E07"; }
+      end(mk(code, msg));
+    }
+    if (window.LOCAL) {   /* appli autonome : pas de relais, tout est local */
+      timer = setTimeout(function () { end(mk("E01", "pas de réponse")); }, what === "lum" ? 50000 : 25000);
+      try { window.LOCAL.req(method, url, body ? JSON.stringify(body) : null, reply); } catch (e) { end(mk("E08", String(e && e.message || e))); }
+      return;
+    }
+    x = new XMLHttpRequest();
+    try {
+      x.open(method, url, true);
+      x.timeout = what === "lum" ? 40000 : 12000;
+      if (body) { x.setRequestHeader("Content-Type", "application/json"); }
+      x.onload = function () {
+        var j = null;
+        try { j = JSON.parse(x.responseText); } catch (e) {}
+        reply(x.status, j);
+      };
+      x.onerror = function () { end(mk("E01", "relais injoignable")); };
+      x.ontimeout = function () { end(mk("E01", "pas de réponse du relais")); };
+      x.send(body ? JSON.stringify(body) : null);
+    } catch (e) { end(mk("E08", String(e && e.message || e))); }
+  }
+
+  /* ---------------- fenêtre de diagnostic ---------------- */
+  function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function ago(t) { if (!t) { return "jamais"; } var s = Math.round((Date.now() - t) / 1000); return s < 90 ? "il y a " + s + " s" : "il y a " + Math.round(s / 60) + " min"; }
+  var relayTxt = "…";
+  function stt(k) {
+    if (ACT[k]) { return '<span class="e">' + ACT[k] + "</span> dernière réponse correcte " + ago(OKT[k]); }
+    if (!OKT[k]) { return "pas encore de réponse"; }
+    return '<span class="ok">OK</span> dernière réponse ' + ago(OKT[k]);
+  }
+  function drawDbg() {
+    var h = "", i, l, k;
+    h += "<h3>État</h3>";
+    h += "<p>Page : " + (UI_NAME === "?" ? "2.07 (beta)" : UI_NAME) + ", ouverte depuis " + Math.round((Date.now() - T0) / 60000) + " min</p>";
+    h += "<p>Clim : " + (S.linked ? '<span class="ok">liée</span>' : '<span class="e">non liée</span>') + ", " + stt("clim") + "</p>";
+    h += "<p>Météo : " + stt("wx") + "</p>";
+    h += "<p>Agenda : " + stt("ag") + "</p>";
+    h += "<p>Lumières : " + stt("lum") + "</p>";
+    h += "<p>" + (window.LOCAL ? "Moteur" : "Relais") + " : " + relayTxt + "</p>";
+    h += "<p>Écran : " + window.innerWidth + "×" + window.innerHeight + "</p>";
+    h += "<h3>Journal (récent en haut)</h3>";
+    if (!LOG.length) { h += '<p class="ok">Aucune erreur enregistrée.</p>'; }
+    for (i = LOG.length - 1, k = 0; i >= 0 && k < 25; i--, k++) {
+      l = LOG[i];
+      h += "<p><span class=\"e\">" + l.c + "</span> " + hms(l.t) + " · " + esc(l.w) + " · " + esc(l.m) + (l.n > 1 ? " (×" + l.n + ")" : "") + "</p>";
+    }
+    $("dbgL").innerHTML = h;
+    h = "<h3>Signification des codes</h3>";
+    for (k in CODES) { if (CODES.hasOwnProperty(k)) { h += '<p><span class="e">' + k + "</span> " + esc(CODES[k]) + "</p>"; } }
+    h += "<h3>Navigateur</h3><p>" + esc(navigator.userAgent) + "</p>";
+    $("dbgR").innerHTML = h;
+  }
+  function openDbg() {
+    var d = $("dbg"); d.style.display = "-webkit-flex"; d.style.display = "flex";
+    relayTxt = "interrogation…"; drawDbg();
+    call("GET", "/api/debug", null, function (err, r) {
+      if (err) { relayTxt = '<span class="e">' + err.code + "</span> " + esc(err.message); }
+      else {
+        relayTxt = (window.LOCAL ? '<span class="ok">appli autonome</span> depuis ' : '<span class="ok">en ligne</span> depuis ') + Math.round(r.uptime_s / 60) + " min · Airzone : "
+          + (r.airzone.ok ? '<span class="ok">joignable</span>' : '<span class="e">injoignable</span> (' + esc(r.airzone.error) + ")")
+          + " · agenda : " + (r.agenda ? (r.agenda.configured ? (r.agenda.age_s === null ? "jamais récupéré" : "âge " + Math.round(r.agenda.age_s / 60) + " min") : "pas de lien (ical.txt)") : "?")
+          + " · météo : " + (r.weather.age_s === null ? "jamais récupérée" : "âge " + Math.round(r.weather.age_s / 60) + " min" + (r.weather.stale ? " (ancienne)" : ""));
+      }
+      if ($("dbg").style.display !== "none") { drawDbg(); }
+    });
+  }
+  $("err").onclick = openDbg;
+  $("ban").onclick = function () { openDbg(); };
+  $("dbgX").onclick = function () { $("dbg").style.display = "none"; };
+  $("dbgClr").onclick = function () { LOG = []; drawDbg(); };
+  (function () {   /* 5 touches rapides sur le numéro de version = ouvre le diagnostic même sans erreur */
+    var n = 0, t0 = 0;
+    $("ver").onclick = function () {
+      var now = Date.now(); if (now - t0 > 3000) { n = 0; } if (n === 0) { t0 = now; }
+      n++; if (n >= 5) { n = 0; openDbg(); }
+    };
+  })();
+
+  /* ---------------- navigation ---------------- */
+  var PAGES = ["home", "clim", "lum", "app", "wx"];
+  function appView(v) {
+    var ag = v === "agenda", wx = v === "wx7", st = v === "set", lib = !ag && !wx && !st;
+    function sh(id, on) { var e = $(id); e.style.display = on ? "-webkit-flex" : "none"; if (on) { e.style.display = "flex"; } }
+    sh("libV", lib); sh("agV", ag); sh("wxV", wx); sh("setV", st);
+    $("libMsg").style.display = lib ? "block" : "none";
+    $("agBack").style.display = lib ? "none" : "block";
+    $("appT").textContent = ag ? "Agenda" : (wx ? "Météo de la semaine" : (st ? "Réglages" : "Autre"));
+    $("libNote").style.display = lib ? "block" : "none";
+    if (wx && W7) { drawW7(); }
+    if (st) { drawSet(); }
+  }
+  function go(p) {
+    if (p === "app") { appView("lib"); }
+    if (p === "lum") { loadLum(); }
+    var i, navs = document.querySelectorAll(".nb");
+    for (i = 0; i < PAGES.length; i++) { $("p-" + PAGES[i]).className = "page" + (PAGES[i] === p ? " on" : ""); }
+    for (i = 0; i < navs.length; i++) { navs[i].className = "nb" + (navs[i].getAttribute("data-p") === p ? " sel" : ""); }
+  }
+  (function () {
+    var els = document.querySelectorAll("[data-p]"), i;
+    for (i = 0; i < els.length; i++) { els[i].onclick = (function (el) { return function () { go(el.getAttribute("data-p")); }; })(els[i]); }
+  })();
+  (function () {
+    var mods = document.querySelectorAll(".mi"), i;
+    for (i = 0; i < mods.length; i++) {
+      mods[i].onclick = (function (b) {
+        return function () {
+          var k = b.getAttribute("data-mod");
+          if (k === "agenda") { appView("agenda"); return; }
+          if (k === "reglages") { appView("set"); return; }
+          if (k === "meteo7") { appView("wx7"); loadW7(); return; }
+          if (k === "debug") { openDbg(); return; }
+          $("libMsg").textContent = "« " + b.getElementsByTagName("span")[0].textContent + " » : emplacement libre, module pas encore créé.";
+        };
+      })(mods[i]);
+    }
+    $("agBack").onclick = function () { appView("lib"); };
+  })();
+
+  /* ---------------- réglages (appli autonome) ---------------- */
+  var SETF = [["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
+    ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
+    ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""], ["updurl", "Adresse des mises à jour (dossier en ligne)", ""]];
+  var UI_CODE = parseInt("207", 10) || 0, UI_NAME = "2.07 (beta)".charAt(0) === "_" ? "?" : "2.07 (beta)";
+  (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
+  function updUi(html, say, doApk) {
+    var r = window.Native.otaSave(html);
+    if (r.indexOf("ok:") === 0) { say("Interface mise à jour, rechargement…"); setTimeout(function () { window.location.reload(); }, 900); return; }
+    if (r.indexOf("err:needapk") === 0) { return doApk ? doApk() : say("Cette interface demande une nouvelle appli : mets à jour l'appli d'abord."); }
+    say("Mise à jour impossible : " + r.substr(4));
+  }
+  function updRun(auto, say) {
+    var c = window.LOCAL.cfg(), base = String(c.updurl || "").replace(/\/+$/, ""), code = window.Native.appCode(), t;
+    if (!base) {
+      if (auto) { return; }
+      t = window.Native.readDropped("index", ".html");
+      if (!t) { return say("Aucune adresse de mise à jour renseignée, et aucun fichier index.html déposé sur la tablette."); }
+      return updUi(t, say, null);
+    }
+    window.LOCAL.getText(base + "/version.json?t=" + Date.now(), 15000, function (err, tx) {
+      var v;
+      if (err) { return auto ? 0 : say("Mise à jour impossible : " + err); }
+      try { v = JSON.parse(tx); } catch (e) { return auto ? 0 : say("Mise à jour impossible : version.json illisible"); }
+      function doApk() {
+        if (!(v.apk > code && v.apkfile)) { return say("Déjà à jour (" + UI_NAME + ")."); }
+        if (auto) { var ve = $("ver"); if (ve) { ve.textContent += " · mise à jour disponible"; } return; }
+        say("Téléchargement de la nouvelle appli " + (v.name || "") + "…");
+        window.LOCAL.apkInstall(base + "/" + v.apkfile + "?t=" + Date.now(), function (e3) {
+          say(e3 ? "Téléchargement impossible : " + e3 : "Appuie sur « Installer » dans la fenêtre Android, puis rouvre le tableau de bord.");
+        });
+      }
+      if (v.ui > UI_CODE) {
+        if (!auto) { say("Téléchargement de la nouvelle interface…"); }
+        window.LOCAL.getText(base + "/" + (v.uifile || "index.html") + "?t=" + Date.now(), 60000, function (e2, html) {
+          if (e2) { return auto ? 0 : say("Mise à jour impossible : " + e2); }
+          updUi(html, auto ? function () {} : say, auto ? function () { var ve = $("ver"); if (ve) { ve.textContent += " · mise à jour disponible"; } } : doApk);
+        });
+      } else { doApk(); }
+    });
+  }
+  setTimeout(function () { if (window.LOCAL && window.Native && window.Native.appCode) { updRun(true, function () {}); } }, 30000);
+  setInterval(function () { if (window.LOCAL && window.Native && window.Native.appCode) { updRun(true, function () {}); } }, 6 * 3600 * 1000);
+  function drawSet() {
+    var h, i, c, f;
+    if (!window.LOCAL) { $("setB").innerHTML = '<p class="msg">Les réglages ne sont disponibles que dans l\'appli autonome (en mode PC, ils sont dans les fichiers du relais).</p>'; return; }
+    c = window.LOCAL.cfg();
+    h = '<div class="sbar"><button type="button" class="pw" id="setSave"><span class="bw">Enregistrer</span></button><button type="button" class="pw" id="setImp"><span class="bw">Importer</span></button><button type="button" class="pw" id="setUpd"><span class="bw">Mettre à jour</span></button></div><div class="note" id="setMsg" style="margin:-6px 0 12px">Import : glisse ical.txt et tuya.txt sur la tablette (n\'importe où). Version actuelle : ' + UI_NAME + '.</div>';
+    h += '<div class="sfw">';
+    for (i = 0; i < SETF.length; i++) {
+      f = SETF[i];
+      h += '<div class="sf"><label for="sf_' + f[0] + '">' + esc(f[1]) + '</label><input id="sf_' + f[0] + '" type="' + (f[2] || "text") + '" value="' + esc(c[f[0]]).replace(/"/g, "&quot;") + '" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>';
+    }
+    h += '</div><div class="sbar" style="margin-top:6px"><button type="button" class="pw" id="setReset"><span class="bw">Revenir à l\'interface d\'origine</span></button></div>';
+    $("setB").innerHTML = h;
+    $("setSave").onclick = function () {
+      var o = {}, k;
+      for (k = 0; k < SETF.length; k++) { o[SETF[k][0]] = $("sf_" + SETF[k][0]).value; }
+      try { window.Native.cfgSet("cfg", JSON.stringify(o)); $("setMsg").textContent = "Enregistré, rechargement…"; setTimeout(function () { window.location.reload(); }, 700); }
+      catch (e) { $("setMsg").textContent = "Enregistrement impossible : " + e; }
+    };
+    $("setUpd").onclick = function () { updRun(false, function (m) { $("setMsg").textContent = m; }); };
+    $("setReset").onclick = function () { try { window.Native.otaClear(); } catch (e) { } $("setMsg").textContent = "Interface d\'origine rétablie, rechargement…"; setTimeout(function () { window.location.reload(); }, 700); };
+    $("setImp").onclick = function () {
+      var t, got = [], lines, k, kv, map = { id: "tyid", secret: "tysecret", device: "tydevice", region: "tyregion", code: "tycode", name: "tyname" };
+      try {
+        t = window.Native.readFile("ical.txt") || "";
+        lines = t.split(/\r?\n/);
+        for (k = 0; k < lines.length; k++) { if (lines[k].replace(/\s/g, "") && lines[k].charAt(0) !== "#") { $("sf_ical").value = lines[k].replace(/^\s+|\s+$/g, ""); got.push("agenda"); break; } }
+        t = window.Native.readFile("tuya.txt") || "";
+        lines = t.split(/\r?\n/);
+        for (k = 0; k < lines.length; k++) {
+          if (lines[k].charAt(0) === "#" || lines[k].indexOf("=") < 0) { continue; }
+          kv = lines[k].split("="); if (map[kv[0].replace(/\s/g, "").toLowerCase()]) { $("sf_" + map[kv[0].replace(/\s/g, "").toLowerCase()]).value = kv.slice(1).join("=").replace(/^\s+|\s+$/g, ""); if (got.indexOf("Tuya") < 0) { got.push("Tuya"); } }
+        }
+        $("setMsg").textContent = got.length ? "Importé : " + got.join(", ") + ". Appuie sur Enregistrer." : "Rien trouvé : ical.txt / tuya.txt introuvables sur la tablette (racine, Download ou Documents).";
+      } catch (e) { $("setMsg").textContent = "Import impossible : " + e; }
+    };
+  }
+
+  /* ---------------- lumières ---------------- */
+  var LUM = null, lumBusy = false, lumTxt = "", lumBad = false;
+  var COLS = [["Blanc", 255, 255, 255], ["Chaud", 255, 170, 70], ["Rouge", 255, 0, 0], ["Orange", 255, 100, 0], ["Vert", 0, 255, 0], ["Cyan", 0, 200, 255], ["Bleu", 0, 0, 255], ["Violet", 150, 0, 255], ["Rose", 255, 0, 150]];
+  var LSEL = 0;
+  var SVGB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.500 10.900c.6.500 1 1.200 1 2.100h5c0-.900.400-1.600 1-2.100A6 6 0 0 0 12 3z"/></svg>';
+  var SVGP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v5M15 3v5M6.500 8h11v3.500a5.500 5.500 0 0 1-11 0zM12 17v4"/></svg>';
+  function drawHome() {
+    var h = "", i, L, on, rgb, st, e = $("hLum");
+    if (!e) { return; }
+    if (!LUM) { e.innerHTML = '<p class="msg' + (lumBad ? " bad" : "") + '">' + esc(lumBad ? lumTxt : "Chargement…") + "</p>"; return; }
+    for (i = 0; i < LUM.lights.length; i++) {
+      L = LUM.lights[i];
+      on = L.on && !(L.kind === "switch" && L.error);
+      rgb = L.kind === "switch" || !(L.known || L.assumed) ? [216, 221, 230] : L.color;
+      st = on ? "border-color:rgb(" + rgb.join(",") + ");color:rgb(" + rgb.join(",") + ");background:rgba(" + rgb.join(",") + ",0.16);-webkit-box-shadow:0 0 40px rgba(" + rgb.join(",") + ",0.45);box-shadow:0 0 40px rgba(" + rgb.join(",") + ",0.45);" : "";
+      h += '<button type="button" class="hb" style="' + st + '" data-l="' + i + '"' + (lumBusy ? " disabled" : "") + '><span class="bw">' + (L.kind === "switch" ? SVGP : SVGB) + esc(L.name) + "<small>" + (L.kind !== "switch" && !L.known && !L.assumed ? "État ?" : (on ? (L.kind === "switch" ? "Allumé" : L.bright + " %") : "Éteint") + (L.assumed && !L.known ? " (dernier)" : "")) + "</small></span></button>";
+    }
+    e.innerHTML = h;
+  }
+  $("hLum").onclick = function (ev) {
+    var t = ev.target, L;
+    while (t && t !== this && !(t.getAttribute && t.getAttribute("data-l"))) { t = t.parentNode; }
+    if (!t || t === this || !LUM) { return; }
+    L = LUM.lights[parseInt(t.getAttribute("data-l"), 10)];
+    if (!L) { return; }
+    if (L.kind !== "switch" && !L.known && !L.assumed) { LSEL = parseInt(t.getAttribute("data-l"), 10); drawLum(); go("lum"); return; }
+    lumCmd({ id: L.id, on: !L.on });
+  };
+  function drawLum() {
+    drawHome();
+    $("lumAllOff").disabled = lumBusy || !LUM; $("lumAllOn").disabled = lumBusy || !LUM;
+    var h = "", i, j, L, c, sel, d = lumBusy ? " disabled" : "", rgb, st, on, n;
+    if (!LUM) { $("lumL").innerHTML = '<p class="msg" id="lumMsg">' + esc(lumTxt || "Chargement des lumières…") + "</p>"; return; }
+    if (LSEL >= LUM.lights.length) { LSEL = 0; }
+    h += '<div class="ltabs">';
+    for (i = 0; i < LUM.lights.length; i++) { h += '<button type="button" class="ltab' + (i === LSEL ? " sel" : "") + '" data-l="' + i + '" data-a="tab">' + esc(LUM.lights[i].name) + "</button>"; }
+    h += '</div><div class="lbody">';
+    L = LUM.lights[LSEL];
+    if (L) {
+      on = L.on && !(L.kind === "switch" && L.error);
+      rgb = L.kind === "switch" || !(L.known || L.assumed) ? [216, 221, 230] : L.color;
+      st = on ? "border-color:rgb(" + rgb.join(",") + ");color:rgb(" + rgb.join(",") + ");background:rgba(" + rgb.join(",") + ",0.16);-webkit-box-shadow:0 0 80px rgba(" + rgb.join(",") + ",0.5);box-shadow:0 0 80px rgba(" + rgb.join(",") + ",0.5);" : "";
+      if (L.kind !== "switch" && !L.known && !L.assumed) {
+        h += '<div class="lcol" style="-webkit-align-items:center;align-items:center"><div class="lbulb" style="border-style:dashed"><span class="bw">' + SVGB + '<b style="font-size:26px">État inconnu</b></span></div><div class="fx" style="margin-top:14px"><button type="button" class="pw" style="margin-right:12px" data-l="' + LSEL + '" data-a="on"' + d + '><span class="bw">Allumer</span></button><button type="button" class="pw" data-l="' + LSEL + '" data-a="off"' + d + '><span class="bw">Éteindre</span></button></div><div class="note" style="margin-top:10px;max-width:290px;text-align:center">La lumière ne dit pas si elle est allumée : choisis une action.</div></div>';
+      } else {
+        h += '<div class="lcol" style="-webkit-align-items:center;align-items:center"><button type="button" class="lbulb" style="' + st + '" data-l="' + LSEL + '" data-a="pw"' + d + '><span class="bw">' + (L.kind === "switch" ? SVGP : SVGB) + "<b>" + (L.kind === "switch" ? (on ? "Allumé" : "Éteint") : (on ? L.bright + " %" : "Éteinte")) + '</b></span></button><div class="note" style="margin-top:14px;max-width:290px;text-align:center">' + (L.assumed && !L.known ? "Dernier état envoyé depuis le tableau de bord, pas vérifié. Touche pour allumer / éteindre." : "Touche pour allumer / éteindre") + "</div></div>";
+      }
+      if (L.kind === "switch") {
+        h += '<div class="lcol" style="max-width:330px"><div class="lcap">Relais tout ou rien</div><div class="note" style="font-size:15px">Pas de couleur ni de luminosité sur cet appareil.</div>' + (L.error ? '<div class="note" style="margin-top:12px;color:#ff7a70">' + esc(L.error) + "</div>" : (L.known ? "" : '<div class="note" style="margin-top:12px">État inconnu pour le moment.</div>')) + "</div>";
+      } else {
+        h += '<div class="lcol"><div class="lcap">Luminosité</div><div class="lseg">';
+        n = Math.round(L.bright / 10);
+        for (j = 1; j <= 10; j++) { h += '<button type="button" class="sgb' + (j <= n ? " o" : "") + '" data-l="' + LSEL + '" data-a="s' + j + '"' + d + "></button>"; }
+        h += '</div><div class="lcap">Couleur</div><div class="lcg">';
+        for (j = 0; j < COLS.length; j++) {
+          c = COLS[j]; sel = (L.known || L.assumed) && L.on && L.color[0] === c[1] && L.color[1] === c[2] && L.color[2] === c[3];
+          h += '<button type="button" class="sw' + (sel ? " sel" : "") + '" style="background:rgb(' + c[1] + "," + c[2] + "," + c[3] + ')" data-l="' + LSEL + '" data-a="c' + j + '" aria-label="' + c[0] + '"' + d + "></button>";
+        }
+        h += "</div>" + ((L.known || L.assumed) ? "" : '<div class="note" style="max-width:330px">État inconnu tant qu\'aucun ordre n\'a été envoyé.</div>') + "</div>";
+      }
+    }
+    h += '</div><div class="note" id="lumMsg" style="-webkit-flex:none;flex:none;' + (lumBad ? "color:#ff7a70" : "") + '">' + esc(lumTxt || "Un seul appareil Bluetooth à la fois : ferme l'appli LEDBLE sur le téléphone.") + "</div>";
+    $("lumL").innerHTML = h;
+  }
+  function loadLum() {
+    call("GET", "/api/lum", null, function (err, r) {
+      if (err) { lumTxt = "Lumières [" + err.code + "] : " + err.message; lumBad = true; drawLum(); return; }
+      try { if (!r.lights) { throw 1; } LUM = r; OKT.lum = Date.now(); ACT.lum = null; drawErr(); if (!r.available) { lumTxt = window.LOCAL ? "Bluetooth basse consommation indisponible sur cette tablette (seul le relais Tuya fonctionne)." : "Lumières non activées : bleak n'est pas installé sur le PC du relais."; lumBad = true; } else { lumTxt = ""; lumBad = false; } }
+      catch (e) { noteErr(mk("E05", "réponse lumières incomplète"), "lum"); }
+      drawLum();
+    });
+  }
+  function lumCmd(cmd) {
+    if (lumBusy) { return; }
+    lumBusy = true; lumTxt = "Envoi à la lumière…"; lumBad = false; drawLum();
+    call("POST", "/api/lum", cmd, function (err, r) {
+      lumBusy = false;
+      if (err) { lumTxt = "Ordre refusé [" + err.code + "] : " + err.message; lumBad = true; }
+      else { LUM = r; OKT.lum = Date.now(); ACT.lum = null; drawErr(); lumTxt = ""; lumBad = false; }
+      drawLum();
+    });
+  }
+  function lumAll(on) {
+    var ls, k = 0, bad = [];
+    if (lumBusy || !LUM || !LUM.lights.length) { return; }
+    ls = LUM.lights.slice(0);
+    lumBusy = true; lumTxt = on ? "Allumage de toutes les lumières…" : "Extinction de toutes les lumières…"; lumBad = false; drawLum();
+    (function next() {
+      var L;
+      if (k >= ls.length) {
+        lumBusy = false; lumBad = bad.length > 0;
+        lumTxt = bad.length ? "Pas tout : " + bad.join(" ; ") : (on ? "Tout est allumé." : "Tout est éteint.");
+        drawLum(); return;
+      }
+      L = ls[k++];
+      call("POST", "/api/lum", { id: L.id, on: on }, function (err, r) {
+        if (err) { bad.push(L.name + " [" + err.code + "] " + err.message); } else { LUM = r; OKT.lum = Date.now(); ACT.lum = null; drawErr(); }
+        next();
+      });
+    })();
+  }
+  $("lumAllOff").onclick = function () { lumAll(false); };
+  $("lumAllOn").onclick = function () { lumAll(true); };
+  $("lumL").onclick = function (ev) {
+    var t = ev.target, a, L, n, k;
+    while (t && t !== this && !(t.getAttribute && t.getAttribute("data-a"))) { t = t.parentNode; }
+    if (!t || t === this || !LUM) { return; }
+    a = t.getAttribute("data-a"); k = parseInt(t.getAttribute("data-l"), 10); L = LUM.lights[k];
+    if (!L) { return; }
+    if (a === "tab") { LSEL = k; drawLum(); }
+    else if (a === "pw") { lumCmd({ id: L.id, on: !L.on }); }
+    else if (a === "on") { lumCmd({ id: L.id, on: true }); }
+    else if (a === "off") { lumCmd({ id: L.id, on: false }); }
+    else if (a.charAt(0) === "s") { lumCmd({ id: L.id, bright: parseInt(a.substr(1), 10) * 10 }); }
+    else if (a.charAt(0) === "c") { n = COLS[parseInt(a.substr(1), 10)]; if (n) { lumCmd({ id: L.id, color: [n[1], n[2], n[3]] }); } }
+  };
+  loadLum(); setInterval(loadLum, 30000);
+  go("clim");
+
+  /* ---------------- heure ---------------- */
+  var lastMin = -1;
+  function tick() {
+    var d = new Date();
+    if (d.getMinutes() === lastMin) { return; }
+    lastMin = d.getMinutes();
+    $("clock").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
+    $("date").textContent = DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()];
+  }
+  tick(); setInterval(tick, 1000);
+
+  /* ---------------- icônes météo ---------------- */
+  var CLOUD = "M14 34h20a8 8 0 0 0 .8-16A11 11 0 0 0 13.6 20 7 7 0 0 0 14 34z";
+  var RAYS = "M24 5v5M24 38v5M5 24h5M38 24h5M10.6 10.6l3.5 3.5M33.9 33.9l3.5 3.5M10.6 37.4l3.5-3.5M33.9 14.1l3.5-3.5";
+  var SUN = "#ffc533", MOON = "#f7e9a8", CLD = "#f4f7fb", CLD2 = "#c3cddb", RAIN = "#4aa8ff", BOLT = "#ffd23f", ICE = "#cfe8ff", FOG = "#b4bfcc";
+  function wsvg(inner) { return '<svg viewBox="0 0 48 48" fill="none">' + inner + "</svg>"; }
+  function cloud(t, c) { return '<path fill="' + (c || CLD) + '" ' + (t ? 'transform="' + t + '" ' : "") + 'd="' + CLOUD + '"/>'; }
+  function line(d, c, w) { return '<path d="' + d + '" stroke="' + c + '" stroke-width="' + w + '" stroke-linecap="round"/>'; }
+  var ICONS = {
+    sun: wsvg('<circle cx="24" cy="24" r="9" fill="' + SUN + '"/>' + line(RAYS, SUN, 3)),
+    moon: wsvg('<path d="M31 7a17 17 0 1 0 10 25 14 14 0 0 1-10-25z" fill="' + MOON + '"/>'),
+    partly: wsvg('<circle cx="17" cy="17" r="7" fill="' + SUN + '"/>' + line("M17 4v3M5 17h3M8.5 8.5l2 2M25.5 8.5l-2 2", SUN, 3) + cloud("translate(7 8) scale(.82)")),
+    partlyNight: wsvg('<path d="M22 5a10 10 0 1 0 9 14 8 8 0 0 1-9-14z" fill="' + MOON + '"/>' + cloud("translate(7 8) scale(.82)")),
+    cloud: wsvg(cloud("translate(8 -4) scale(.8)", CLD2) + cloud("translate(-1 4)")),
+    rain: wsvg(cloud("translate(0 -3)") + line("M16 37l-2 5M24 37l-2 5M32 37l-2 5", RAIN, 3.2)),
+    storm: wsvg(cloud("translate(0 -3)", CLD2) + '<path d="M26 28l-8 11h6l-3 9 10-13h-6z" fill="' + BOLT + '"/>'),
+    snow: wsvg(cloud("translate(0 -3)") + line("M16 39v.1M24 42v.1M32 39v.1", ICE, 4.5)),
+    fog: wsvg(line("M9 16h30M6 24h36M10 32h28M15 40h18", FOG, 3))
+  };
+  function wmo(code, day) {
+    var n = Number(code), night = (day === 0);
+    if (n === 0) { return { k: night ? "moon" : "sun", t: night ? "Ciel dégagé" : "Ensoleillé" }; }
+    if (n === 1) { return { k: night ? "moon" : "sun", t: "Plutôt dégagé" }; }
+    if (n === 2) { return { k: night ? "partlyNight" : "partly", t: "Éclaircies" }; }
+    if (n === 3) { return { k: "cloud", t: "Couvert" }; }
+    if (n === 45 || n === 48) { return { k: "fog", t: "Brouillard" }; }
+    if (n >= 51 && n <= 57) { return { k: "rain", t: "Bruine" }; }
+    if (n >= 61 && n <= 67) { return { k: "rain", t: n === 65 || n === 67 ? "Forte pluie" : "Pluie" }; }
+    if (n >= 71 && n <= 77) { return { k: "snow", t: "Neige" }; }
+    if (n >= 80 && n <= 82) { return { k: "rain", t: "Averses" }; }
+    if (n === 85 || n === 86) { return { k: "snow", t: "Averses de neige" }; }
+    if (n >= 95) { return { k: "storm", t: "Orage" }; }
+    return { k: "cloud", t: "Nuageux" };
+  }
+
+  /* ---------------- météo ---------------- */
+  var wxOk = false;
+  function drawWeather(w) {
+    var n = w.now, m = wmo(n.code, n.day), t = w.days[0], i;
+    $("nowIco").innerHTML = ICONS[m.k];
+    $("nowT").textContent = rnd(n.temp) + "°";
+    $("nowP").textContent = m.t;
+    var p1 = ["Max " + rnd(t.hi) + "° · Min " + rnd(t.lo) + "°"];
+    if (n.feel !== null && n.feel !== undefined) { p1.push("ressenti " + rnd(n.feel) + "°"); }
+    var p2 = [];
+    if (n.wind !== null && n.wind !== undefined) { p2.push("vent " + rnd(n.wind) + " km/h"); }
+    if (n.hum !== null && n.hum !== undefined) { p2.push("humidité " + rnd(n.hum) + " %"); }
+    $("nowD").innerHTML = p1.join(" · ") + (p2.length ? "<br>" + p2.join(" · ") : "");
+    $("nowMsg").style.display = "none"; $("nowBox").style.display = "block";
+    $("hIco").innerHTML = ICONS[m.k];
+    $("hT").textContent = rnd(n.temp) + "°";
+    $("hP").innerHTML = m.t + "<br>" + rnd(t.hi) + "° / " + rnd(t.lo) + "°";
+
+    var min = 1e9, max = -1e9, html = "";
+    for (i = 0; i < w.days.length; i++) { min = Math.min(min, w.days[i].lo); max = Math.max(max, w.days[i].hi); }
+    var span = Math.max(1, max - min);
+    for (i = 0; i < w.days.length; i++) {
+      var d = w.days[i], q = d.date.split("-"), dt = new Date(Number(q[0]), Number(q[1]) - 1, Number(q[2]), 12, 0, 0);
+      var left = (d.lo - min) / span * 100, wid = Math.max(10, (d.hi - d.lo) / span * 100);
+      html += '<div class="fr"><span class="fd">' + (i === 0 ? "Auj." : SHORT[dt.getDay()]) + '</span>'
+        + '<span class="fi">' + ICONS[wmo(d.code, 1).k] + '</span>'
+        + '<span class="fp">' + (d.rain >= 30 ? d.rain + "%" : "") + '</span>'
+        + '<span class="fn">' + rnd(d.lo) + '°</span>'
+        + '<span class="fb"><i style="left:' + left.toFixed(1) + '%;width:' + wid.toFixed(1) + '%"></i></span>'
+        + '<span class="fh">' + rnd(d.hi) + '°</span></div>';
+    }
+    for (i = 1; i <= 2; i++) { $("fl" + i).innerHTML = html; $("castMsg" + i).style.display = "none"; show($("fl" + i), true); }
+    var u = new Date(w.updated);
+    $("wxNote").textContent = (w.stale ? "Données anciennes · " : "") + "mise à jour à " + pad(u.getHours()) + ":" + pad(u.getMinutes());
+  }
+  function loadWeather() {
+    call("GET", "/api/meteo", null, function (err, w) {
+      if (err) {
+        if (!wxOk) {
+          $("nowMsg").className = "msg bad"; $("nowMsg").textContent = "Météo indisponible [" + err.code + "] : " + err.message;
+          $("castMsg1").className = $("castMsg2").className = "msg bad";
+          $("castMsg1").textContent = $("castMsg2").textContent = "Prévisions indisponibles.";
+          $("hP").textContent = "Météo indisponible";
+        } else { $("wxNote").textContent = "Mise à jour impossible, dernières données affichées"; }
+        return;
+      }
+      try { drawWeather(w); wxOk = true; OKT.wx = Date.now(); ACT.wx = null; if (w.stale) { noteErr(mk("E04", "données météo anciennes"), "meteo"); } drawErr(); } catch (e) {
+        noteErr(mk("E05", "météo : réponse inattendue"), "meteo");
+        if (!wxOk) { $("nowMsg").className = "msg bad"; $("nowMsg").textContent = "Météo : réponse inattendue [E05]"; }
+      }
+    });
+  }
+  loadWeather(); setInterval(loadWeather, 600000);
+
+  /* ---------------- météo de la semaine (module de « Autre ») ---------------- */
+  var W7 = null, w7Day = 0, w7Var = "t";
+  var W7V = [
+    ["t", "Température", "°", "#b9c2d0", "t"], ["feel", "Ressenti", "°", "#e58a5e", "feel"],
+    ["mm", "Pluie", " mm", "#6fb3d9", "mm"], ["wind", "Vent", " km/h", "#8fa3bd", "wind"],
+    ["hum", "Humidité", " %", "#5fc4b0", "hum"], ["uv", "UV", "", "#ffc533", "uv"]
+  ];
+  var DIRS = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
+  function nv(v, d) { return (v === null || v === undefined) ? "–" : String(Math.round(v * (d || 1)) / (d || 1)).replace(".", ","); }
+  function dayName(date, i) { var q = date.split("-"), dt = new Date(Number(q[0]), Number(q[1]) - 1, Number(q[2]), 12, 0, 0); return i === 0 ? "Auj." : SHORT[dt.getDay()] + " " + dt.getDate(); }
+  function drawW7() {
+    var i, d, h = "", v, sp, hrs, vals = [], mn, mx, base, top, c, hh, x = "", sel, nowH = new Date().getHours(), val, pc, lab;
+    if (!W7 || !W7.days.length) { return; }
+    if (w7Day >= W7.days.length) { w7Day = 0; }
+    for (i = 0; i < W7.days.length; i++) {
+      d = W7.days[i];
+      h += '<button type="button" class="w7d' + (i === w7Day ? " sel" : "") + '" data-d="' + i + '"><span class="l">' + esc(dayName(d.date, i)) + '</span><span class="i">' + ICONS[wmo(d.code, 1).k] + '</span><span class="m">' + nv(d.hi) + '°<small> ' + nv(d.lo) + '°</small></span></button>';
+    }
+    $("w7D").innerHTML = h;
+    h = "";
+    for (i = 0; i < W7V.length; i++) { h += '<button type="button" class="w7k' + (W7V[i][0] === w7Var ? " sel" : "") + '" data-v="' + W7V[i][0] + '">' + W7V[i][1] + "</button>"; }
+    $("w7K").innerHTML = h;
+    d = W7.days[w7Day]; hrs = d.hours;
+    sp = "<b>" + esc(wmo(d.code, 1).t) + "</b> · " + nv(d.hi) + "° / " + nv(d.lo) + "°<br><span>";
+    if (w7Var === "t") { sp += "Max " + nv(d.hi) + "° · min " + nv(d.lo) + "°"; }
+    else if (w7Var === "feel") { sp += "Ressenti " + nv(d.fhi) + "° / " + nv(d.flo) + "°"; }
+    else if (w7Var === "mm") { sp += nv(d.mm, 10) + " mm sur la journée · risque " + nv(d.pp) + " %"; }
+    else if (w7Var === "wind") { sp += "Max " + nv(d.wind) + " km/h " + (d.wdir === null ? "" : DIRS[Math.round(d.wdir / 45) % 8]) + " · rafales " + nv(d.gust) + " km/h"; }
+    else if (w7Var === "hum") { for (i = 0, v = 0, c = 0; i < hrs.length; i++) { if (hrs[i].hum !== null) { v += hrs[i].hum; c++; } } sp += "Moyenne " + (c ? nv(v / c) : "–") + " %"; }
+    else { sp += "UV max " + nv(d.uv, 10) + " · soleil " + d.sunrise + " → " + d.sunset; }
+    $("w7S").innerHTML = sp + "</span>";
+    for (i = 0; i < W7V.length; i++) { if (W7V[i][0] === w7Var) { v = W7V[i]; } }
+    for (i = 0; i < hrs.length; i++) { vals.push(hrs[i][v[4]]); }
+    mn = 1e9; mx = -1e9;
+    for (i = 0; i < vals.length; i++) { if (vals[i] !== null) { mn = Math.min(mn, vals[i]); mx = Math.max(mx, vals[i]); } }
+    if (mn > mx) { mn = 0; mx = 1; }
+    base = (w7Var === "t" || w7Var === "feel") ? Math.min(0, mn) : 0;
+    top = w7Var === "pp" || w7Var === "hum" ? 100 : (w7Var === "uv" ? Math.max(mx, 3) : (w7Var === "mm" ? Math.max(mx, 1) : Math.max(mx, base + 5)));
+    h = ""; x = "";
+    for (i = 0; i < hrs.length; i++) {
+      val = vals[i]; hh = hrs[i].h;
+      pc = val === null ? 0 : Math.max(3, (val - base) / (top - base) * 80);
+      lab = (val !== null && hh % 3 === 0) ? nv(val, w7Var === "mm" || w7Var === "uv" ? 10 : 1) : "";
+      h += '<div class="w7c' + (w7Day === 0 && hh === nowH ? " now" : "") + '"><i style="height:' + pc.toFixed(1) + '%;background:' + v[3] + '"></i><b style="bottom:' + (pc + 1).toFixed(1) + '%">' + lab + "</b></div>";
+      x += "<span>" + (hh % 3 === 0 ? hh + "h" : "") + "</span>";
+    }
+    $("w7C").innerHTML = h; $("w7X").innerHTML = x;
+    $("w7Msg").style.display = "none"; $("w7Box").style.display = "-webkit-flex"; $("w7Box").style.display = "flex";
+  }
+  $("w7D").onclick = function (ev) {
+    var t = ev.target; while (t && t !== this && !t.getAttribute("data-d")) { t = t.parentNode; }
+    if (t && t !== this) { w7Day = parseInt(t.getAttribute("data-d"), 10); drawW7(); }
+  };
+  $("w7K").onclick = function (ev) {
+    var t = ev.target; while (t && t !== this && !t.getAttribute("data-v")) { t = t.parentNode; }
+    if (t && t !== this) { w7Var = t.getAttribute("data-v"); drawW7(); }
+  };
+  function loadW7() {
+    call("GET", "/api/meteo7", null, function (err, w) {
+      if (err) {
+        if (!W7) { $("w7Msg").className = "msg bad"; $("w7Msg").style.display = "block"; $("w7Msg").textContent = "Météo de la semaine indisponible [" + err.code + "] : " + err.message; }
+        return;
+      }
+      try { if (!w.days || !w.days.length) { throw 1; } W7 = w; drawW7(); OKT.wx = Date.now(); ACT.wx = null; if (w.stale) { noteErr(mk("E04", "données météo anciennes"), "meteo7"); } drawErr(); }
+      catch (e) { noteErr(mk("E05", "météo semaine : réponse inattendue"), "meteo7"); }
+    });
+  }
+  loadW7(); setInterval(loadW7, 600000);
+
+
+  /* ---------------- agenda (Google Agenda, lu par le relais) ---------------- */
+  var agDays = [], agSel = 0;
+  function showDay() {
+    var cells = $("agW").getElementsByTagName("button"), i, day = agDays[agSel], h = "";
+    for (i = 0; i < cells.length; i++) { cells[i].className = "wk" + (i === 0 ? " today" : "") + (i === agSel ? " sel" : ""); }
+    if (!day) { return; }
+    h += '<div class="h">' + esc(day.label) + "</div>";
+    if (!day.evs.length) { h += '<div class="agN">Rien de prévu</div>'; }
+    for (i = 0; i < day.evs.length; i++) {
+      h += '<div class="ev' + (day.evs[i].past ? " past" : "") + '"><b>' + esc(day.evs[i].time) + "</b><span>" + esc(day.evs[i].title) + "</span></div>";
+    }
+    $("agD").innerHTML = h;
+  }
+  function drawAgenda(r) {
+    var i, k, d, p, evs, h = "", now = Date.now();
+    agDays = [];
+    for (k = 0; k < r.days.length; k++) {
+      p = r.days[k].key.split("-");
+      d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]), 12, 0, 0);
+      evs = [];
+      for (i = 0; i < r.days[k].events.length; i++) {
+        var e = r.days[k].events[i];
+        evs.push({ time: e.time, title: e.title, past: !e.allDay && k === 0 && e.startMs < now });
+      }
+      agDays.push({ label: k === 0 ? "Aujourd'hui" : (k === 1 ? "Demain" : DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()]), evs: evs });
+      h += '<button type="button" class="wk" data-i="' + k + '" aria-label="' + esc(agDays[k].label) + '"><span class="l">' + DAYS[d.getDay()].charAt(0).toUpperCase()
+        + '</span><span class="n">' + d.getDate() + '</span><span class="d">';
+      for (i = 0; i < Math.min(evs.length, 3); i++) { h += "<i></i>"; }
+      h += "</span></button>";
+    }
+    $("agW").innerHTML = h;
+    var bs = $("agW").getElementsByTagName("button");
+    for (i = 0; i < bs.length; i++) { bs[i].onclick = (function (b) { return function () { agSel = Number(b.getAttribute("data-i")); showDay(); }; })(bs[i]); }
+    if (agSel >= agDays.length) { agSel = 0; }
+    $("agMsg").style.display = "none"; show($("agW"), true); $("agD").style.display = "block";
+    var u = new Date(r.updated);
+    $("agNote").textContent = (r.stale ? "données anciennes · " : "") + "màj " + pad(u.getHours()) + ":" + pad(u.getMinutes());
+    showDay();
+  }
+  function loadAgenda() {
+    call("GET", "/api/agenda", null, function (err, r) {
+      if (err) {
+        if (!agDays.length) { $("agMsg").style.display = "block"; $("agMsg").className = "msg bad"; $("agMsg").textContent = "Agenda indisponible [" + err.code + "] : " + err.message; }
+        else { $("agNote").textContent = "mise à jour impossible [" + err.code + "]"; }
+        return;
+      }
+      if (!r.configured) {
+        $("agMsg").style.display = "block"; $("agMsg").className = "msg";
+        $("agMsg").innerHTML = window.LOCAL ? "Agenda pas encore relié.<br><br>Va dans <b>Autre &gt; Réglages</b> : colle l'adresse secrète iCal de ton Google Agenda (ou dépose <b>ical.txt</b> sur la tablette et appuie sur « Importer »), puis « Enregistrer »." : "Agenda pas encore relié.<br><br>Colle l'adresse secrète iCal de ton Google Agenda dans le fichier <b>ical.txt</b> (à côté de relay.py), puis relance le relais. Les étapes sont dans LISEZ-MOI.md.";
+        return;
+      }
+      try { drawAgenda(r); OKT.ag = Date.now(); ACT.ag = null; if (r.stale) { noteErr(mk("E10", "agenda ancien (Google injoignable ?)"), "agenda"); } drawErr(); }
+      catch (e) { noteErr(mk("E05", "agenda : réponse inattendue"), "agenda"); }
+    });
+  }
+  loadAgenda(); setInterval(loadAgenda, 300000);
+
+  /* ---------------- clim ---------------- */
+  /* codes Airzone : 2 froid, 3 chaud, 4 ventilation, 5 déshumidification, 7 auto */
+  var MODES = [
+    { t: "Froid", az: 2, c: "#6fb3d9", svg: '<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9 4.5l3 2.5 3-2.5M9 19.5l3-2.5 3 2.5"/>' },
+    { t: "Chaud", az: 3, c: "#e58a5e", svg: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>' },
+    { t: "Auto", az: 7, c: "#d8dde6", svg: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>' },
+    { t: "Déshum.", az: 5, c: "#d8dde6", svg: '<path d="M12 3C8.5 8 6.5 11 6.5 14a5.5 5.5 0 0 0 11 0C17.5 11 15.5 8 12 3z"/>' },
+    { t: "Ventil.", az: 4, c: "#d8dde6", svg: '<path d="M12 12c0-4 1-7 4-7s3 4-4 7zM12 12c4 0 7 1 7 4s-4 3-7-4zM12 12c0 4-1 7-4 7s-3-4 4-7zM12 12c-4 0-7-1-7-4s4-3 7 4z"/>' }
+  ];
+  var S = { mode: -1, temp: 22, on: false, linked: false, lo: 18, hi: 30 };
+  var lastUser = 0, sendTimer = 0, busy = false, modeBusy = false;
+
+  function say(t, bad) { var m = $("info"); m.textContent = t; m.style.color = bad ? "#ff7a70" : ""; }
+  function modeIndex(code) { for (var i = 0; i < MODES.length; i++) { if (MODES[i].az === code) { return i; } } return -1; }
+
+  function buildModes() {
+    var html = "", i;
+    for (i = 0; i < MODES.length; i++) {
+      html += '<button type="button" class="mb" data-i="' + i + '" aria-label="Mode ' + MODES[i].t + '"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="' + MODES[i].c + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + MODES[i].svg + "</svg>" + MODES[i].t + "</span></button>";
+    }
+    $("modes").innerHTML = html;
+    var bs = $("modes").getElementsByTagName("button");
+    for (i = 0; i < bs.length; i++) { bs[i].onclick = (function (b) { return function () { setMode(Number(b.getAttribute("data-i"))); }; })(bs[i]); }
+  }
+  function drawMode() {
+    var bs = $("modes").getElementsByTagName("button"), i;
+    for (i = 0; i < bs.length; i++) { bs[i].className = "mb" + (i === S.mode ? " sel" : ""); bs[i].disabled = !S.linked || modeBusy; }
+    $("hMode").textContent = S.linked && S.mode >= 0 ? "Mode " + MODES[S.mode].t.toLowerCase().replace(".", "") : " ";
+  }
+  function drawTemp() {
+    var v = (S.linked ? fmt(S.temp) : "--");
+    $("temp").innerHTML = v + "<small>°C</small>";
+    $("hTemp").innerHTML = v + "<small>°C</small>";
+    $("dn").disabled = !S.linked || S.temp <= S.lo;
+    $("up").disabled = !S.linked || S.temp >= S.hi;
+  }
+  function drawClim() {
+    var txt, cls, i, ps = [$("cPill"), $("hPill")];
+    if (!S.linked) { txt = "Injoignable"; cls = "pill bad"; }
+    else { txt = S.on ? "En marche" : "Éteinte"; cls = "pill" + (S.on ? " on" : ""); }
+    for (i = 0; i < 2; i++) { ps[i].textContent = txt; ps[i].className = cls; }
+    $("pw").className = $("pw2").className = "pw" + (S.on ? " on" : "");
+    $("pwt").textContent = $("pw2t").textContent = S.on ? "Éteindre" : "Allumer";
+    $("navSub").textContent = S.linked ? fmt(S.temp) + "° · " + (S.on ? "en marche" : "éteinte") : "injoignable";
+  }
+  function pull() {
+    if (Date.now() - lastUser < 6000) { return; }
+    call("GET", "/api/clim", null, function (err, z) {
+      if (err) {
+        S.linked = false; drawClim(); drawTemp(); drawMode();
+        say("Clim injoignable [" + err.code + "] : " + err.message + ". Touche le badge rouge pour le diagnostic.", true);
+        return;
+      }
+      S.linked = true; S.on = !!z.on; OKT.clim = Date.now(); ACT.clim = null; drawErr();
+      var mi = modeIndex(z.mode); if (mi >= 0) { S.mode = mi; }
+      if (typeof z.minTemp === "number") { S.lo = Math.max(18, z.minTemp); }
+      if (typeof z.maxTemp === "number") { S.hi = Math.min(30, z.maxTemp); }
+      if (typeof z.setpoint === "number") { S.temp = Math.max(S.lo, Math.min(S.hi, z.setpoint)); }
+      $("room").textContent = typeof z.roomTemp === "number" ? "Dans la pièce : " + fmt(z.roomTemp) + "°" + (typeof z.humidity === "number" ? " · humidité " + z.humidity + " %" : "") : "";
+      drawMode(); drawClim(); drawTemp();
+      say("Le mode est commun à toute la maison.", false);
+    });
+  }
+  function step(d) {
+    if (!S.linked) { return; }
+    var t = Math.round((S.temp + d) * 2) / 2;
+    S.temp = Math.max(S.lo, Math.min(S.hi, t));
+    lastUser = Date.now(); drawTemp(); drawClim();
+    clearTimeout(sendTimer);
+    sendTimer = setTimeout(function () {
+      var t = S.temp;
+      call("POST", "/api/clim", { setpoint: t }, function (err) {
+        if (err) { say("Consigne refusée [" + err.code + "] : " + err.message, true); lastUser = 0; pull(); }
+        else { say("Consigne : " + fmt(t) + "°", false); lastUser = Date.now() - 3000; }
+      });
+    }, 800);
+  }
+  function setMode(i) {
+    if (!S.linked || modeBusy || i === S.mode) { return; }
+    var prev = S.mode;
+    modeBusy = true; S.mode = i; drawMode(); lastUser = Date.now();
+    call("POST", "/api/clim", { mode: MODES[i].az }, function (err) {
+      modeBusy = false;
+      if (err) { S.mode = prev; say("Mode refusé [" + err.code + "] : " + err.message, true); }
+      else { say("Mode : " + MODES[i].t, false); }
+      drawMode(); lastUser = 0; pull();
+    });
+  }
+  function power() {
+    if (!S.linked || busy) { return; }
+    var want = !S.on;
+    busy = true; $("pw").disabled = $("pw2").disabled = true; clearTimeout(sendTimer);
+    S.on = want; drawClim(); lastUser = 0;
+    call("POST", "/api/clim", { on: want ? 1 : 0 }, function (err) {
+      if (err) { S.on = !want; drawClim(); say("Échec [" + err.code + "] : " + err.message, true); }
+      else { say(want ? "Clim allumée (chambre seulement)" : "Clim éteinte (chambre seulement)", false); }
+      busy = false; $("pw").disabled = $("pw2").disabled = false; lastUser = 0; pull();
+    });
+  }
+  $("dn").onclick = function () { step(-0.5); };
+  $("up").onclick = function () { step(0.5); };
+  $("pw").onclick = power; $("pw2").onclick = power;
+
+  buildModes(); drawMode(); drawClim(); drawTemp();
+  pull(); setInterval(pull, 15000);
+
+  /* recharge la page après 6 h, quand personne ne touche l'écran */
+  var lastTouch = Date.now();
+  document.addEventListener("touchstart", function () { lastTouch = Date.now(); });
+  document.addEventListener("click", function () { lastTouch = Date.now(); });
+  setInterval(function () {
+    if (Date.now() - lastTouch > 300000 && performance && performance.now && performance.now() > 6 * 3600000) { location.reload(); }
+  }, 60000);
+})();
+</script>
+</body></html>
