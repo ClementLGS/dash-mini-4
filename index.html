@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:233 TDBA:208-->
+<!--TDBV:236 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -338,6 +338,8 @@ button:focus { outline: none; }
 @-webkit-keyframes wfk{0%{opacity:0;-webkit-transform:translate3d(0,-70%,0)}50%{opacity:1}100%{opacity:0;-webkit-transform:translate3d(100%,420%,0)}}
 @keyframes wfk{0%{opacity:0;transform:translate3d(0,-70%,0)}50%{opacity:1}100%{opacity:0;transform:translate3d(100%,420%,0)}}
 .noico .wl, .noico .rd, .noico .wst, .noico .wfk { -webkit-animation: none; animation: none; }
+.ico2 .wl { -webkit-animation: none; animation: none; }
+.ico2 .rd, .ico2 .wfk, .ico2 .wst { -webkit-animation-timing-function: steps(4); animation-timing-function: steps(4); }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
  <div id="nav">
@@ -1193,7 +1195,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("233", 10) || 0, UI_NAME = "2.33 (beta) TEST".charAt(0) === "_" ? "?" : "2.33 (beta) TEST";
+  var UI_CODE = parseInt("236", 10) || 0, UI_NAME = "2.36 (beta) TEST".charAt(0) === "_" ? "?" : "2.36 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1490,7 +1492,7 @@ button:focus { outline: none; }
     snow: wl(cloud("translate(0 -3)"), "wdp3", ad(12)) + wdot("wfk", "left:33.3%;" + ad(4.8)) + wdot("wfk", "left:50%;" + ad(4.8, 1.6)) + wdot("wfk", "left:66.7%;" + ad(4.8, 3.2)),
     fog: wl(line("M9 16h30", FOG, 3), "wdp8", ad(12)) + wl(line("M6 24h36", FOG, 3), "wdm8", ad(14)) + wl(line("M10 32h28", FOG, 3), "wdp8", ad(16)) + wl(line("M15 40h18", FOG, 3), "wdm6", ad(10))
   };
-  var ICO = xGet("ico", 1), wxLast = null;
+  var ICO = xGet("ico", 2), wxLast = null;
   function wic(k) { return ICO ? ICONS_A[k] : ICONS[k]; }
   function wmo(code, day) {
     var n = Number(code), night = (day === 0);
@@ -1814,7 +1816,8 @@ button:focus { outline: none; }
   var PERF = xGet("perf", 1);
   function perfApply() { var c = document.documentElement.className.replace(/\bperf\b/g, "").replace(/\s+$/, ""); document.documentElement.className = PERF ? (c ? c + " perf" : "perf") : c; }
   perfApply();
-  if (!xGet("ico", 1)) { document.documentElement.classList.add("noico"); }
+  function icoApply() { var c = document.documentElement.className.replace(/\b(noico|ico2)\b/g, "").replace(/\s+$/, ""); document.documentElement.className = ICO === 0 ? (c ? c + " noico" : "noico") : (ICO === 2 ? (c ? c + " ico2" : "ico2") : c); }
+  icoApply();
   var labRes = "";
   function labRun() {
     var o = document.createElement("div"), tx, ball, n = 0, t0 = Date.now(), last = t0, worst = 0, raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (f) { return setTimeout(f, 16); };
@@ -1835,7 +1838,7 @@ button:focus { outline: none; }
   }
   function dispDraw() {
     var h = '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (PERF ? " on" : "") + '" data-x="perf">Mode léger : ' + (PERF ? "oui" : "non") + '</button></div>';
-    h += '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (ICO ? " on" : "") + '" data-x="ico">Animations d\'icônes : ' + (ICO ? "oui" : "non") + '</button></div>';
+    h += '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (ICO ? " on" : "") + '" data-x="ico">Animations d\'icônes : ' + ["non", "complète", "légère"][ICO] + '</button></div>';
     h += '<p class="note" style="margin-bottom:10px">Le mode léger supprime les ombres, les transparences, les halos et les animations pour que la tablette reste fluide. Compare avec « non » grâce au test ci-dessous.</p>';
     h += '<div class="xrow2"><span style="font-size:20px;font-weight:bold">Fluidité : <span id="fpsV">…</span> images/s · pire image <span id="fpsW">…</span> ms</span></div><div class="fpsb"><i id="fpsS"></i></div><p class="note">Même mesure que le bandeau des versions TEST (pire image : la plus longue pause des 5 dernières secondes). La bille doit glisser sans saccade. Autour de 60 images/s : parfait. Moins de 20 : la tablette peine.</p>';
     h += '<div class="xrow2" style="margin-top:6px"><button type="button" class="xbtn sm" data-x="lab">Test à vide (6 s)</button><span class="note" id="labR" style="margin-left:6px">' + esc(labRes) + '</span></div>';
@@ -1862,7 +1865,7 @@ button:focus { outline: none; }
   }
   function dispClick(a) {
     if (a === "perf") { PERF = PERF ? 0 : 1; xSet("perf", PERF); perfApply(); dispDraw(); }
-    if (a === "ico") { ICO = ICO ? 0 : 1; xSet("ico", ICO); document.documentElement.classList[ICO ? "remove" : "add"]("noico"); if (wxLast) { drawWeather(wxLast); } dispDraw(); }
+    if (a === "ico") { ICO = ICO === 1 ? 2 : (ICO === 2 ? 0 : 1); xSet("ico", ICO); icoApply(); if (wxLast) { drawWeather(wxLast); } dispDraw(); }
   }
 
   /* =============== 2.17 TEST : fonds d'écran, animations, Claude =============== */
