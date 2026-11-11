@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:225 TDBA:208-->
+<!--TDBV:226 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1166,7 +1166,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("225", 10) || 0, UI_NAME = "2.25 (beta) TEST".charAt(0) === "_" ? "?" : "2.25 (beta) TEST";
+  var UI_CODE = parseInt("226", 10) || 0, UI_NAME = "2.26 (beta) TEST".charAt(0) === "_" ? "?" : "2.26 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1945,6 +1945,32 @@ button:focus { outline: none; }
     if ((ev.keyCode || ev.which) === 13 && ev.target.id === "cIn") { var v = ev.target.value; ev.target.value = ""; clSend(v); }
   };
   var lastTV = null;
+
+  /* =============== bandeau FPS : versions TEST seulement =============== */
+  (function () {
+    var bar, raf, n = 0, t0 = Date.now(), mins = [], last = Date.now(), worst = 0;
+    if (String(UI_NAME).indexOf("TEST") < 0) { return; }
+    raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    bar = document.createElement("div");
+    bar.style.cssText = "position:fixed;left:0;top:0;right:0;height:22px;line-height:22px;z-index:2000;background:rgba(0,0,0,0.78);color:#9fe6a0;font:bold 13px/22px monospace;text-align:center;pointer-events:none;letter-spacing:.5px";
+    bar.textContent = "FPS …";
+    document.body.appendChild(bar);
+    function f() {
+      var now = Date.now(), d = now - last, fps, mn, i, c;
+      last = now; n++; if (d > worst) { worst = d; }
+      if (now - t0 >= 1000) {
+        fps = Math.round(n * 1000 / (now - t0));
+        mins.push(worst); if (mins.length > 5) { mins.shift(); }
+        mn = 0; for (i = 0; i < mins.length; i++) { if (mins[i] > mn) { mn = mins[i]; } }
+        c = fps >= 45 ? "#9fe6a0" : (fps >= 25 ? "#ffc533" : "#ff7a70");
+        bar.style.color = c;
+        bar.textContent = "FPS " + fps + "  ·  pire image " + mn + " ms  ·  " + UI_NAME;
+        n = 0; t0 = now; worst = 0;
+      }
+      raf(f);
+    }
+    raf(f);
+  })();
 
   /* recharge la page après 6 h, quand personne ne touche l'écran */
   var lastTouch = Date.now();
