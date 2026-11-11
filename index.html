@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:211 TDBA:208-->
+<!--TDBV:212 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -234,8 +234,8 @@ button:focus { outline: none; }
 @-webkit-keyframes mist{0%{-webkit-transform:translate3d(-300px,0,0)}100%{-webkit-transform:translate3d(300px,0,0)}}@keyframes mist{0%{transform:translate3d(-300px,0,0)}100%{transform:translate3d(300px,0,0)}}
 #bg{position:fixed;left:0;top:0;right:0;bottom:0;overflow:hidden;z-index:0}#app{position:relative;z-index:1}
 #bg i{position:absolute;display:block}
-.al{-webkit-animation:dA 70s ease-in-out infinite;animation:dA 70s ease-in-out infinite}
-.bl{-webkit-animation:dB 90s ease-in-out infinite;animation:dB 90s ease-in-out infinite}
+.al{}
+.bl{}
 #ban { -webkit-flex: none; flex: none; background: rgba(220, 53, 53, 0.6); border-bottom: 1px solid rgba(255, 120, 120, 0.7); color: #fff; padding: 7px 20px; font-size: 15px; font-weight: bold; line-height: 1.3; }
 #ban span { font-weight: normal; opacity: 0.9; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
@@ -719,7 +719,7 @@ button:focus { outline: none; }
   function lumSend(L, frames, cb) {
     if (!bleOk()) { return cb(E(501, "Bluetooth basse consommation indisponible sur cette tablette")); }
     var id = nid(function (st, tx, er) { if (er) { cb(E(502, er)); } else { cb(null); } });
-    try { N.bleWrite(id, L.addr, frames.join(","), 30000); } catch (e) { delete cbs[id]; cb(E(502, String(e && e.message || e))); }
+    try { N.bleWrite(id, L.addr, frames.join(","), 300000); } catch (e) { delete cbs[id]; cb(E(502, String(e && e.message || e))); }
   }
 
   /* ---------- Relais Tuya (cloud) ---------- */
@@ -788,7 +788,7 @@ button:focus { outline: none; }
     });
   }
 
-  function lumView(cb) {
+  function lumView(cb, fast) {
     var out = { available: bleOk(), lights: [] }, i, L, c = tyCfg(), item;
     if (!lumInit) { lightsInit(); }
     for (i = 0; i < LIGHTS.length; i++) {
@@ -799,7 +799,7 @@ button:focus { outline: none; }
     item = { id: "tuya", name: c.name, kind: "switch", on: !!ty.state, known: ty.state !== null, error: "" };
     out.lights.push(item);
     if (c.miss.length) { item.error = "réglages Tuya incomplets : il manque " + c.miss.join(", "); return cb(null, out); }
-    if (Date.now() - ty.at > 10000) {
+    if (!fast && Date.now() - ty.at > 10000) {
       tyRead(c, function (err) { if (err) { item.error = String(err); } else { item.on = !!ty.state; item.known = true; } cb(null, out); });
     } else { cb(null, out); }
   }
@@ -810,7 +810,7 @@ button:focus { outline: none; }
       for (k in cmd) { if (cmd.hasOwnProperty(k)) { n++; if (k !== "id" && k !== "on") { return cb(E(400, "commande inconnue")); } } }
       if (n !== 2 || typeof cmd.on !== "boolean") { return cb(E(400, "commande inconnue")); }
       if (c.miss.length) { return cb(E(502, "réglages Tuya incomplets : il manque " + c.miss.join(", "))); }
-      return tySet(c, cmd.on, function (err) { if (err) { return cb(E(502, String(err))); } lumView(cb); });
+      return tySet(c, cmd.on, function (err) { if (err) { return cb(E(502, String(err))); } lumView(cb, true); });
     }
     for (i = 0; i < LIGHTS.length; i++) { if (LIGHTS[i].id === cmd.id) { L = LIGHTS[i]; } }
     if (!L) { return cb(E(400, "lumière inconnue")); }
@@ -835,7 +835,7 @@ button:focus { outline: none; }
     lumSend(L, frames, function (err) {
       if (err) { return cb(err); }
       for (k in nw) { if (nw.hasOwnProperty(k)) { L[k] = nw[k]; } }
-      L.known = true; stateSave(); lumView(cb);
+      L.known = true; stateSave(); lumView(cb, true);
     });
   }
 
@@ -1087,7 +1087,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("211", 10) || 0, UI_NAME = "2.11 (beta)".charAt(0) === "_" ? "?" : "2.11 (beta)";
+  var UI_CODE = parseInt("212", 10) || 0, UI_NAME = "2.12 (beta)".charAt(0) === "_" ? "?" : "2.12 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1189,7 +1189,7 @@ button:focus { outline: none; }
       L = LUM.lights[i];
       on = L.on && !(L.kind === "switch" && L.error);
       rgb = L.kind === "switch" || !(L.known || L.assumed) ? [216, 221, 230] : L.color;
-      st = on ? "border-color:rgb(" + rgb.join(",") + ");color:rgb(" + rgb.join(",") + ");background:rgba(" + rgb.join(",") + ",0.16);-webkit-box-shadow:0 0 40px rgba(" + rgb.join(",") + ",0.45);box-shadow:0 0 40px rgba(" + rgb.join(",") + ",0.45);" : "";
+      st = on ? "border-color:rgb(" + rgb.join(",") + ");color:rgb(" + rgb.join(",") + ");background:rgba(" + rgb.join(",") + ",0.16);-webkit-box-shadow:0 0 18px rgba(" + rgb.join(",") + ",0.45);box-shadow:0 0 18px rgba(" + rgb.join(",") + ",0.45);" : "";
       h += '<button type="button" class="hb" style="' + st + '" data-l="' + i + '"' + (lumBusy ? " disabled" : "") + '><span class="bw">' + (L.kind === "switch" ? SVGP : SVGB) + esc(L.name) + "<small>" + (L.kind !== "switch" && !L.known && !L.assumed ? "État ?" : (on ? (L.kind === "switch" ? "Allumé" : L.bright + " %") : "Éteint") + (L.assumed && !L.known ? " (dernier)" : "")) + "</small></span></button>";
     }
     e.innerHTML = h;
@@ -1216,7 +1216,7 @@ button:focus { outline: none; }
     if (L) {
       on = L.on && !(L.kind === "switch" && L.error);
       rgb = L.kind === "switch" || !(L.known || L.assumed) ? [216, 221, 230] : L.color;
-      st = on ? "border-color:rgb(" + rgb.join(",") + ");color:rgb(" + rgb.join(",") + ");background:rgba(" + rgb.join(",") + ",0.16);-webkit-box-shadow:0 0 80px rgba(" + rgb.join(",") + ",0.5);box-shadow:0 0 80px rgba(" + rgb.join(",") + ",0.5);" : "";
+      st = on ? "border-color:rgb(" + rgb.join(",") + ");color:rgb(" + rgb.join(",") + ");background:rgba(" + rgb.join(",") + ",0.16);-webkit-box-shadow:0 0 26px rgba(" + rgb.join(",") + ",0.5);box-shadow:0 0 26px rgba(" + rgb.join(",") + ",0.5);" : "";
       if (L.kind !== "switch" && !L.known && !L.assumed) {
         h += '<div class="lcol" style="-webkit-align-items:center;align-items:center"><div class="lbulb" style="border-style:dashed"><span class="bw">' + SVGB + '<b style="font-size:26px">État inconnu</b></span></div><div class="fx" style="margin-top:14px"><button type="button" class="pw" style="margin-right:12px" data-l="' + LSEL + '" data-a="on"' + d + '><span class="bw">Allumer</span></button><button type="button" class="pw" data-l="' + LSEL + '" data-a="off"' + d + '><span class="bw">Éteindre</span></button></div><div class="note" style="margin-top:10px;max-width:290px;text-align:center">La lumière ne dit pas si elle est allumée : choisis une action.</div></div>';
       } else {
@@ -1258,23 +1258,23 @@ button:focus { outline: none; }
     });
   }
   function lumAll(on) {
-    var ls, k = 0, bad = [];
+    var ls, left, bad = [], i;
     if (lumBusy || !LUM || !LUM.lights.length) { return; }
-    ls = LUM.lights.slice(0);
-    lumBusy = true; lumTxt = on ? "Allumage de toutes les lumières…" : "Extinction de toutes les lumières…"; lumBad = false; drawLum();
-    (function next() {
-      var L;
-      if (k >= ls.length) {
+    ls = LUM.lights.slice(0); left = ls.length;
+    lumBusy = true; lumTxt = on ? "Allumage de toutes les lumières…" : "Extinction de toutes les lumières…"; lumBad = false;
+    for (i = 0; i < LUM.lights.length; i++) { LUM.lights[i].on = on; }   /* affichage immédiat */
+    drawLum();
+    function one(L) {
+      call("POST", "/api/lum", { id: L.id, on: on }, function (err, r) {
+        if (err) { bad.push(L.name + " [" + err.code + "] " + err.message); }
+        else { OKT.lum = Date.now(); ACT.lum = null; drawErr(); }
+        if (--left > 0) { return; }
         lumBusy = false; lumBad = bad.length > 0;
         lumTxt = bad.length ? "Pas tout : " + bad.join(" ; ") : (on ? "Tout est allumé." : "Tout est éteint.");
-        drawLum(); return;
-      }
-      L = ls[k++];
-      call("POST", "/api/lum", { id: L.id, on: on }, function (err, r) {
-        if (err) { bad.push(L.name + " [" + err.code + "] " + err.message); } else { LUM = r; OKT.lum = Date.now(); ACT.lum = null; drawErr(); }
-        next();
+        loadLum();
       });
-    })();
+    }
+    for (i = 0; i < ls.length; i++) { one(ls[i]); }   /* tout part en même temps : LED (Bluetooth) et Tuya (internet) */
   }
   $("lumAllOff").onclick = function () { lumAll(false); };
   $("lumAllOn").onclick = function () { lumAll(true); };
@@ -1293,6 +1293,34 @@ button:focus { outline: none; }
   };
   loadLum(); setInterval(loadLum, 30000);
   go("clim");
+
+
+  /* tap immédiat : l'ancien WebView attend ~300 ms avant de valider un appui */
+  (function () {
+    var sx = 0, sy = 0, st = 0, mv = false, tg = null;
+    document.addEventListener("touchstart", function (e) {
+      var t = e.touches && e.touches[0];
+      if (!t || e.touches.length > 1) { tg = null; return; }
+      sx = t.clientX; sy = t.clientY; st = Date.now(); mv = false; tg = e.target;
+    }, false);
+    document.addEventListener("touchmove", function (e) {
+      var t = e.touches && e.touches[0];
+      if (t && (Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10)) { mv = true; }
+    }, false);
+    document.addEventListener("touchend", function (e) {
+      var el = tg, n;
+      tg = null;
+      if (!el || mv || Date.now() - st > 600) { return; }
+      n = el.nodeType === 1 ? el : el.parentNode;
+      while (n && n !== document.body) {
+        if (/^(INPUT|TEXTAREA|SELECT|A|LABEL)$/.test(n.tagName)) { return; }
+        n = n.parentNode;
+      }
+      if (e.cancelable) { e.preventDefault(); }
+      if (el.nodeType !== 1) { el = el.parentNode; }
+      if (el.click) { el.click(); }
+    }, false);
+  })();
 
   /* ---------------- heure ---------------- */
   var lastMin = -1;
