@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:227 TDBA:208-->
+<!--TDBV:228 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -257,11 +257,6 @@ button:focus { outline: none; }
 .perf #bg i { display: none; }
 @-webkit-keyframes spin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.clim-on .nb[data-p="clim"] svg, .clim-on .mb.sel svg { -webkit-animation: spin 9s linear infinite; animation: spin 9s linear infinite; }
-.clim-on .mb.sel[data-i="1"] svg { -webkit-animation-duration: 14s; animation-duration: 14s; }
-.clim-on .mb.sel[data-i="3"] svg { -webkit-animation: none; animation: none; }
-.clim-on .mb.sel[data-i="4"] svg { -webkit-animation-duration: 1.3s; animation-duration: 1.3s; }
-.noico .nb svg, .noico .mb svg { -webkit-animation: none !important; animation: none !important; }
 .perf .tile { background: #181c22; }
 .perf *, .perf *:before, .perf *:after { -webkit-box-shadow: none !important; box-shadow: none !important; -webkit-transition: none !important; transition: none !important; text-shadow: none !important; }
 .fpsb { position: relative; height: 70px; margin: 10px 20px 4px; border-radius: 14px; background: #14171c; border: 1px solid #2f353e; overflow: hidden; }
@@ -342,7 +337,6 @@ button:focus { outline: none; }
 @keyframes wfl{0%{opacity:1}40%{opacity:1}45%{opacity:.1}50%{opacity:1}58%{opacity:.15}64%{opacity:1}100%{opacity:1}}
 @-webkit-keyframes wfk{0%{opacity:0;-webkit-transform:translate3d(0,-70%,0)}50%{opacity:1}100%{opacity:0;-webkit-transform:translate3d(100%,420%,0)}}
 @keyframes wfk{0%{opacity:0;transform:translate3d(0,-70%,0)}50%{opacity:1}100%{opacity:0;transform:translate3d(100%,420%,0)}}
-.clim-on .nb[data-p="clim"] svg, .clim-on .mb.sel svg { -webkit-backface-visibility: hidden; }
 .noico .wl, .noico .rd, .noico .wst, .noico .wfk { -webkit-animation: none; animation: none; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
@@ -1199,7 +1193,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("227", 10) || 0, UI_NAME = "2.27 (beta) TEST".charAt(0) === "_" ? "?" : "2.27 (beta) TEST";
+  var UI_CODE = parseInt("228", 10) || 0, UI_NAME = "2.28 (beta) TEST".charAt(0) === "_" ? "?" : "2.28 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1519,7 +1513,7 @@ button:focus { outline: none; }
   function drawWeather(w) {
     var n = w.now, m = wmo(n.code, n.day), t = w.days[0], i;
     wxLast = w;
-    $("nowIco").innerHTML = wic(m.k);
+    $("nowIco").innerHTML = ICONS[m.k];
     $("nowT").textContent = rnd(n.temp) + "°";
     $("nowP").textContent = m.t;
     var p1 = ["Max " + rnd(t.hi) + "° · Min " + rnd(t.lo) + "°"];
