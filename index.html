@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:216 TDBA:208-->
+<!--TDBV:218 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -244,6 +244,21 @@ button:focus { outline: none; }
 .tsl input::-webkit-slider-runnable-track { height: 12px; border-radius: 6px; background: #2f353e; }
 .tsl input::-webkit-slider-thumb { -webkit-appearance: none; width: 50px; height: 50px; margin-top: -19px; border-radius: 50%; background: #d8dde6; border: 0; }
 .tsn { display: -webkit-flex; display: flex; -webkit-justify-content: space-between; justify-content: space-between; font-size: 13px; color: #8f98a5; margin-top: -4px; }
+.xbtn { white-space: nowrap; height: 50px; padding: 0 18px; margin-right: 10px; border-radius: 25px; background: #232830; border: 1px solid #2f353e; color: #eceff3; font-size: 16px; font-weight: bold; display: block; }
+.xbtn:active { background: #d8dde6; color: #14171c; }
+.xbtn.on { background: #d8dde6; border-color: #d8dde6; color: #14171c; }
+.xbtn.lg { height: 64px; padding: 0 30px; border-radius: 32px; font-size: 20px; }
+.xbtn.sm { height: 42px; padding: 0 14px; font-size: 15px; border-radius: 21px; }
+.xbtn.bad { color: #ff7a70; border-color: #ff7a70; }
+.xrow2 { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; -webkit-align-items: center; align-items: center; margin-bottom: 8px; }
+.xrow2.c { -webkit-justify-content: center; justify-content: center; }
+/* ---- mode léger (2.18) : pas d'ombres, de transparences, d'animations ni de halos ---- */
+.xbtn { -webkit-flex: none; flex: none; }
+.perf #bg i { display: none; }
+.perf .tile { background: #181c22; }
+.perf *, .perf *:before, .perf *:after { -webkit-box-shadow: none !important; box-shadow: none !important; -webkit-transition: none !important; transition: none !important; -webkit-animation: none !important; animation: none !important; text-shadow: none !important; }
+.fpsb { position: relative; height: 70px; margin: 10px 20px 4px; border-radius: 14px; background: #14171c; border: 1px solid #2f353e; overflow: hidden; }
+.fpsb i { position: absolute; left: 0; top: 15px; width: 40px; height: 40px; border-radius: 50%; background: #d8dde6; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
  <div id="nav">
@@ -302,7 +317,7 @@ button:focus { outline: none; }
 
    <section class="page" id="p-app">
     <div class="ttl"><span class="fx" style="-webkit-align-items:center;align-items:center"><button type="button" class="bk" id="agBack" style="display:none" aria-label="Retour à la bibliothèque">&lsaquo; Autre</button><h2 id="appT">Autre</h2></span><span class="note" id="libNote">Bibliothèque de modules</span></div>
-    <div id="libV" class="lib"><div class="mod"><button type="button" class="mi on" data-mod="agenda"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Agenda</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="minuteur"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.500" r="7"/><path d="M12 9.500v4l2.500 1.500M9.500 3h5"/></svg><span>Minuteur</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="reveil"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.500 1.500M4 6l3-2.500M20 6l-3-2.500"/></svg><span>Réveil</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="musique"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></svg><span>Musique</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="reglages"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.400 15a1.650 1.650 0 0 0 .330 1.820l.060.060a2 2 0 1 1-2.830 2.830l-.060-.060a1.650 1.650 0 0 0-1.820-.330 1.650 1.650 0 0 0-1 1.510V21a2 2 0 0 1-4 0v-.090A1.650 1.650 0 0 0 9 19.400a1.650 1.650 0 0 0-1.820.330l-.060.060a2 2 0 1 1-2.830-2.830l.060-.060A1.650 1.650 0 0 0 4.680 15a1.650 1.650 0 0 0-1.510-1H3a2 2 0 0 1 0-4h.090A1.650 1.650 0 0 0 4.600 9a1.650 1.650 0 0 0-.330-1.820l-.060-.060a2 2 0 1 1 2.830-2.830l.060.060A1.650 1.650 0 0 0 9 4.680a1.650 1.650 0 0 0 1-1.510V3a2 2 0 0 1 4 0v.090a1.650 1.650 0 0 0 1 1.510 1.650 1.650 0 0 0 1.820-.330l.060-.060a2 2 0 1 1 2.830 2.830l-.060.060A1.650 1.650 0 0 0 19.400 9a1.650 1.650 0 0 0 1.510 1H21a2 2 0 0 1 0 4h-.090a1.650 1.650 0 0 0-1.510 1z"/></svg><span>Réglages</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="taches"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.500l2 2 3.500-4M4 14.500l2 2 3.500-4M13 7h7M13 15h7"/></svg><span>Tâches</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="meteo7"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 11a3.500 3.500 0 0 0 1 7z"/></svg><span>Météo semaine</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="prises"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v5M15 3v5M6.500 8h11v3.500a5.500 5.500 0 0 1-11 0zM12 17v4"/></svg><span>Prises</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="volets"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16M5 8h14M5 12h14M5 16h14M12 16v4"/></svg><span>Volets</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="tv"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>TV</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="debug"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="8" height="11" rx="4"/><path d="M12 8V5M9 5l1.500 1.500M15 5l-1.500 1.500M4 12h4M16 12h4M5 19l3-2M19 19l-3-2M5 7l3 2M19 7l-3 2"/></svg><span>Debug</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="trajets"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.200 7-11.500A7 7 0 0 0 5 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg><span>Trajets</span></span></button></div></div>
+    <div id="libV" class="lib"><div class="mod"><button type="button" class="mi on" data-mod="agenda"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Agenda</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="minuteur"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.500" r="7"/><path d="M12 9.500v4l2.500 1.500M9.500 3h5"/></svg><span>Minuteur</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="reveil"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.500 1.500M4 6l3-2.500M20 6l-3-2.500"/></svg><span>Réveil</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="musique"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></svg><span>Musique</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="reglages"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.400 15a1.650 1.650 0 0 0 .330 1.820l.060.060a2 2 0 1 1-2.830 2.830l-.060-.060a1.650 1.650 0 0 0-1.820-.330 1.650 1.650 0 0 0-1 1.510V21a2 2 0 0 1-4 0v-.090A1.650 1.650 0 0 0 9 19.400a1.650 1.650 0 0 0-1.820.330l-.060.060a2 2 0 1 1-2.830-2.830l.060-.060A1.650 1.650 0 0 0 4.680 15a1.650 1.650 0 0 0-1.510-1H3a2 2 0 0 1 0-4h.090A1.650 1.650 0 0 0 4.600 9a1.650 1.650 0 0 0-.330-1.820l-.060-.060a2 2 0 1 1 2.830-2.830l.060.060A1.650 1.650 0 0 0 9 4.680a1.650 1.650 0 0 0 1-1.510V3a2 2 0 0 1 4 0v.090a1.650 1.650 0 0 0 1 1.510 1.650 1.650 0 0 0 1.820-.330l.060-.060a2 2 0 1 1 2.830 2.830l-.060.060A1.650 1.650 0 0 0 19.400 9a1.650 1.650 0 0 0 1.510 1H21a2 2 0 0 1 0 4h-.090a1.650 1.650 0 0 0-1.510 1z"/></svg><span>Réglages</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="taches"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.500l2 2 3.500-4M4 14.500l2 2 3.500-4M13 7h7M13 15h7"/></svg><span>Tâches</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="meteo7"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 11a3.500 3.500 0 0 0 1 7z"/></svg><span>Météo semaine</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="prises"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v5M15 3v5M6.500 8h11v3.500a5.500 5.500 0 0 1-11 0zM12 17v4"/></svg><span>Prises</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="volets"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16M5 8h14M5 12h14M5 16h14M12 16v4"/></svg><span>Volets</span></span></button></div><div class="mod"><button type="button" class="mi" data-mod="tv"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>TV</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="debug"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="8" height="11" rx="4"/><path d="M12 8V5M9 5l1.500 1.500M15 5l-1.500 1.500M4 12h4M16 12h4M5 19l3-2M19 19l-3-2M5 7l3 2M19 7l-3 2"/></svg><span>Debug</span></span></button></div><div class="mod"><button type="button" class="mi on" data-mod="affichage"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span>Affichage</span></span></button></div></div>
     <div class="note" id="libMsg" style="margin-top:8px;min-height:18px">Les modules grisés sont des emplacements libres : dis-moi lesquels créer.</div>
     <div id="wxV" style="display:none;-webkit-flex:1;flex:1;min-height:0;-webkit-flex-direction:column;flex-direction:column">
      <div class="tile agT"><p class="msg" id="w7Msg">Chargement de la météo de la semaine…</p>
@@ -313,6 +328,9 @@ button:focus { outline: none; }
     </div>
     <div id="setV" style="display:none;-webkit-flex:1;flex:1;min-height:0;-webkit-flex-direction:column;flex-direction:column">
      <div class="tile agT"><div class="agD" id="setB" style="display:block;border-top:0;margin-top:0;padding-top:0;height:calc(100vh - 215px);-webkit-flex:none;flex:none;overflow-y:auto"></div></div>
+    </div>
+    <div id="xV" style="display:none;-webkit-flex:1;flex:1;min-height:0;-webkit-flex-direction:column;flex-direction:column">
+     <div class="tile agT"><div id="xB" style="height:calc(100vh - 215px);-webkit-flex:none;flex:none;overflow-y:auto;-webkit-overflow-scrolling:touch"></div></div>
     </div>
     <div id="agV" style="display:none;-webkit-flex:1;flex:1;min-height:0;-webkit-flex-direction:column;flex-direction:column">
      <div class="tile agT"><div class="agH"><h3>Agenda</h3><span id="agNote"></span></div>
@@ -858,6 +876,7 @@ button:focus { outline: none; }
   window.LOCAL = {
     cfg: cfg, DEF: DEF,
     apkInstall: function (url, cb) { var id = nid(function (st, tx, er) { cb(er || null); }); try { N.apkInstall(id, url); } catch (e) { delete cbs[id]; cb(String(e && e.message || e)); } },
+    postJson: function (url, headers, body, timeout, cb) { http("POST", url, headers, body, timeout, cb); },
     getText: function (url, timeout, cb, extra) { var hd = { "User-Agent": "tableau-de-bord" }, k; if (extra) { for (k in extra) { if (extra.hasOwnProperty(k)) { hd[k] = extra[k]; } } } http("GET", url, hd, "", timeout, function (err, st, tx) { if (err) { return cb(err); } if (st < 200 || st >= 300) { return cb("HTTP " + st); } cb(null, tx); }); },
     reset: function () { wxS = {}; w7S = {}; agS = {}; ty.token = null; ty.state = null; ty.at = 0; lumInit = false; },
     req: function (method, url, body, cb) {
@@ -1052,12 +1071,12 @@ button:focus { outline: none; }
   /* ---------------- navigation ---------------- */
   var PAGES = ["home", "clim", "lum", "app", "wx"];
   function appView(v) {
-    var ag = v === "agenda", wx = v === "wx7", st = v === "set", lib = !ag && !wx && !st;
+    var ag = v === "agenda", wx = v === "wx7", st = v === "set", x = v === "x", lib = !ag && !wx && !st && !x;
     function sh(id, on) { var e = $(id); e.style.display = on ? "-webkit-flex" : "none"; if (on) { e.style.display = "flex"; } }
-    sh("libV", lib); sh("agV", ag); sh("wxV", wx); sh("setV", st);
+    sh("libV", lib); sh("agV", ag); sh("wxV", wx); sh("setV", st); sh("xV", x);
     $("libMsg").style.display = lib ? "block" : "none";
     $("agBack").style.display = lib ? "none" : "block";
-    $("appT").textContent = ag ? "Agenda" : (wx ? "Météo de la semaine" : (st ? "Réglages" : "Autre"));
+    $("appT").textContent = ag ? "Agenda" : (wx ? "Météo de la semaine" : (st ? "Réglages" : (x ? "Affichage" : "Autre")));
     $("libNote").style.display = lib ? "block" : "none";
     if (wx && W7) { drawW7(); }
     if (st) { drawSet(); }
@@ -1081,6 +1100,7 @@ button:focus { outline: none; }
           var k = b.getAttribute("data-mod");
           if (k === "agenda") { appView("agenda"); return; }
           if (k === "reglages") { appView("set"); return; }
+          if (k === "affichage") { xOpen(); return; }
           if (k === "meteo7") { appView("wx7"); loadW7(); return; }
           if (k === "debug") { openDbg(); return; }
           $("libMsg").textContent = "« " + b.getElementsByTagName("span")[0].textContent + " » : emplacement libre, module pas encore créé.";
@@ -1094,7 +1114,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("216", 10) || 0, UI_NAME = "2.16 (beta)".charAt(0) === "_" ? "?" : "2.16 (beta)";
+  var UI_CODE = parseInt("218", 10) || 0, UI_NAME = "2.18 (beta)".charAt(0) === "_" ? "?" : "2.18 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1682,6 +1702,39 @@ button:focus { outline: none; }
 
   buildModes(); drawMode(); drawClim(); drawTemp();
   pull(); setInterval(pull, 15000);
+
+  /* =============== 2.18 : affichage (mode léger + test de fluidité) =============== */
+  function xGet(k, d) { try { var v = window.localStorage.getItem("tdb_" + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
+  function xSet(k, v) { try { window.localStorage.setItem("tdb_" + k, JSON.stringify(v)); } catch (e) { } }
+  var PERF = xGet("perf", 1);
+  function perfApply() { var c = document.documentElement.className.replace(/\bperf\b/g, "").replace(/\s+$/, ""); document.documentElement.className = PERF ? (c ? c + " perf" : "perf") : c; }
+  perfApply();
+  function dispDraw() {
+    var h = '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (PERF ? " on" : "") + '" data-x="perf">Mode léger : ' + (PERF ? "oui" : "non") + '</button></div>';
+    h += '<p class="note" style="margin-bottom:10px">Le mode léger supprime les ombres, les transparences, les halos et les animations pour que la tablette reste fluide. Compare avec « non » grâce au test ci-dessous.</p>';
+    h += '<div class="xrow2"><span style="font-size:20px;font-weight:bold">Fluidité : <span id="fpsV">…</span> images/s</span></div><div class="fpsb"><i id="fpsS"></i></div><p class="note">La bille doit glisser sans saccade. Autour de 60 images/s : parfait. Moins de 20 : la tablette peine.</p>';
+    $("xB").innerHTML = h; fpsStart();
+  }
+  function fpsStart() {
+    var n = 0, t0 = Date.now(), raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    function f() {
+      var now = Date.now(), s = $("fpsS"), v = $("fpsV");
+      if (!s || !v) { return; }
+      n++;
+      if (now - t0 >= 1000) { v.textContent = Math.round(n * 1000 / (now - t0)); n = 0; t0 = now; }
+      s.style.webkitTransform = "translate3d(" + Math.round(((now % 2000) / 2000) * 820) + "px,0,0)";
+      raf(f);
+    }
+    raf(f);
+  }
+  function xDraw() { dispDraw(); }
+  function xOpen() { appView("x"); xDraw(); }
+  $("xB").onclick = function (ev) {
+    var t = ev.target;
+    while (t && t !== this && !(t.getAttribute && t.getAttribute("data-x"))) { t = t.parentNode; }
+    if (!t || t === this) { return; }
+    if (t.getAttribute("data-x") === "perf") { PERF = PERF ? 0 : 1; xSet("perf", PERF); perfApply(); dispDraw(); }
+  };
 
   /* recharge la page après 6 h, quand personne ne touche l'écran */
   var lastTouch = Date.now();
