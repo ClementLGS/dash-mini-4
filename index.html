@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:293 TDBA:211-->
+<!--TDBV:294 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -261,9 +261,13 @@ button:focus { outline: none; }
 .al{}
 .bl{}
 #ban { -webkit-flex: none; flex: none; background: rgba(220, 53, 53, 0.6); border-bottom: 1px solid rgba(255, 120, 120, 0.7); color: #fff; padding: 7px 20px; font-size: 15px; font-weight: bold; line-height: 1.3; }
-.ed { display: none; position: fixed; top: 0; bottom: 0; width: 110px; z-index: 900; pointer-events: none; opacity: 0.2; }
-#edL { left: 0; background: -webkit-linear-gradient(left, rgba(230, 50, 50, 1), rgba(230, 50, 50, 0)); background: linear-gradient(90deg, rgba(230, 50, 50, 1), rgba(230, 50, 50, 0)); }
-#edR { right: 0; background: -webkit-linear-gradient(right, rgba(230, 50, 50, 1), rgba(230, 50, 50, 0)); background: linear-gradient(270deg, rgba(230, 50, 50, 1), rgba(230, 50, 50, 0)); }
+.ed { display: none; position: fixed; z-index: 900; pointer-events: none; opacity: 0.2; }
+#edL, #edR { top: 0; bottom: 0; width: 105px; }
+#edT, #edB { left: 0; right: 0; height: 105px; }
+#edL { left: 0; background: -webkit-linear-gradient(left, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); background: linear-gradient(90deg, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); }
+#edR { right: 0; background: -webkit-linear-gradient(right, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); background: linear-gradient(270deg, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); }
+#edT { top: 0; background: -webkit-linear-gradient(top, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); background: linear-gradient(180deg, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); }
+#edB { bottom: 0; background: -webkit-linear-gradient(bottom, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); background: linear-gradient(0deg, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); }
 #ban span { font-weight: normal; opacity: 0.9; }
 .hb:active, .go:active, .sw:active, .sgb:active, .lbulb:active, .ltab:active { opacity: 0.7; }
 .tsl { width: 70%; max-width: 640px; margin-top: 18px; }
@@ -365,7 +369,7 @@ button:focus { outline: none; }
 
  <div id="main">
   <div id="ban" style="display:none" role="alert"></div>
-  <div id="edL" class="ed"></div><div id="edR" class="ed"></div>
+  <div id="edL" class="ed"></div><div id="edR" class="ed"></div><div id="edT" class="ed"></div><div id="edB" class="ed"></div>
   <div id="top">
    <div id="clock">--:--</div><div id="date">&nbsp;</div><button type="button" class="pill bad" id="err" aria-label="Voir le diagnostic des erreurs"></button>
    
@@ -1099,12 +1103,12 @@ button:focus { outline: none; }
     edgeSet(txt.length > 0);
   }
   /* erreur : lueur rouge sur les bords de l'écran, qui pulse de 20 % à 60 % d'opacité (10 images/s, arrêtée en veille) */
-  var edOn = false, edT = 0;
-  function edTick() { var o = (0.4 - 0.2 * Math.cos(new Date().getTime() / 1500 * 3.14159)).toFixed(2); $("edL").style.opacity = o; $("edR").style.opacity = o; }
+  var edOn = false, edT = 0, EDS = ["edL", "edR", "edT", "edB"];
+  function edTick() { var o = (0.4 - 0.2 * Math.cos(new Date().getTime() / 1500 * 3.14159)).toFixed(2); var k; for (k = 0; k < EDS.length; k++) { $(EDS[k]).style.opacity = o; } }
   function edgeSet(on) {
     if (on === edOn) { return; }
     edOn = on;
-    $("edL").style.display = on ? "block" : "none"; $("edR").style.display = on ? "block" : "none";
+    var k; for (k = 0; k < EDS.length; k++) { $(EDS[k]).style.display = on ? "block" : "none"; }
     if (on) { edTick(); edT = setInterval(edTick, 100); } else { clearInterval(edT); }
   }
   function map(g) { var o = [], i; for (i = 0; i < g.length; i++) { o.push(AREAS[g[i]][0]); } return o.join(", "); }
@@ -1285,7 +1289,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("293", 10) || 0, UI_NAME = "2.93 (beta) TEST".charAt(0) === "_" ? "?" : "2.93 (beta) TEST";
+  var UI_CODE = parseInt("294", 10) || 0, UI_NAME = "2.94 (beta) TEST".charAt(0) === "_" ? "?" : "2.94 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
