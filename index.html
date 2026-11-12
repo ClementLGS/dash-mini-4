@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:264 TDBA:208-->
+<!--TDBV:265 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1204,7 +1204,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("264", 10) || 0, UI_NAME = "2.64 (beta)".charAt(0) === "_" ? "?" : "2.64 (beta)";
+  var UI_CODE = parseInt("265", 10) || 0, UI_NAME = "2.65 (beta)".charAt(0) === "_" ? "?" : "2.65 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1444,7 +1444,7 @@ button:focus { outline: none; }
       })(ls[i]);
     }
   }
-  function lumLat(L) { return xGet("lat_" + L.id, L.kind === "switch" ? 900 : 350) + (L.kind === "switch" ? 250 : 0); }
+  function lumLat(L) { return xGet("lat_" + L.id, L.kind === "switch" ? 900 : 350) + (L.kind === "switch" ? xGet("sync", 0) : 0); }
   function lumLearn(L, ms) {
     var old = xGet("lat_" + L.id, L.kind === "switch" ? 900 : 350);
     ms = Math.min(2500, Math.max(50, ms));
@@ -1950,6 +1950,8 @@ button:focus { outline: none; }
     var h = '<div class="xrow2" style="margin-bottom:10px"><button type="button" class="xbtn lg' + (PERF ? " on" : "") + '" data-x="perf">Mode léger : ' + (PERF ? "oui" : "non") + '</button><button type="button" class="xbtn lg' + (ICO ? " on" : "") + '" data-x="ico" style="margin-left:8px">Animation météo : ' + ["non", "complète", "légère"][ICO] + '</button></div>';
     h += '<p class="note" style="margin-bottom:10px">Le mode léger supprime les ombres, les transparences, les halos et les animations pour que la tablette reste fluide. Compare avec « non » grâce au test ci-dessous.</p>';
     h += '<div class="xrow2"><span style="font-size:20px;font-weight:bold">Fluidité : <span id="fpsV">…</span> images/s · pire image <span id="fpsW">…</span> ms</span></div><div class="fpsb"><i id="fpsS"></i></div><p class="note">Même mesure que le bandeau des versions TEST (pire image : la plus longue pause des 5 dernières secondes). La bille doit glisser sans saccade. Autour de 60 images/s : parfait. Moins de 20 : la tablette peine.</p>';
+    h += '<div class="xrow2" style="margin-top:8px"><span style="font-size:17px;margin-right:10px">Synchro des lumières (Lego par rapport à la LED) : <b>' + (xGet("sync", 0) > 0 ? "+" : "") + xGet("sync", 0) + ' ms</b></span><button type="button" class="xbtn sm" data-x="synm">− 50</button><button type="button" class="xbtn sm" data-x="synp">+ 50</button></div>';
+    h += '<p class="note">Si Lego réagit avant la LED, mets − ; s\'il réagit après, mets +. Appuie sur « Tout éteindre » pour tester.</p>';
     h += '<div class="xrow2" style="margin-top:6px"><button type="button" class="xbtn sm" data-x="lab">Test à vide (6 s)</button><span class="note" id="labR" style="margin-left:6px">' + esc(labRes) + '</span></div>';
     h += '<p class="note">Le test à vide affiche un écran noir : si la tablette y reste à 30 images/s, c\'est la tablette elle-même qui plafonne, pas l\'interface.</p>';
     $("xB").innerHTML = h; fpsStart();
@@ -2019,6 +2021,7 @@ button:focus { outline: none; }
     if (a === "ico") { ICO = ICO === 1 ? 2 : (ICO === 2 ? 0 : 1); xSet("ico", ICO); icoApply(); if (wxLast) { drawWeather(wxLast); } dispDraw(); }
     else if (a === "perf") { PERF = PERF ? 0 : 1; xSet("perf", PERF); perfApply(); dispDraw(); }
     else if (a === "lab") { labRun(); }
+    else if (a === "synm" || a === "synp") { xSet("sync", Math.max(-1000, Math.min(1000, xGet("sync", 0) + (a === "synp" ? 50 : -50)))); dispDraw(); }
     else if (a === "consoZ") { PF = {}; PWAIT = {}; PZ = pfNow(); consoDraw(); }
     else if (a === "wall") { WALL = v; xSet("wall", WALL); wallApply(); wallDraw(); }
   };
