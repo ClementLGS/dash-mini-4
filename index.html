@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:300 TDBA:211-->
+<!--TDBV:301 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1076,6 +1076,28 @@ button:focus { outline: none; }
     E11: "Lumière injoignable. Bluetooth : éteinte, trop loin de la tablette, ou occupée par l'appli LEDBLE (la fermer). Relais Tuya : pas d'Internet ou codes Tuya faux (Réglages).",
     E12: "Bluetooth indisponible : cette tablette n'a pas le Bluetooth basse consommation (ou bleak absent en mode PC)."
   };
+  /* journal d'événements (Wi-Fi, Bluetooth, batterie, services, veille…) : informatif, ne déclenche pas d'erreur */
+  var EV = [], PA = {}, BP = null, BC = false, BA = null;
+  function evLog(k, m) { EV.push({ t: Date.now(), k: k, m: m }); if (EV.length > 120) { EV.shift(); } }
+  function evAct() {
+    var k, cur, m, nm;
+    for (k in AREAS) {
+      if (!AREAS.hasOwnProperty(k)) { continue; }
+      cur = ACT[k] || "";
+      if (cur === (PA[k] || "")) { continue; }
+      PA[k] = cur; nm = AREAS[k][0];
+      if (cur) {
+        m = lastMsg(cur, AREAS[k][1]);
+        evLog(nm, "erreur " + cur + " : " + (cur === "E99" ? "simulation" : (CODES[cur] || "").split(/ \(|\./)[0]) + (m && cur !== "E99" ? " (" + m + ")" : ""));
+        if (k === "lum" && cur === "E11") { evLog("Bluetooth", "lumière injoignable (éteinte, trop loin, ou occupée par l'appli LEDBLE)"); }
+        if (k === "lum" && cur === "E12") { evLog("Bluetooth", "Bluetooth basse consommation indisponible"); }
+      } else { evLog(nm, "retour à la normale"); }
+    }
+  }
+  evLog("App", "démarrage de la page");
+  evLog("Réseau", navigator.onLine === false ? "hors ligne au démarrage" : "en ligne au démarrage");
+  window.addEventListener("online", function () { evLog("Réseau", "connexion rétablie (Wi-Fi reconnecté)"); }, false);
+  window.addEventListener("offline", function () { evLog("Réseau", "connexion perdue (Wi-Fi déconnecté ou sans Internet)"); }, false);
   var LOG = [], ACT = { clim: null, wx: null, ag: null, lum: null, js: null }, OKT = { clim: 0, wx: 0, ag: 0, lum: 0 }, T0 = Date.now();
   function mk(code, msg) { var e = new Error(msg); e.code = code; return e; }
   function hms(t) { var d = new Date(t); return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); }
@@ -1087,6 +1109,7 @@ button:focus { outline: none; }
   }
   function drawErr() {
     var c = [], k, b = $("err"), groups = {}, order = [], code, i, txt = [], m, g, ban = $("ban");
+    evAct();
     for (k in ACT) {
       if (ACT.hasOwnProperty(k) && ACT[k]) {
         c.push(ACT[k]); code = ACT[k];
@@ -1198,6 +1221,12 @@ button:focus { outline: none; }
     h += "<p>Lumières : " + stt("lum") + "</p>";
     h += "<p>" + (window.LOCAL ? "Moteur" : "Relais") + " : " + relayTxt + "</p>";
     h += "<p>Écran : " + window.innerWidth + "×" + window.innerHeight + "</p>";
+    h += "<p>Réseau : " + (navigator.onLine === false ? '<span class="e">hors ligne</span>' : '<span class="ok">en ligne</span>') + "</p>";
+    h += "<p>Bluetooth : " + (BA === null ? "inconnu" : (BA ? '<span class="ok">activé</span>' : '<span class="e">désactivé ou indisponible</span>')) + "</p>";
+    h += "<p>Batterie : " + (BP === null ? "inconnue" : BP + " %" + (BC ? " (en charge)" : " (sur batterie)")) + "</p>";
+    h += "<h3>Événements (récent en haut)</h3>";
+    if (!EV.length) { h += "<p>Rien pour l'instant.</p>"; }
+    for (i = EV.length - 1, k = 0; i >= 0 && k < 40; i--, k++) { h += "<p>" + hms(EV[i].t) + " · <b>" + esc(EV[i].k) + "</b> · " + esc(EV[i].m) + "</p>"; }
     h += "<h3>Journal (récent en haut)</h3>";
     if (!LOG.length) { h += '<p class="ok">Aucune erreur enregistrée.</p>'; }
     for (i = LOG.length - 1, k = 0; i >= 0 && k < 25; i--, k++) {
@@ -1296,7 +1325,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("300", 10) || 0, UI_NAME = "3.00 (beta) TEST".charAt(0) === "_" ? "?" : "3.00 (beta) TEST";
+  var UI_CODE = parseInt("301", 10) || 0, UI_NAME = "3.01 (beta) TEST".charAt(0) === "_" ? "?" : "3.01 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -1593,8 +1622,22 @@ button:focus { outline: none; }
     e.className = ch ? "" : (p <= 15 ? "low" : (p <= 30 ? "mid" : ""));
     $("batF").setAttribute("width", String(Math.max(0, Math.min(18, p * 18 / 100))));
     $("batT").textContent = p + " %" + (ch ? " ⚡" : "");
+    if (BP !== null) {
+      if (ch !== BC) { evLog("Batterie", (ch ? "branchée (en charge)" : "débranchée") + " à " + p + " %"); }
+      if (p <= 30 && BP > 30) { evLog("Batterie", "sous 30 % (" + p + " %)"); }
+      if (p <= 15 && BP > 15) { evLog("Batterie", "sous 15 % (" + p + " %)"); }
+      if (p >= 100 && BP < 100) { evLog("Batterie", "pleine (100 %)"); }
+    } else { evLog("Batterie", p + " %" + (ch ? ", en charge" : ", sur batterie") + " au démarrage"); }
+    BP = p; BC = ch;
   }
-  batDraw(); setInterval(pw("Batterie", batDraw), 60000);
+  function bleWatch() {
+    var a;
+    try { if (!window.Native || !window.Native.bleAvailable) { return; } a = !!window.Native.bleAvailable(); } catch (x) { return; }
+    if (BA === null) { evLog("Bluetooth", a ? "activé au démarrage" : "désactivé ou indisponible au démarrage"); }
+    else if (a !== BA) { evLog("Bluetooth", a ? "activé" : "désactivé ou indisponible"); }
+    BA = a;
+  }
+  batDraw(); bleWatch(); setInterval(pw("Batterie", function () { batDraw(); bleWatch(); }), 60000);
 
   /* ---------------- curseur « Bonne nuit » : un appui sur la lune ouvre la piste, puis on glisse vers la droite ---------------- */
   var SWW = 210, swX = 0, swDrag = false, swX0 = 0, swBusy = false, swOpen = false, swW = 36, swTm = 0, swAn = 0, swMoved = false, swPx0 = 0;
@@ -1642,6 +1685,7 @@ button:focus { outline: none; }
   })();
   /* scène « Bonne nuit » : clim éteinte, toutes les lumières éteintes, puis veille */
   function bonneNuit() {
+    evLog("Veille", "mode Bonne nuit lancé (lumières éteintes, veille)");
     if (LUM && LUM.lights && LUM.lights.length) { lumAll(false); }
     sleepOn();
   }
@@ -1666,6 +1710,7 @@ button:focus { outline: none; }
   }
   function sleepOn() {
     var i;
+    evLog("Veille", "entrée en veille");
     SLEEP = 1;
     for (i = 0; i < IVS.length; i++) { _ci.call(window, IVS[i].id); }
     $("app").style.display = "none"; $("bg").style.display = "none";
@@ -1677,7 +1722,7 @@ button:focus { outline: none; }
   function sleepOff() {
     var i;
     if (!SLEEP) { return; }
-    SLEEP = 0; clearTimeout(slTm);
+    SLEEP = 0; clearTimeout(slTm); evLog("Veille", "sortie de veille");
     try { if (window.Native && window.Native.setSleep) { window.Native.setSleep(false); } } catch (e) { }
     $("slp").style.display = "none"; $("app").style.display = ""; $("bg").style.display = "";
     for (i = 0; i < IVS.length; i++) { IVS[i].id = _si.call(window, IVS[i].f, IVS[i].ms); }
