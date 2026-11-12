@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:262 TDBA:208-->
+<!--TDBV:263 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1204,7 +1204,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("262", 10) || 0, UI_NAME = "2.62 (beta)".charAt(0) === "_" ? "?" : "2.62 (beta)";
+  var UI_CODE = parseInt("263", 10) || 0, UI_NAME = "2.63 (beta)".charAt(0) === "_" ? "?" : "2.63 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1491,6 +1491,7 @@ button:focus { outline: none; }
     for (i = 0; i < IVS.length; i++) { _ci.call(window, IVS[i].id); }
     $("app").style.display = "none"; $("bg").style.display = "none";
     $("slp").style.display = "-webkit-flex"; $("slp").style.display = "flex";
+    try { if (window.Native && window.Native.setSleep) { window.Native.setSleep(true); } } catch (e) { }
     pull();
     slTick();
   }
@@ -1498,6 +1499,7 @@ button:focus { outline: none; }
     var i;
     if (!SLEEP) { return; }
     SLEEP = 0; clearTimeout(slTm);
+    try { if (window.Native && window.Native.setSleep) { window.Native.setSleep(false); } } catch (e) { }
     $("slp").style.display = "none"; $("app").style.display = ""; $("bg").style.display = "";
     for (i = 0; i < IVS.length; i++) { IVS[i].id = _si.call(window, IVS[i].f, IVS[i].ms); }
     lastMin = -1; tick(); pull(); loadLum(); loadWeather(); loadAgenda();
