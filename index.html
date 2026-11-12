@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:238 TDBA:208-->
+<!--TDBV:243 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -300,45 +300,38 @@ button:focus { outline: none; }
 .cm.s { float: left; background: transparent; border: 1px dashed #2f353e; color: #8f98a5; font-size: 14px; padding: 5px 12px; }
 .cm.e { float: left; background: transparent; color: #ff7a70; font-size: 15px; }
 #nowIco, #hIco { position: relative; }
-.rd { position: absolute; top: 73.8%; width: 6.7%; height: 18%; margin-left: -3.3%; border-radius: 4px; background: #4aa8ff; opacity: 0; -webkit-backface-visibility: hidden; -webkit-animation: rdrop 1.8s linear infinite; animation: rdrop 1.8s linear infinite; }
-@-webkit-keyframes rdrop { 0% { opacity: 0; -webkit-transform: translate3d(0,-17%,0) rotate(22deg); } 50% { opacity: 1; } 100% { opacity: 0; -webkit-transform: translate3d(0,100%,0) rotate(22deg); } }
-@keyframes rdrop { 0% { opacity: 0; transform: translate3d(0,-17%,0) rotate(22deg); } 50% { opacity: 1; } 100% { opacity: 0; transform: translate3d(0,100%,0) rotate(22deg); } }
-@-webkit-keyframes cdr { 0% { -webkit-transform: translate3d(0,0,0); } 50% { -webkit-transform: translate3d(3%,0,0); } 100% { -webkit-transform: translate3d(0,0,0); } }
-@keyframes cdr { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(3%,0,0); } 100% { transform: translate3d(0,0,0); } }
-.wl { position: absolute; left: 0; top: 0; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.rd { position: absolute; top: 70.8%; width: 6.7%; height: 18%; margin-left: -3.3%; border-radius: 4px; background-color: rgba(74,168,255,0); -webkit-transform: rotate(22deg); transform: rotate(22deg); -webkit-animation: rdrop 1.8s linear infinite; animation: rdrop 1.8s linear infinite; }
+@-webkit-keyframes rdrop { 0% { top: 70.8%; background-color: rgba(74,168,255,0); } 50% { background-color: rgba(74,168,255,1); } 100% { top: 91.8%; background-color: rgba(74,168,255,0); } }
+@keyframes rdrop { 0% { top: 70.8%; background-color: rgba(74,168,255,0); } 50% { background-color: rgba(74,168,255,1); } 100% { top: 91.8%; background-color: rgba(74,168,255,0); } }
+.wl { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 .wl svg { display: block; width: 100%; height: 100%; }
-.wsp { -webkit-transform-origin: 50% 50%; transform-origin: 50% 50%; -webkit-animation: wsp 60s linear infinite; animation: wsp 60s linear infinite; }
-.wpu { -webkit-transform-origin: 50% 50%; transform-origin: 50% 50%; -webkit-animation: wpu 8s ease-in-out infinite; animation: wpu 8s ease-in-out infinite; }
-.wst { position: absolute; width: 2.8%; height: 2.8%; border-radius: 50%; background: #fff; opacity: .2; -webkit-backface-visibility: hidden; -webkit-animation: wst 5.2s ease-in-out infinite; animation: wst 5.2s ease-in-out infinite; }
-.wfk { position: absolute; top: 72%; width: 4.4%; height: 4.4%; margin-left: -2.2%; border-radius: 50%; background: #cfe8ff; opacity: 0; -webkit-backface-visibility: hidden; -webkit-animation: wfk 4.8s linear infinite; animation: wfk 4.8s linear infinite; }
+.wst { position: absolute; width: 2.8%; height: 2.8%; border-radius: 50%; background-color: rgba(255,255,255,.2); -webkit-animation: wst 5.2s ease-in-out infinite; animation: wst 5.2s ease-in-out infinite; }
+.wfk { position: absolute; top: 68.9%; width: 4.4%; height: 4.4%; margin-left: -2.2%; border-radius: 50%; background-color: rgba(207,232,255,0); -webkit-animation: wfk 4.8s linear infinite; animation: wfk 4.8s linear infinite; }
 .wfl { -webkit-animation: wfl 7.2s linear infinite; animation: wfl 7.2s linear infinite; }
-.wdp3 { -webkit-animation: wdp3 12s ease-in-out infinite; animation: wdp3 12s ease-in-out infinite; }
-@-webkit-keyframes wdp3{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(3%,0,0)}100%{-webkit-transform:translate3d(0,0,0)}}
-@keyframes wdp3{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(3%,0,0)}100%{transform:translate3d(0,0,0)}}
-.wdm3 { -webkit-animation: wdm3 12s ease-in-out infinite; animation: wdm3 12s ease-in-out infinite; }
-@-webkit-keyframes wdm3{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(-3%,0,0)}100%{-webkit-transform:translate3d(0,0,0)}}
-@keyframes wdm3{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-3%,0,0)}100%{transform:translate3d(0,0,0)}}
-.wdp8 { -webkit-animation: wdp8 12s ease-in-out infinite; animation: wdp8 12s ease-in-out infinite; }
-@-webkit-keyframes wdp8{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(8%,0,0)}100%{-webkit-transform:translate3d(0,0,0)}}
-@keyframes wdp8{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(8%,0,0)}100%{transform:translate3d(0,0,0)}}
-.wdm8 { -webkit-animation: wdm8 12s ease-in-out infinite; animation: wdm8 12s ease-in-out infinite; }
-@-webkit-keyframes wdm8{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(-8%,0,0)}100%{-webkit-transform:translate3d(0,0,0)}}
-@keyframes wdm8{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-8%,0,0)}100%{transform:translate3d(0,0,0)}}
-.wdm6 { -webkit-animation: wdm6 12s ease-in-out infinite; animation: wdm6 12s ease-in-out infinite; }
-@-webkit-keyframes wdm6{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(-6%,0,0)}100%{-webkit-transform:translate3d(0,0,0)}}
-@keyframes wdm6{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(-6%,0,0)}100%{transform:translate3d(0,0,0)}}
-@-webkit-keyframes wsp{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
-@keyframes wsp{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@-webkit-keyframes wpu{0%{-webkit-transform:scale(1)}50%{-webkit-transform:scale(1.13)}100%{-webkit-transform:scale(1)}}
-@keyframes wpu{0%{transform:scale(1)}50%{transform:scale(1.13)}100%{transform:scale(1)}}
-@-webkit-keyframes wst{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
-@keyframes wst{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
-@-webkit-keyframes wfl{0%{opacity:1}40%{opacity:1}45%{opacity:.1}50%{opacity:1}58%{opacity:.15}64%{opacity:1}100%{opacity:1}}
-@keyframes wfl{0%{opacity:1}40%{opacity:1}45%{opacity:.1}50%{opacity:1}58%{opacity:.15}64%{opacity:1}100%{opacity:1}}
-@-webkit-keyframes wfk{0%{opacity:0;-webkit-transform:translate3d(0,-70%,0)}50%{opacity:1}100%{opacity:0;-webkit-transform:translate3d(100%,420%,0)}}
-@keyframes wfk{0%{opacity:0;transform:translate3d(0,-70%,0)}50%{opacity:1}100%{opacity:0;transform:translate3d(100%,420%,0)}}
+.wdp3 { position: absolute; -webkit-animation: wdp3 12s ease-in-out infinite; animation: wdp3 12s ease-in-out infinite; }
+@-webkit-keyframes wdp3{0%{left:0}50%{left:3%}100%{left:0}}
+@keyframes wdp3{0%{left:0}50%{left:3%}100%{left:0}}
+.wdm3 { position: absolute; -webkit-animation: wdm3 12s ease-in-out infinite; animation: wdm3 12s ease-in-out infinite; }
+@-webkit-keyframes wdm3{0%{left:0}50%{left:-3%}100%{left:0}}
+@keyframes wdm3{0%{left:0}50%{left:-3%}100%{left:0}}
+.wdp8 { position: absolute; -webkit-animation: wdp8 12s ease-in-out infinite; animation: wdp8 12s ease-in-out infinite; }
+@-webkit-keyframes wdp8{0%{left:0}50%{left:8%}100%{left:0}}
+@keyframes wdp8{0%{left:0}50%{left:8%}100%{left:0}}
+.wdm8 { position: absolute; -webkit-animation: wdm8 12s ease-in-out infinite; animation: wdm8 12s ease-in-out infinite; }
+@-webkit-keyframes wdm8{0%{left:0}50%{left:-8%}100%{left:0}}
+@keyframes wdm8{0%{left:0}50%{left:-8%}100%{left:0}}
+.wdm6 { position: absolute; -webkit-animation: wdm6 12s ease-in-out infinite; animation: wdm6 12s ease-in-out infinite; }
+@-webkit-keyframes wdm6{0%{left:0}50%{left:-6%}100%{left:0}}
+@keyframes wdm6{0%{left:0}50%{left:-6%}100%{left:0}}
+@-webkit-keyframes wst{0%{background-color:rgba(255,255,255,.2)}50%{background-color:rgba(255,255,255,1)}100%{background-color:rgba(255,255,255,.2)}}
+@keyframes wst{0%{background-color:rgba(255,255,255,.2)}50%{background-color:rgba(255,255,255,1)}100%{background-color:rgba(255,255,255,.2)}}
+@-webkit-keyframes wfl{0%{visibility:visible}44%{visibility:visible}45%{visibility:hidden}49%{visibility:hidden}50%{visibility:visible}57%{visibility:visible}58%{visibility:hidden}62%{visibility:hidden}63%{visibility:visible}100%{visibility:visible}}
+@keyframes wfl{0%{visibility:visible}44%{visibility:visible}45%{visibility:hidden}49%{visibility:hidden}50%{visibility:visible}57%{visibility:visible}58%{visibility:hidden}62%{visibility:hidden}63%{visibility:visible}100%{visibility:visible}}
+@-webkit-keyframes wfk{0%{top:68.9%;margin-left:-2.2%;background-color:rgba(207,232,255,0)}50%{background-color:rgba(207,232,255,1)}100%{top:90.5%;margin-left:2.2%;background-color:rgba(207,232,255,0)}}
+@keyframes wfk{0%{top:68.9%;margin-left:-2.2%;background-color:rgba(207,232,255,0)}50%{background-color:rgba(207,232,255,1)}100%{top:90.5%;margin-left:2.2%;background-color:rgba(207,232,255,0)}}
+
 .noico .wl, .noico .rd, .noico .wst, .noico .wfk { -webkit-animation: none; animation: none; }
-.ico2 .wl { -webkit-animation: none; animation: none; -webkit-backface-visibility: visible; backface-visibility: visible; }
+.ico2 .wl { -webkit-animation: none; animation: none; }
 .ico2 .rd, .ico2 .wfk, .ico2 .wst { -webkit-animation-timing-function: steps(4); animation-timing-function: steps(4); }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
@@ -1195,7 +1188,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("238", 10) || 0, UI_NAME = "2.38 (beta) TEST".charAt(0) === "_" ? "?" : "2.38 (beta) TEST";
+  var UI_CODE = parseInt("243", 10) || 0, UI_NAME = "2.43 (beta) TEST".charAt(0) === "_" ? "?" : "2.43 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
