@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:283 TDBA:211-->
+<!--TDBV:284 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -78,7 +78,8 @@ button:focus { outline: none; }
 
 /* ---- accueil ---- */
 .hRow { -webkit-flex: 1; flex: 1; min-height: 0; display: -webkit-flex; display: flex; }
-.hClim, .hCast { max-height: 316px; }
+.hRow { -webkit-align-items: center; align-items: center; }
+.hClim, .hCast { height: 316px; }
 .hClim { -webkit-flex: 1 1 0; flex: 1 1 0; margin-right: 14px; padding: 18px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; text-align: center; }
 .hClim .t { font-size: 84px; line-height: 1; font-weight: bold; color: #b9c2d0; margin: 10px 0; }
 .hClim .t small { font-size: 28px; color: #8f98a5; font-weight: normal; }
@@ -229,6 +230,7 @@ button:focus { outline: none; }
   .sb { width: 76px; height: 76px; line-height: 70px; }
   .hRow, .wRow { -webkit-flex-direction: column; flex-direction: column; }
   .hClim, .wNow { margin: 0 0 12px; }
+  .hClim, .hCast { height: auto; }
   #date { display: none; }
 }
 @-webkit-keyframes dA{0%{-webkit-transform:translate3d(0,0,0)}50%{-webkit-transform:translate3d(120px,60px,0)}100%{-webkit-transform:translate3d(0,0,0)}}
@@ -1248,7 +1250,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("283", 10) || 0, UI_NAME = "2.83 (beta) TEST".charAt(0) === "_" ? "?" : "2.83 (beta) TEST";
+  var UI_CODE = parseInt("284", 10) || 0, UI_NAME = "2.84 (beta) TEST".charAt(0) === "_" ? "?" : "2.84 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
