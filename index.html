@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:314 TDBA:211-->
+<!--TDBV:315 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1341,7 +1341,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["diagrepo", "Dépôt de diagnostic (propriétaire/nom)", ""], ["diagtok", "Jeton du dépôt de diagnostic", "password"], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("314", 10) || 0, UI_NAME = "3.14 (beta) TEST".charAt(0) === "_" ? "?" : "3.14 (beta) TEST";
+  var UI_CODE = parseInt("315", 10) || 0, UI_NAME = "3.15 (beta) TEST".charAt(0) === "_" ? "?" : "3.15 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -2260,7 +2260,7 @@ button:focus { outline: none; }
     h += '<div class="mLb" style="margin:10px 0 6px">Appareils</div>';
     for (i = 0; i < SP.devs.length; i++) { d = SP.devs[i]; h += '<span class="spB' + (d.is_active ? " on" : "") + '" data-sp="dev" data-id="' + esc(d.id) + '">' + esc(d.name) + '</span>'; }
     if (!SP.devs.length) { h += '<p class="note">Aucun appareil Spotify ouvert. Ouvre Spotify sur ton téléphone ou ton PC.</p>'; }
-    h += '<p class="note" style="margin-top:8px">' + (SP.msg ? esc(SP.msg) + " · " : "") + 'Spotify · mise à jour toutes les 8 s.</p>';
+    h += '<p class="note" style="margin-top:8px">' + (SP.msg ? esc(SP.msg) + " · " : "") + 'Spotify · mise à jour toutes les 6 s.</p>';
     $("xB").innerHTML = h;
   }
   function xDraw() { if (xMod === "musique") { musiDraw(); } else if (xMod === "fonds") { wallDraw(); } else if (xMod === "conso") { consoDraw(); } else { dispDraw(); } }
@@ -2397,7 +2397,7 @@ button:focus { outline: none; }
   $("dbgSend").onclick = function () { var b = $("dbgSend"); b.textContent = "Envoi…"; dgSend("bouton", function (e) { b.textContent = e ? "Échec (voir l'état)" : "Envoyé ✓"; setTimeout(function () { b.textContent = "Envoyer le diagnostic"; if ($("dbg").style.display !== "none") { drawDbg(); } }, 2500); }); };
 
   /* ---------------- Spotify (Web API, connexion PKCE faite à distance) ---------------- */
-  var SP = { cid: "", rt: "", at: "", exp: 0, st: null, msg: "", devs: [], last: 0, busy: false };
+  var SP = { cid: "", rt: "", at: "", exp: 0, st: null, msg: "", devs: [], last: 0, busy: false, hold: 0, sig: "", dn: 0 };
   (function () { var o = xGet("spo", null); if (o && o.rt) { SP.cid = o.cid; SP.rt = o.rt; SP.at = o.at || ""; SP.exp = o.exp || 0; } })();
   function spSave() { xSet("spo", SP.rt ? { cid: SP.cid, rt: SP.rt, at: SP.at, exp: SP.exp } : null); }
   function spToken(cb) {
@@ -2447,6 +2447,7 @@ button:focus { outline: none; }
     spApi("GET", "/me/player", "", function (err, st, j) {
       var it, im, a, i;
       SP.busy = false;
+      if (Date.now() < SP.hold) { return; }
       if (err) { SP.msg = "Spotify injoignable"; SP.st = null; return spRender(); }
       if (st === 204 || !j || !j.device) { SP.st = null; SP.msg = ""; }
       else if (st === 200) {
@@ -2454,35 +2455,41 @@ button:focus { outline: none; }
         im = it.album && it.album.images ? it.album.images : [];
         if (it.artists) { for (i = 0; i < it.artists.length; i++) { arr.push(it.artists[i].name); } }
         a = it.show ? it.show.publisher : arr.join(", ");
-        SP.st = { playing: !!j.is_playing, title: it.name || "Titre inconnu", artist: a || "", art: im.length ? im[im.length - 1].url : "", vol: j.device.volume_percent, volOk: j.device.supports_volume !== false, dev: j.device.name };
+        SP.st = { playing: !!j.is_playing, title: it.name || "Titre inconnu", artist: a || "", art: im.length ? im[im.length - 1].url : "", devId: j.device.id, vol: j.device.volume_percent, volOk: j.device.supports_volume !== false, dev: j.device.name };
         SP.msg = "";
       } else { SP.msg = "Spotify : erreur " + st; SP.st = null; evLog("Spotify", "lecture : HTTP " + st); }
       SP.last = Date.now();
-      spRender();
+      a = JSON.stringify([SP.st, SP.msg, SP.devs, xMod, $("xV").style.display]);
+      if (a !== SP.sig) { SP.sig = a; spRender(); }
     });
-    if (xMod === "musique" && $("xV").style.display !== "none") {
-      spApi("GET", "/me/player/devices", "", function (e, st, j) { if (!e && st === 200 && j && j.devices) { SP.devs = j.devices; spRender(); } });
+    SP.dn++;
+    if (xMod === "musique" && $("xV").style.display !== "none" && SP.dn % 2 === 1) {
+      spApi("GET", "/me/player/devices", "", function (e, st, j) { if (!e && st === 200 && j && j.devices) { SP.devs = j.devices; SP.sig = ""; } });
     }
   }
   function spAct(a, id) {
-    var pl = SP.st && SP.st.playing, m, p, b = "{}", v;
+    var pl = SP.st && SP.st.playing, m, p, b = "{}", v, t0;
     if (a === "dev") { m = "PUT"; p = "/me/player"; b = JSON.stringify({ device_ids: [id], play: true }); }
     else if (a === "pp") { m = "PUT"; p = pl ? "/me/player/pause" : "/me/player/play"; }
     else if (a === "next") { m = "POST"; p = "/me/player/next"; }
     else if (a === "prev") { m = "POST"; p = "/me/player/previous"; }
     else if (a === "vu" || a === "vd") { v = Math.max(0, Math.min(100, (SP.st ? SP.st.vol : 50) + (a === "vu" ? 10 : -10))); m = "PUT"; p = "/me/player/volume?volume_percent=" + v; if (SP.st) { SP.st.vol = v; spRender(); } }
     else { return; }
+    if (SP.st && SP.st.devId && a !== "dev") { p += (p.indexOf("?") < 0 ? "?" : "&") + "device_id=" + SP.st.devId; }
+    SP.hold = Date.now() + 4000; t0 = Date.now();
     if (SP.st && a === "pp") { SP.st.playing = !pl; spRender(); }
-    spApi(m, p, b, function (err, st) {
-      if (err || (st !== 200 && st !== 202 && st !== 204)) { SP.msg = err ? "Spotify injoignable" : (st === 404 ? "aucun appareil actif : choisis-en un" : "commande refusée (HTTP " + st + ")"); evLog("Spotify", "commande " + a + " : " + (err || st)); spRender(); }
-      setTimeout(spPoll, 700);
+    spApi(m, p, b, function (err, st, j) {
+      var why = j && j.error ? String(j.error.reason || j.error.message || "") : "";
+      evLog("Spotify", "commande " + a + " : " + (err || ("HTTP " + st + (why ? " " + why : ""))) + " en " + (Date.now() - t0) + " ms");
+      if (err || (st !== 200 && st !== 202 && st !== 204)) { SP.hold = 0; SP.msg = err ? "Spotify injoignable" : (st === 404 ? "aucun appareil actif : choisis-en un" : "refusé : " + (why || ("HTTP " + st))); SP.sig = ""; spRender(); }
+      setTimeout(spPoll, 2500);
     });
   }
   $("hmPrev").onclick = function () { spAct("prev"); };
   $("hmNext").onclick = function () { spAct("next"); };
   $("hmPlay").onclick = function () { spAct("pp"); };
   $("hmPause").onclick = function () { spAct("pp"); };
-  setInterval(pw("Spotify", spPoll), 8000);
+  setInterval(pw("Spotify", spPoll), 6000);
   setTimeout(spPoll, 3000);
   window.spSet = function (cid, rt) { SP.cid = cid; SP.rt = rt; SP.at = ""; SP.exp = 0; SP.msg = ""; spSave(); evLog("Spotify", "connexion enregistrée"); spPoll(); };
 
