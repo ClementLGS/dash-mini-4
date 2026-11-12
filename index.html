@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:265 TDBA:208-->
+<!--TDBV:266 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -319,6 +319,8 @@ button:focus { outline: none; }
 .slI svg { width: 100%; height: 100%; display: block; }
 .slV { font-size: 54px; font-weight: bold; color: #8a919c; margin-top: 6px; }
 #slWI { opacity: 0.5; }
+#slp { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+#slP { display: none; position: absolute; left: 0; bottom: 0; height: 4px; width: 0; background: #3c424b; }
 #slS { font-size: 30px; font-weight: bold; color: #8a919c; margin-bottom: 34px; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
@@ -422,7 +424,7 @@ button:focus { outline: none; }
  </div>
 </div>
 
-<div id="slp"><div id="slC">--:--</div><div id="slD"></div><div id="slR"><div class="slb"><div class="slI" id="slWI"></div><div class="slV" id="slWT"></div></div><div class="slb"><div class="slI" id="slMI"></div><div class="slV" id="slT"></div></div></div><div id="slS"></div></div>
+<div id="slp"><div id="slC">--:--</div><div id="slD"></div><div id="slR"><div class="slb"><div class="slI" id="slWI"></div><div class="slV" id="slWT"></div></div><div class="slb"><div class="slI" id="slMI"></div><div class="slV" id="slT"></div></div></div><div id="slS"></div><div id="slP"></div></div>
 <div id="dbg"><div class="bar"><h2>Diagnostic</h2><span><button type="button" id="dbgClr">Vider le journal</button><button type="button" id="dbgX">Fermer</button></span></div>
  <div class="cols"><div class="box" id="dbgL"></div><div class="box" id="dbgR"></div></div></div>
 
@@ -1204,7 +1206,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("265", 10) || 0, UI_NAME = "2.65 (beta)".charAt(0) === "_" ? "?" : "2.65 (beta)";
+  var UI_CODE = parseInt("266", 10) || 0, UI_NAME = "2.66 (beta)".charAt(0) === "_" ? "?" : "2.66 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1519,7 +1521,19 @@ button:focus { outline: none; }
     for (i = 0; i < IVS.length; i++) { IVS[i].id = _si.call(window, IVS[i].f, IVS[i].ms); }
     lastMin = -1; tick(); pull(); loadLum(); loadWeather(); loadAgenda();
   }
-  $("slp").onclick = sleepOff;
+  (function () {
+    var p = $("slp"), bar = $("slP"), t0 = 0, tm = 0;
+    function cancel() { clearTimeout(tm); t0 = 0; bar.style.display = "none"; bar.style.width = "0"; }
+    function tick() {
+      var e = Date.now() - t0;
+      bar.style.width = Math.min(100, e / 30) + "%";
+      if (e >= 3000) { cancel(); sleepOff(); } else { tm = setTimeout(tick, 100); }
+    }
+    function start(ev) { if (!SLEEP || t0) { return; } if (ev.preventDefault) { ev.preventDefault(); } t0 = Date.now(); bar.style.display = "block"; tick(); }
+    p.addEventListener("touchstart", start); p.addEventListener("mousedown", start);
+    p.addEventListener("touchend", cancel); p.addEventListener("touchcancel", cancel); p.addEventListener("mouseup", cancel); p.addEventListener("mouseleave", cancel);
+    p.addEventListener("contextmenu", function (ev) { ev.preventDefault(); });
+  })();
 
   loadLum(); setInterval(pw("Lumières", loadLum), 30000);
   go("clim");
