@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:242 TDBA:208-->
+<!--TDBV:244 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1180,7 +1180,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("242", 10) || 0, UI_NAME = "2.42 (beta)".charAt(0) === "_" ? "?" : "2.42 (beta)";
+  var UI_CODE = parseInt("244", 10) || 0, UI_NAME = "2.44 (beta)".charAt(0) === "_" ? "?" : "2.44 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1460,7 +1460,7 @@ button:focus { outline: none; }
     fog: wsvg(line("M9 16h30M6 24h36M10 32h28M15 40h18", FOG, 3))
   };
   var wxLast = null;
-  function wic(k) { return ICONS[k]; }
+  function wic(k) { return ICO ? ICONS_A[k] : ICONS[k]; }
   function wl(inner, cls, st) { return '<span class="wl ' + (cls || "") + '"' + (st ? ' style="' + st + '"' : "") + '>' + wsvg(inner) + "</span>"; }
   function wdot(cls, st) { return '<i class="' + cls + '" style="' + st + '"></i>'; }
   function ad(d, dl) { return "-webkit-animation-duration:" + d + "s;animation-duration:" + d + "s;" + (dl ? "-webkit-animation-delay:" + dl + "s;animation-delay:" + dl + "s;" : ""); }
@@ -1799,6 +1799,7 @@ button:focus { outline: none; }
   var ICO = xGet("ico", 2);
   function icoApply() { var c = document.documentElement.className.replace(/\b(noico|ico2)\b/g, "").replace(/\s+$/, ""); document.documentElement.className = ICO === 0 ? (c ? c + " noico" : "noico") : (ICO === 2 ? (c ? c + " ico2" : "ico2") : c); }
   icoApply();
+  if (wxLast) { drawWeather(wxLast); }
   var labRes = "";
   function labRun() {
     var o = document.createElement("div"), tx, ball, n = 0, t0 = Date.now(), last = t0, worst = 0, raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (f) { return setTimeout(f, 16); };
