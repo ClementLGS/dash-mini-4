@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:247 TDBA:208-->
+<!--TDBV:249 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1189,7 +1189,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("247", 10) || 0, UI_NAME = "2.47 (beta) TEST".charAt(0) === "_" ? "?" : "2.47 (beta) TEST";
+  var UI_CODE = parseInt("249", 10) || 0, UI_NAME = "2.49 (beta) TEST".charAt(0) === "_" ? "?" : "2.49 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1589,6 +1589,7 @@ button:focus { outline: none; }
     else if (w7Var === "wind") { sp += "Max " + nv(d.wind) + " km/h " + (d.wdir === null ? "" : DIRS[Math.round(d.wdir / 45) % 8]) + " · rafales " + nv(d.gust) + " km/h"; }
     else if (w7Var === "hum") { for (i = 0, v = 0, c = 0; i < hrs.length; i++) { if (hrs[i].hum !== null) { v += hrs[i].hum; c++; } } sp += "Moyenne " + (c ? nv(v / c) : "–") + " %"; }
     else { sp += "UV max " + nv(d.uv, 10) + " · soleil " + d.sunrise + " → " + d.sunset; }
+    sp += "<br>Barres, heure par heure : " + ({ t: "température en °C", feel: "température ressentie en °C", mm: "pluie en mm par heure (1 mm = 1 litre d'eau par m²)", wind: "vent moyen en km/h", hum: "humidité de l'air en % (100 % = air saturé)", uv: "indice UV, sans unité (1-2 faible, 3-5 modéré, 6-7 fort, 8 et plus très fort)" })[w7Var];
     $("w7S").innerHTML = sp + "</span>";
     for (i = 0; i < W7V.length; i++) { if (W7V[i][0] === w7Var) { v = W7V[i]; } }
     for (i = 0; i < hrs.length; i++) { vals.push(hrs[i][v[4]]); }
