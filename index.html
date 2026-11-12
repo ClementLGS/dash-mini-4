@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:255 TDBA:208-->
+<!--TDBV:256 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1187,7 +1187,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("255", 10) || 0, UI_NAME = "2.55 (beta)".charAt(0) === "_" ? "?" : "2.55 (beta)";
+  var UI_CODE = parseInt("256", 10) || 0, UI_NAME = "2.56 (beta)".charAt(0) === "_" ? "?" : "2.56 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1368,6 +1368,7 @@ button:focus { outline: none; }
       }
     }
     h += '</div><div class="note" id="lumMsg" style="-webkit-flex:none;flex:none;' + (lumBad ? "color:#ff7a70" : "") + '">' + esc(lumTxt || "Un seul appareil Bluetooth à la fois : ferme l'appli LEDBLE sur le téléphone.") + "</div>";
+    if (lumDrag && Date.now() - lumDragT < 5000) { return; }
     if (h !== lumHtml) { lumHtml = h; $("lumL").innerHTML = h; }
   }
   function loadLum() {
@@ -1432,16 +1433,21 @@ button:focus { outline: none; }
     else if (a.charAt(0) === "s") { lumCmd({ id: L.id, bright: parseInt(a.substr(1), 10) * 10 }); }
     else if (a.charAt(0) === "c") { n = COLS[parseInt(a.substr(1), 10)]; if (n) { lumCmd({ id: L.id, color: [n[1], n[2], n[3]] }); } }
   };
+  var lumDrag = 0, lumDragT = 0, lumTmr = 0;
+  function lumDragOn(ev) { var t = ev.target; if (t && String(t.className).indexOf("lrs") >= 0) { lumDrag = 1; lumDragT = Date.now(); } }
+  function lumDragOff() { lumDrag = 0; }
+  document.addEventListener("touchstart", lumDragOn, true); document.addEventListener("mousedown", lumDragOn, true);
+  document.addEventListener("touchend", lumDragOff, true); document.addEventListener("touchcancel", lumDragOff, true); document.addEventListener("mouseup", lumDragOff, true);
   $("lumL").oninput = function (ev) {
-    var t = ev.target, lv;
-    if (!t || String(t.className).indexOf("lrs") < 0) { return; }
-    lv = $("lrgV"); if (lv) { lv.textContent = t.value + " %"; }
-  };
-  $("lumL").onchange = function (ev) {
-    var t = ev.target, L, v;
+    var t = ev.target, L, v, lv, bb;
     if (!t || String(t.className).indexOf("lrs") < 0 || !LUM) { return; }
+    lumDragT = Date.now();
     L = LUM.lights[parseInt(t.getAttribute("data-l"), 10)]; v = parseInt(t.value, 10);
-    if (L) { lumCmd(v < 1 ? { id: L.id, on: false } : { id: L.id, bright: v }); }
+    if (!L) { return; }
+    lv = $("lrgV"); if (lv) { lv.textContent = v + " %"; }
+    bb = document.querySelector("#lumL .lbulb b"); if (bb) { bb.textContent = v < 1 ? "Éteinte" : v + " %"; }
+    clearTimeout(lumTmr);
+    lumTmr = setTimeout(function () { lumCmd(v < 1 ? { id: L.id, on: false } : { id: L.id, bright: v }); }, 450);
   };
   loadLum(); setInterval(pw("Lumières", loadLum), 30000);
   go("clim");
