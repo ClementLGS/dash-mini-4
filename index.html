@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:303 TDBA:211-->
+<!--TDBV:304 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -537,9 +537,10 @@ button:focus { outline: none; }
   /* ---------- Airzone ---------- */
   function az(method, body, cb) {
     var c = cfg();
+    if (!c.airzone) { return cb(E(502, "adresse Airzone non configurée (Réglages)")); }
     http(method, "http://" + c.airzone + "/api/v1/hvac", { "Content-Type": "application/json", "Accept": "*/*" }, JSON.stringify(body), 6000, function (err, st, tx) {
       var j = null, m;
-      if (err) { return cb(E(502, "boîtier Airzone injoignable")); }
+      if (err) { return cb(E(502, "boîtier Airzone injoignable (" + String(err).substr(0, 90) + ")")); }
       try { j = JSON.parse(tx || "{}"); } catch (e) { j = null; }
       if (st >= 200 && st < 300) { return j ? cb(null, j) : cb(E(502, "réponse Airzone illisible")); }
       m = "HTTP " + st; try { m = j.errors[0].error; } catch (e2) {}
@@ -1000,7 +1001,7 @@ button:focus { outline: none; }
   /* ---------- routeur ---------- */
   function debug(cb) {
     readZone(null, function (err) {
-      cb(null, { uptime_s: Math.round((Date.now() - START) / 1000), airzone: { ok: !err, error: err ? err.m : "" },
+      cb(null, { uptime_s: Math.round((Date.now() - START) / 1000), airzone: { ok: !err, error: err ? err.m : "", addr: cfg().airzone || "AUCUNE" },
         lumieres: { bleak: bleOk(), n: LIGHTS.length }, mode: "appli autonome",
         agenda: { configured: !!icalUrl(), age_s: agS.data ? Math.round((Date.now() - agS.at) / 1000) : null },
         weather: { age_s: wxS.data ? Math.round((Date.now() - wxS.at) / 1000) : null, stale: !!wxS.data && (Date.now() - wxS.at) > WX_TTL * 2 } });
@@ -1247,7 +1248,7 @@ button:focus { outline: none; }
       if (err) { relayTxt = '<span class="e">' + err.code + "</span> " + esc(err.message); }
       else {
         relayTxt = (window.LOCAL ? '<span class="ok">appli autonome</span> depuis ' : '<span class="ok">en ligne</span> depuis ') + Math.round(r.uptime_s / 60) + " min · Airzone : "
-          + (r.airzone.ok ? '<span class="ok">joignable</span>' : '<span class="e">injoignable</span> (' + esc(r.airzone.error) + ")")
+          + (r.airzone.ok ? '<span class="ok">joignable</span>' : '<span class="e">injoignable</span> (' + esc(r.airzone.error) + ")") + " · adresse " + esc(r.airzone.addr || "?")
           + " · agenda : " + (r.agenda ? (r.agenda.configured ? (r.agenda.age_s === null ? "jamais récupéré" : "âge " + Math.round(r.agenda.age_s / 60) + " min") : "pas de lien (ical.txt)") : "?")
           + " · météo : " + (r.weather.age_s === null ? "jamais récupérée" : "âge " + Math.round(r.weather.age_s / 60) + " min" + (r.weather.stale ? " (ancienne)" : ""));
       }
@@ -1326,7 +1327,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("303", 10) || 0, UI_NAME = "3.03 (beta) TEST".charAt(0) === "_" ? "?" : "3.03 (beta) TEST";
+  var UI_CODE = parseInt("304", 10) || 0, UI_NAME = "3.04 (beta) TEST".charAt(0) === "_" ? "?" : "3.04 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
