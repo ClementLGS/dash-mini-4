@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:268 TDBA:208-->
+<!--TDBV:269 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -981,6 +981,14 @@ button:focus { outline: none; }
   var IVS = [], SLEEP = 0, slTm = 0, _si = window.setInterval, _ci = window.clearInterval;
   window.setInterval = function (f, ms) { var o = { f: f, ms: ms, id: 0 }; o.id = _si.call(window, f, ms); IVS.push(o); return o.id; };
   window.clearInterval = function (id) { var i; for (i = 0; i < IVS.length; i++) { if (IVS[i].id === id) { IVS.splice(i, 1); break; } } _ci.call(window, id); };
+  /* économie d'énergie : sans toucher l'écran depuis 2 min, les relevés réguliers (clim, lumières) se font 4 fois moins souvent */
+  var LT = Date.now();
+  function isIdle() { return Date.now() - LT > 120000; }
+  function slow(fn) { var n = 0; return function () { if (document.hidden) { return; } n++; if (isIdle() && n % 4 !== 1) { return; } return fn.apply(this, arguments); }; }
+  document.addEventListener("touchstart", function () {
+    var was = isIdle(); LT = Date.now();
+    if (was) { try { pull(); loadLum(); } catch (e) { } }
+  }, true);
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function fmt(t) { return (Math.round(Number(t) * 10) / 10).toFixed(1).replace(".", ","); }
   function rnd(x) { return Math.round(Number(x)); }
@@ -1211,7 +1219,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("268", 10) || 0, UI_NAME = "2.68 (beta)".charAt(0) === "_" ? "?" : "2.68 (beta)";
+  var UI_CODE = parseInt("269", 10) || 0, UI_NAME = "2.69 (beta)".charAt(0) === "_" ? "?" : "2.69 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1554,7 +1562,7 @@ button:focus { outline: none; }
     p.addEventListener("contextmenu", function (ev) { ev.preventDefault(); });
   })();
 
-  loadLum(); setInterval(pw("Lumières", loadLum), 30000);
+  loadLum(); setInterval(slow(pw("Lumières", loadLum)), 30000);
   go("clim");
 
 
@@ -1594,7 +1602,9 @@ button:focus { outline: none; }
     $("clock").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
     $("date").textContent = DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()];
   }
-  tick(); setInterval(pw("Horloge", tick), 1000);
+  var clkTm = 0;
+  function clkLoop() { clearTimeout(clkTm); pw("Horloge", tick)(); clkTm = setTimeout(clkLoop, 60000 - (Date.now() % 60000) + 50); }
+  clkLoop();
 
   /* ---------------- icônes météo ---------------- */
   var CLOUD = "M14 34h20a8 8 0 0 0 .8-16A11 11 0 0 0 13.6 20 7 7 0 0 0 14 34z";
@@ -1949,7 +1959,7 @@ button:focus { outline: none; }
   $("pw").onclick = power; $("pw2").onclick = power;
 
   buildModes(); drawMode(); drawClim(); drawTemp();
-  pull(); setInterval(pw("Clim", pull), 15000);
+  pull(); setInterval(slow(pw("Clim", pull)), 15000);
 
   /* =============== 2.18 : affichage (mode léger + test de fluidité) =============== */
   function xGet(k, d) { try { var v = window.localStorage.getItem("tdb_" + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
