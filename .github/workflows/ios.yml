@@ -25,6 +25,11 @@ jobs:
       - name: Installer XcodeGen
         run: brew install xcodegen
 
+      - name: Tester la vérification de signature (vrais fichiers du dépôt)
+        run: |
+          swiftc -o /tmp/sigtest ios/TableauDeBord/Sources/Sig.swift ios/Tests/main.swift
+          /tmp/sigtest version.json version.sig index.html
+
       - name: Copier l'interface (index.html de la branche)
         run: cp index.html ios/TableauDeBord/Resources/index.html
 
