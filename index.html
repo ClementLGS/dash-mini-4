@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:253 TDBA:208-->
+<!--TDBV:254 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1190,7 +1190,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("253", 10) || 0, UI_NAME = "2.53 (beta)".charAt(0) === "_" ? "?" : "2.53 (beta)";
+  var UI_CODE = parseInt("254", 10) || 0, UI_NAME = "2.54 (beta)".charAt(0) === "_" ? "?" : "2.54 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1362,10 +1362,10 @@ button:focus { outline: none; }
       if (L.kind === "switch") {
         h += '<div class="lcol" style="max-width:330px"><div class="lcap">Relais tout ou rien</div><div class="note" style="font-size:15px">Pas de couleur ni de luminosité sur cet appareil.</div>' + (L.error ? '<div class="note" style="margin-top:12px;color:#ff7a70">' + esc(L.error) + "</div>" : (L.known ? "" : '<div class="note" style="margin-top:12px">État inconnu pour le moment.</div>')) + "</div>";
       } else {
-        h += '<div class="lcol"><div class="lcap">Luminosité</div><div class="lseg">';
+        h += '<div class="lcol"><div class="lcap">Luminosité · <span id="lrgV">' + Math.round(L.bright) + ' %</span></div><div class="lseg">';
         n = Math.round(L.bright / 10);
         for (j = 1; j <= 10; j++) { h += '<span class="sgb' + (j <= n ? " o" : "") + '"></span>'; }
-        h += '<input type="range" class="lrg" min="10" max="100" step="10" value="' + Math.max(10, n * 10) + '" data-l="' + LSEL + '" aria-label="Luminosité"' + d + '></div><div class="lcap">Couleur</div><div class="lcg">';
+        h += '<input type="range" class="lrg" min="1" max="100" step="1" value="' + Math.max(1, Math.round(L.bright)) + '" data-l="' + LSEL + '" aria-label="Luminosité"' + d + '></div><div class="lcap">Couleur</div><div class="lcg">';
         for (j = 0; j < COLS.length; j++) {
           c = COLS[j]; sel = (L.known || L.assumed) && L.on && L.color[0] === c[1] && L.color[1] === c[2] && L.color[2] === c[3];
           h += '<button type="button" class="sw' + (sel ? " sel" : "") + '" style="background:rgb(' + c[1] + "," + c[2] + "," + c[3] + ')" data-l="' + LSEL + '" data-a="c' + j + '" aria-label="' + c[0] + '"' + d + "></button>";
@@ -1374,7 +1374,7 @@ button:focus { outline: none; }
       }
     }
     h += '</div><div class="note" id="lumMsg" style="-webkit-flex:none;flex:none;' + (lumBad ? "color:#ff7a70" : "") + '">' + esc(lumTxt || "Un seul appareil Bluetooth à la fois : ferme l'appli LEDBLE sur le téléphone.") + "</div>";
-    if (h !== lumHtml) { lumHtml = h; $("lumL").innerHTML = h; }
+    if (h !== lumHtml) { lumHtml = h; $("lumL").innerHTML = h; lumFill(); }
   }
   function loadLum() {
     call("GET", "/api/lum", null, function (err, r) {
@@ -1438,11 +1438,21 @@ button:focus { outline: none; }
     else if (a.charAt(0) === "s") { lumCmd({ id: L.id, bright: parseInt(a.substr(1), 10) * 10 }); }
     else if (a.charAt(0) === "c") { n = COLS[parseInt(a.substr(1), 10)]; if (n) { lumCmd({ id: L.id, color: [n[1], n[2], n[3]] }); } }
   };
+  function lumFill() {
+    var t = document.querySelector("#lumL .lrg"), sg, i, w, x, p, v, sw, lv;
+    if (!t) { return; }
+    sg = t.parentNode.getElementsByClassName("sgb"); w = t.parentNode.offsetWidth || 340; v = parseInt(t.value, 10) || 1;
+    x = 15 + (v - 1) / 99 * (w - 5 - 30); sw = w / 10;
+    for (i = 0; i < sg.length; i++) {
+      p = Math.max(0, Math.min(100, (x - i * sw) / (sw - 5) * 100));
+      sg[i].style.background = p >= 99.5 ? "#d8dde6" : (p <= 0.5 ? "#232830" : "-webkit-linear-gradient(left,#d8dde6 " + p + "%,#232830 " + p + "%)");
+    }
+    lv = $("lrgV"); if (lv) { lv.textContent = v + " %"; }
+  }
   $("lumL").oninput = function (ev) {
-    var t = ev.target, sg, i, n;
+    var t = ev.target;
     if (!t || String(t.className).indexOf("lrg") < 0) { return; }
-    sg = t.parentNode.getElementsByClassName("sgb"); n = Math.round(parseInt(t.value, 10) / 10);
-    for (i = 0; i < sg.length; i++) { sg[i].className = "sgb" + (i < n ? " o" : ""); }
+    lumFill();
   };
   $("lumL").onchange = function (ev) {
     var t = ev.target, L;
