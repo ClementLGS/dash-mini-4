@@ -5,6 +5,7 @@ import WebKit
 final class DashboardViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
     private var webView: WKWebView!
     private let bridge = Bridge()
+    private let ucc = WKUserContentController()
 
     override var prefersStatusBarHidden: Bool { true }
     override var prefersHomeIndicatorAutoHidden: Bool { true }
@@ -12,12 +13,10 @@ final class DashboardViewController: UIViewController, WKNavigationDelegate, WKU
 
     override func loadView() {
         let conf = WKWebViewConfiguration()
-        let ucc = WKUserContentController()
         ucc.add(WeakScriptHandler(self), name: "native")
-        ucc.addUserScript(WKUserScript(source: bridge.shimSource(),
-                                       injectionTime: .atDocumentStart,
-                                       forMainFrameOnly: true))
         conf.userContentController = ucc
+        bridge.onSettingsImported = { [weak self] in self?.loadPage() }
+        bridge.onCfgChanged = { [weak self] in DispatchQueue.main.async { self?.installShim() } }
 
         let wv = WKWebView(frame: .zero, configuration: conf)
         wv.navigationDelegate = self
@@ -41,8 +40,15 @@ final class DashboardViewController: UIViewController, WKNavigationDelegate, WKU
         loadPage()
     }
 
+    /// (Ré)installe le pont avec l'état du moment (réglages, batterie…) : une page rechargée, même par elle-même, le retrouve à jour.
+    private func installShim() {
+        ucc.removeAllUserScripts()
+        ucc.addUserScript(WKUserScript(source: bridge.shimSource(), injectionTime: .atDocumentStart, forMainFrameOnly: true))
+    }
+
     /// Charge l'interface : la version mise à jour (si elle existe et qu'elle est valide), sinon celle fournie avec l'appli.
     func loadPage() {
+        installShim()
         guard let p = Ota.page() else {
             webView.loadHTMLString("<body style='background:#0f1114;color:#ff7a70;font:20px sans-serif;padding:40px'>index.html introuvable dans l'appli.</body>", baseURL: nil)
             return
@@ -62,6 +68,10 @@ final class DashboardViewController: UIViewController, WKNavigationDelegate, WKU
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         bridge.handle(message.body, reloadPage: { [weak self] in self?.loadPage() })
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        bridge.pushState()
     }
 
     // iOS peut arrêter le processus de la page quand il manque de mémoire : on la recharge.

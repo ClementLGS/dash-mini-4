@@ -105,6 +105,23 @@
   /* mise à jour de l'état depuis l'appli (batterie, Bluetooth, fichiers déposés) */
   window.__tdbState = function (o) { var k; for (k in o) { if (o.hasOwnProperty(k)) { ST[k] = o[k]; } } };
 
+  /* message de l'import automatique des réglages (affiché quelques secondes, une seule fois) */
+  try {
+    if (ST.toast) {
+      var toastMsg = String(ST.toast);
+      ST.toast = "";
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+          var t = document.createElement("div");
+          t.textContent = toastMsg;
+          t.style.cssText = "position:fixed;left:50%;bottom:28px;-webkit-transform:translateX(-50%);transform:translateX(-50%);max-width:80%;padding:12px 20px;border-radius:14px;background:rgba(30,34,40,.96);border:1px solid #3a4150;color:#d8dde6;font:16px -apple-system,sans-serif;z-index:2147483647;pointer-events:none;text-align:center";
+          document.body.appendChild(t);
+          setTimeout(function () { if (t.parentNode) { t.parentNode.removeChild(t); } }, 7000);
+        }, 600);
+      });
+    }
+  } catch (e) { }
+
   /* iPad : pas de zoom au double appui ni au pincement, pas de menu de sélection */
   try {
     var css = document.createElement("style");

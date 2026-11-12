@@ -31,10 +31,12 @@ final class Bridge {
         nc.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self = self else { return }
             if self.sleeping { self.applyBrightness(true) }
+            if self.importSettings() { self.onSettingsImported?() }
             self.pushState()
         }
         timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in self?.pushState() }
         prepareDocumentsFolder()
+        importSettings()
     }
 
     // MARK: - état partagé avec la page
@@ -51,39 +53,100 @@ final class Bridge {
         return "\(Int((l * 100).rounded()));\(charging)"
     }
 
-    /// Fichiers ical.txt / tuya.txt déposés dans le dossier de l'appli (app Fichiers) : lus ici, servis à readFile().
-    private func droppedFiles() -> [String: String] {
-        var out: [String: String] = [:]
+    /// Contenu du fichier le plus récent du dossier de l'appli (app Fichiers / iTunes) dont le nom commence par `base`
+    /// et finit par .txt (« ical.txt », « ical (1).txt »…), 200 ko au plus, sans l'éventuel BOM.
+    private func newestDocument(_ base: String) -> String? {
         let fm = FileManager.default
         guard let dir = fm.urls(for: .documentDirectory, in: .userDomainMask).first,
-              let names = try? fm.contentsOfDirectory(atPath: dir.path) else { return out }
+              let names = try? fm.contentsOfDirectory(atPath: dir.path) else { return nil }
+        var best: (Date, URL)?
+        for n in names {
+            let low = n.lowercased()
+            guard low.hasPrefix(base), low.hasSuffix(".txt") else { continue }
+            let u = dir.appendingPathComponent(n)
+            guard let attrs = try? fm.attributesOfItem(atPath: u.path),
+                  let size = attrs[.size] as? Int, size <= 200_000,
+                  let date = attrs[.modificationDate] as? Date else { continue }
+            if best == nil || date > best!.0 { best = (date, u) }
+        }
+        guard let b = best, var text = try? String(contentsOf: b.1, encoding: .utf8) else { return nil }
+        if text.hasPrefix("\u{FEFF}") { text.removeFirst() }
+        return text
+    }
+
+    /// Fichiers ical.txt / tuya.txt déposés dans le dossier de l'appli : servis à readFile() (bouton « Importer » de la page).
+    private func droppedFiles() -> [String: String] {
+        var out: [String: String] = [:]
         for base in ["ical", "tuya"] {
-            var best: (Date, URL)?
-            for n in names {
-                let low = n.lowercased()
-                guard low.hasPrefix(base), low.hasSuffix(".txt") else { continue }
-                let u = dir.appendingPathComponent(n)
-                guard let attrs = try? fm.attributesOfItem(atPath: u.path),
-                      let size = attrs[.size] as? Int, size <= 200_000,
-                      let date = attrs[.modificationDate] as? Date else { continue }
-                if best == nil || date > best!.0 { best = (date, u) }
-            }
-            if let b = best, var text = try? String(contentsOf: b.1, encoding: .utf8) {
-                if text.hasPrefix("\u{FEFF}") { text.removeFirst() }
-                out[base] = text
-            }
+            if let t = newestDocument(base) { out[base] = t }
         }
         return out
+    }
+
+    // MARK: - import automatique des réglages
+
+    private let importHashKey = "tdb.import.hash"
+    private var toast = ""
+    /// Appelé quand un import a changé les réglages alors que la page est déjà affichée : la coque la recharge.
+    var onSettingsImported: (() -> Void)?
+    /// Appelé après un enregistrement de réglage par la page : la coque renouvelle l'état injecté au prochain chargement.
+    var onCfgChanged: (() -> Void)?
+
+    /// Lit reglages.txt, ical.txt et tuya.txt dans le dossier de l'appli. Si leur contenu a changé depuis le dernier import,
+    /// les valeurs sont fusionnées dans les réglages. Renvoie true si au moins un réglage a changé.
+    @discardableResult
+    func importSettings() -> Bool {
+        let ical = newestDocument("ical"), tuya = newestDocument("tuya"), reg = newestDocument("reglages")
+        if ical == nil && tuya == nil && reg == nil { return false }
+        let digest = SettingsImport.digest(ical: ical, tuya: tuya, reglages: reg)
+        if defaults.string(forKey: importHashKey) == digest { return false }
+        defaults.set(digest, forKey: importHashKey)
+
+        var cfg: [String: Any] = [:]
+        if let s = cfgDict()["cfg"], let d = s.data(using: .utf8),
+           let o = try? JSONSerialization.jsonObject(with: d) as? [String: Any] { cfg = o }
+        let r = SettingsImport.apply(ical: ical, tuya: tuya, reglages: reg, to: cfg)
+        if r.changed > 0 {
+            var c = cfgDict()
+            c["cfg"] = jsonString(r.cfg)
+            defaults.set(c, forKey: cfgKey)
+        }
+        toast = r.message
+        return r.changed > 0
     }
 
     private func prepareDocumentsFolder() {
         let fm = FileManager.default
         guard let dir = fm.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
-        let note = dir.appendingPathComponent("LISEZ-MOI.txt")
-        if !fm.fileExists(atPath: note.path) {
-            let t = "Dépose ici ical.txt (lien iCal de l'agenda) et tuya.txt (réglages Tuya), puis dans le tableau de bord : Autre > Réglages > Importer."
-            try? t.write(to: note, atomically: true, encoding: .utf8)
-        }
+        let note = """
+        Réglages automatiques : copie ici un fichier « reglages.txt » (voir exemple-reglages.txt).
+        L'appli le lit toute seule à chaque lancement et dès qu'il change, puis met à jour les réglages.
+        Les anciens ical.txt (lien iCal) et tuya.txt (réglages Tuya) sont lus aussi ; reglages.txt l'emporte.
+        Une valeur laissée vide ne change rien.
+        """
+        try? note.write(to: dir.appendingPathComponent("LISEZ-MOI.txt"), atomically: true, encoding: .utf8)
+        let sample = """
+        # Réglages du tableau de bord : une ligne « clé=valeur ». Les lignes # sont ignorées, une valeur vide ne change rien.
+        # Copie ce fichier sous le nom reglages.txt, remplis-le, puis dépose-le dans ce dossier.
+        updurl=
+        diagrepo=
+        diagtok=
+        airzone=
+        system=
+        zone=
+        lat=
+        lon=
+        ical=
+        lum=
+        lum2=
+        tyname=
+        tyregion=
+        tyid=
+        tysecret=
+        tydevice=
+        tycode=
+        """
+        try? sample.write(to: dir.appendingPathComponent("exemple-reglages.txt"), atomically: true, encoding: .utf8)
     }
 
     private func stateDict(includeCfg: Bool) -> [String: Any] {
@@ -93,7 +156,10 @@ final class Bridge {
             "files": droppedFiles(),
             "appCode": appCode
         ]
-        if includeCfg { d["cfg"] = cfgDict() }
+        if includeCfg {
+            d["cfg"] = cfgDict()
+            d["toast"] = toast
+        }
         return d
     }
 
@@ -110,7 +176,9 @@ final class Bridge {
               let src = try? String(contentsOf: url, encoding: .utf8) else {
             return "window.__tdbShimMissing = true;"
         }
-        return src.replacingOccurrences(of: "__STATE__", with: jsonString(stateDict(includeCfg: true)))
+        let state = jsonString(stateDict(includeCfg: true))
+        toast = ""   // le message d'import n'est montré qu'une fois
+        return src.replacingOccurrences(of: "__STATE__", with: state)
     }
 
     func pushState() {
@@ -143,6 +211,7 @@ final class Bridge {
             var c = cfgDict()
             c[str(a[0])] = str(a[1])
             defaults.set(c, forKey: cfgKey)
+            onCfgChanged?()
         case "bleWrite":
             guard a.count >= 4 else { return }
             let id = int(a[0])
