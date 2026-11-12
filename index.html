@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:274 TDBA:208-->
+<!--TDBV:275 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -465,8 +465,8 @@ button:focus { outline: none; }
   }
 
   /* ---------- réglages ---------- */
-  var DEF = { airzone: "192.168.1.68:3000", system: "1", zone: "1", lat: "44.9", lon: "-0.72", ical: "",
-              lum: "BE:68:15:03:63:08", lum2: "", tyregion: "eu", tyid: "", tysecret: "", tydevice: "", tycode: "switch_1", tyname: "Lego", wxurl: "", updurl: "https://raw.githubusercontent.com/ClementLGS/dash-mini-4/main" };
+  var DEF = { airzone: "", system: "1", zone: "1", lat: "44.9", lon: "-0.72", ical: "",
+              lum: "", lum2: "", tyregion: "eu", tyid: "", tysecret: "", tydevice: "", tycode: "switch_1", tyname: "Lego", wxurl: "", updurl: "https://raw.githubusercontent.com/ClementLGS/dash-mini-4/main" };
   /*TESTCFG*/
   function cfg() {
     var o = {}, k, s = {};
@@ -958,7 +958,7 @@ button:focus { outline: none; }
   }
   window.LOCAL = {
     cfg: cfg, DEF: DEF,
-    apkInstall: function (url, cb) { var id = nid(function (st, tx, er) { cb(er || null); }); try { N.apkInstall(id, url); } catch (e) { delete cbs[id]; cb(String(e && e.message || e)); } },
+    apkInstall: function (url, meta, cb) { var id = nid(function (st, tx, er) { cb(er || null); }); try { N.apkInstallSigned(id, url, meta.vj, meta.sig); } catch (e) { delete cbs[id]; cb(String(e && e.message || e)); } },
     postJson: function (url, headers, body, timeout, cb) { http("POST", url, headers, body, timeout, cb); },
     getText: function (url, timeout, cb, extra) { var hd = { "User-Agent": "tableau-de-bord" }, k; if (extra) { for (k in extra) { if (extra.hasOwnProperty(k)) { hd[k] = extra[k]; } } } http("GET", url, hd, "", timeout, function (err, st, tx) { if (err) { return cb(err); } if (st < 200 || st >= 300) { return cb("HTTP " + st); } cb(null, tx); }); },
     reset: function () { wxS = {}; w7S = {}; agS = {}; ty.token = null; ty.state = null; ty.at = 0; lumInit = false; },
@@ -1231,10 +1231,13 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("274", 10) || 0, UI_NAME = "2.74 (beta) TEST".charAt(0) === "_" ? "?" : "2.74 (beta) TEST";
+  var UI_CODE = parseInt("275", 10) || 0, UI_NAME = "2.75 (beta) TEST".charAt(0) === "_" ? "?" : "2.75 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
-  function updUi(html, say, doApk) {
-    var r = window.Native.otaSave(html);
+  /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
+  function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
+  function updUi(html, say, doApk, meta) {
+    if (!meta || !meta.sig || !window.Native.otaSaveSigned) { return say("Mise à jour refusée : elle n'est pas signée."); }
+    var r = window.Native.otaSaveSigned(html, meta.vj, meta.sig);
     if (r.indexOf("ok:") === 0) { say("Interface mise à jour, rechargement…"); setTimeout(function () { if (window.Native.reloadUi) { window.Native.reloadUi(); } else { window.location.href = "file:///data/data/com.clement.tableaudebord/files/www/index.html"; } }, 900); return; }
     if (r.indexOf("err:needapk") === 0) { return doApk ? doApk() : say("Cette interface demande une nouvelle appli : mets à jour l'appli d'abord."); }
     say("Mise à jour impossible : " + r.substr(4));
@@ -1267,10 +1270,13 @@ button:focus { outline: none; }
           if (v.ui === UI_CODE) { found = true; return next(); }
           if (!found) { return next(); }
           say("Téléchargement de la version " + (v.name || v.ui) + "…");
-          window.LOCAL.getText(root + sha + "/" + (v.uifile || "index.html"), 60000, function (e2, html) {
-            if (e2) { return say("Téléchargement impossible : " + e2); }
-            xSet("hold", 1);
-            updUi(html, say, null);
+          getSig(root + sha, function (sig) {
+            if (!sig) { return say("Cette version précédente n'est pas signée : retour impossible."); }
+            window.LOCAL.getText(root + sha + "/" + (v.uifile || "index.html"), 60000, function (e2, html) {
+              if (e2) { return say("Téléchargement impossible : " + e2); }
+              xSet("hold", 1);
+              updUi(html, say, null, { vj: t1, sig: sig });
+            });
           });
         });
       }
@@ -1282,20 +1288,21 @@ button:focus { outline: none; }
     var c = window.LOCAL.cfg(), base = String(c.updurl || "").replace(/\/+$/, ""), code = window.Native.appCode(), t;
     if (!base) {
       if (auto) { return; }
-      t = window.Native.readDropped("index", ".html");
-      if (!t) { return say("Aucune adresse de mise à jour renseignée, et aucun fichier index.html déposé sur la tablette."); }
-      return updUi(t, say, null);
+      return say("Aucune adresse de mise à jour renseignée.");
     }
     resolveBase(base, function (base) {
     window.LOCAL.getText(base + "/version.json?t=" + Date.now(), 15000, function (err, tx) {
       var v;
       if (err) { return auto ? 0 : say("Mise à jour impossible : " + err); }
       try { v = JSON.parse(tx); } catch (e) { return auto ? 0 : say("Mise à jour impossible : version.json illisible"); }
+      getSig(base, function (sig) {
+      var meta = { vj: tx, sig: sig };
+      if (!sig) { return auto ? 0 : say("Mise à jour refusée : signature absente."); }
       function doApk() {
         if (!(v.apk > code && v.apkfile)) { return say("Déjà à jour (" + UI_NAME + ")."); }
         if (auto) { var ve = $("ver"); if (ve) { ve.textContent += " · mise à jour disponible"; } return; }
         say("Téléchargement de la nouvelle appli " + (v.name || "") + "…");
-        window.LOCAL.apkInstall(base + "/" + v.apkfile + "?t=" + Date.now(), function (e3) {
+        window.LOCAL.apkInstall(base + "/" + v.apkfile + "?t=" + Date.now(), meta, function (e3) {
           say(e3 ? "Téléchargement impossible : " + e3 : "Appuie sur « Installer » dans la fenêtre Android, puis rouvre le tableau de bord.");
         });
       }
@@ -1303,9 +1310,10 @@ button:focus { outline: none; }
         if (!auto) { say("Téléchargement de la nouvelle interface…"); }
         window.LOCAL.getText(base + "/" + (v.uifile || "index.html") + "?t=" + Date.now(), 60000, function (e2, html) {
           if (e2) { return auto ? 0 : say("Mise à jour impossible : " + e2); }
-          updUi(html, auto ? function () {} : say, auto ? function () { var ve = $("ver"); if (ve) { ve.textContent += " · mise à jour disponible"; } } : doApk);
+          updUi(html, auto ? function () {} : say, auto ? function () { var ve = $("ver"); if (ve) { ve.textContent += " · mise à jour disponible"; } } : doApk, meta);
         });
       } else { doApk(); }
+      });
     });
     });
   }
