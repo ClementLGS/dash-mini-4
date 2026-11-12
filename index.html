@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:285 TDBA:211-->
+<!--TDBV:286 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,7 +34,7 @@ button:focus { outline: none; }
 #top { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; padding: 8px 20px; border-bottom: 1px solid #232830; min-height: 72px; }
 #clock { font-size: 50px; line-height: 1; font-weight: bold; color: #d8dde6; letter-spacing: 0.02em; }
 #date { margin-left: 18px; font-size: 17px; color: #8f98a5; }
-#bat { margin-left: auto; margin-right: auto; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; color: #b9c2d0; font-size: 18px; font-weight: bold; }
+#bat { position: relative; left: 10px; margin-left: auto; margin-right: auto; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; color: #b9c2d0; font-size: 18px; font-weight: bold; }
 #bat svg { width: 30px; height: 18px; margin-right: 6px; }
 #bat.low { color: #ff7a70; }
 #bat.mid { color: #ffb347; }
@@ -1251,7 +1251,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("285", 10) || 0, UI_NAME = "2.85 (beta) TEST".charAt(0) === "_" ? "?" : "2.85 (beta) TEST";
+  var UI_CODE = parseInt("286", 10) || 0, UI_NAME = "2.86 (beta) TEST".charAt(0) === "_" ? "?" : "2.86 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
