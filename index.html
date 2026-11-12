@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:267 TDBA:208-->
+<!--TDBV:268 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,11 +34,11 @@ button:focus { outline: none; }
 #top { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; padding: 8px 20px; border-bottom: 1px solid #232830; min-height: 72px; }
 #clock { font-size: 50px; line-height: 1; font-weight: bold; color: #d8dde6; letter-spacing: 0.02em; }
 #date { margin-left: 18px; font-size: 17px; color: #8f98a5; }
-#bat { margin-left: auto; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; color: #b9c2d0; font-size: 18px; font-weight: bold; }
+#bat { margin-left: auto; margin-right: auto; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; color: #b9c2d0; font-size: 18px; font-weight: bold; }
 #bat svg { width: 30px; height: 18px; margin-right: 6px; }
 #bat.low { color: #ff7a70; }
 #bat.mid { color: #ffb347; }
-#hw { margin-left: 22px; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
+#hw { margin-left: 0; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
 #hIco { width: 42px; height: 42px; margin-right: 8px; }
 #hIco svg, .big svg, .fi svg { width: 100%; height: 100%; display: block; }
 #hT { font-size: 36px; font-weight: bold; line-height: 1; margin-right: 10px; }
@@ -1211,7 +1211,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("267", 10) || 0, UI_NAME = "2.67 (beta)".charAt(0) === "_" ? "?" : "2.67 (beta)";
+  var UI_CODE = parseInt("268", 10) || 0, UI_NAME = "2.68 (beta)".charAt(0) === "_" ? "?" : "2.68 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
