@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:257 TDBA:208-->
+<!--TDBV:258 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -310,12 +310,17 @@ button:focus { outline: none; }
 @-webkit-keyframes wfk{0%{top:68.9%;margin-left:-2.2%;background-color:rgba(207,232,255,0)}50%{background-color:rgba(207,232,255,1)}100%{top:90.5%;margin-left:2.2%;background-color:rgba(207,232,255,0)}}
 @keyframes wfk{0%{top:68.9%;margin-left:-2.2%;background-color:rgba(207,232,255,0)}50%{background-color:rgba(207,232,255,1)}100%{top:90.5%;margin-left:2.2%;background-color:rgba(207,232,255,0)}}
 .wdp3, .wdm3, .wdp8, .wdm8, .wdm6 { -webkit-animation: none; animation: none; }
-#slp { display: none; position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 4000; background: #000; color: #6f7783; text-align: center; -webkit-flex-direction: column; flex-direction: column; -webkit-justify-content: center; justify-content: center; -webkit-align-items: center; align-items: center; }
-#slC { font-size: 150px; font-weight: bold; color: #8a919c; line-height: 1.05; }
-#slD { font-size: 24px; margin-bottom: 26px; }
-#slT { font-size: 40px; color: #8a919c; }
-#slS { font-size: 24px; margin-top: 8px; }
-#slH { position: absolute; bottom: 18px; left: 0; right: 0; font-size: 14px; color: #3c424b; }
+#slp { display: none; position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 4000; background: #000; color: #6f7783; text-align: center; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; }
+#slC { font-size: 130px; font-weight: bold; color: #8a919c; line-height: 1; margin-top: 18px; }
+#slD { font-size: 26px; margin-top: 4px; }
+#slR { -webkit-flex: 1; flex: 1; width: 100%; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 0 90px; box-sizing: border-box; }
+.slb { display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; }
+.slI { width: 130px; height: 130px; }
+.slI svg { width: 100%; height: 100%; display: block; }
+.slV { font-size: 54px; font-weight: bold; color: #8a919c; margin-top: 6px; }
+#slWI { opacity: 0.5; }
+#slS { font-size: 20px; margin-bottom: 40px; }
+#slH { position: absolute; bottom: 12px; left: 0; right: 0; font-size: 13px; color: #3c424b; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
  <div id="nav">
@@ -416,7 +421,7 @@ button:focus { outline: none; }
  </div>
 </div>
 
-<div id="slp"><div id="slC">--:--</div><div id="slD"></div><div id="slT"></div><div id="slS"></div><div id="slH">Touche l'écran pour réveiller</div></div>
+<div id="slp"><div id="slC">--:--</div><div id="slD"></div><div id="slR"><div class="slb"><div class="slI" id="slWI"></div><div class="slV" id="slWT"></div></div><div class="slb"><div class="slI"><svg viewBox="0 0 48 48" fill="none" stroke="#8a919c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 28V9a4 4 0 0 1 8 0v19a8 8 0 1 1-8 0z"/><path d="M24 20v14"/><circle cx="24" cy="36" r="2.6" fill="#8a919c"/></svg></div><div class="slV" id="slT"></div></div></div><div id="slS"></div><div id="slH">Touche l'écran pour réveiller</div></div>
 <div id="dbg"><div class="bar"><h2>Diagnostic</h2><span><button type="button" id="dbgClr">Vider le journal</button><button type="button" id="dbgX">Fermer</button></span></div>
  <div class="cols"><div class="box" id="dbgL"></div><div class="box" id="dbgR"></div></div></div>
 
@@ -1198,7 +1203,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("257", 10) || 0, UI_NAME = "2.57 (beta)".charAt(0) === "_" ? "?" : "2.57 (beta)";
+  var UI_CODE = parseInt("258", 10) || 0, UI_NAME = "2.58 (beta)".charAt(0) === "_" ? "?" : "2.58 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1463,10 +1468,12 @@ button:focus { outline: none; }
 
   /* ---------------- mode veille : écran noir, aucune animation, plus aucune actualisation sauf toutes les 5 min ---------------- */
   function slDraw() {
-    var d = new Date(), rm = $("hRoom").textContent.replace(/^\s+|\s+$/g, "");
+    var d = new Date(), rm = $("hRoom").textContent.match(/(-?[\d]+[,.]?[\d]*)\s*°/), w = wxLast, m;
     $("slC").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
     $("slD").textContent = DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()];
-    $("slT").textContent = rm.replace(/ · .*$/, "");
+    $("slT").textContent = rm ? rm[1] + "°" : "--";
+    if (w && w.now) { m = wmo(w.now.code, w.now.day); $("slWI").innerHTML = ICONS[m.k]; $("slWT").textContent = (typeof w.now.temp === "number" ? rnd(w.now.temp) + "°" : "--"); }
+    else { $("slWI").innerHTML = ""; $("slWT").textContent = "--"; }
     $("slS").textContent = !S.linked ? "Clim non jointe" : (S.on ? "Clim en marche · consigne " + fmt(S.temp) + "°" : "Clim éteinte");
   }
   function slTick() {
