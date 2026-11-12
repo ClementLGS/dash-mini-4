@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:266 TDBA:208-->
+<!--TDBV:267 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,7 +34,11 @@ button:focus { outline: none; }
 #top { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; padding: 8px 20px; border-bottom: 1px solid #232830; min-height: 72px; }
 #clock { font-size: 50px; line-height: 1; font-weight: bold; color: #d8dde6; letter-spacing: 0.02em; }
 #date { margin-left: 18px; font-size: 17px; color: #8f98a5; }
-#hw { margin-left: auto; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
+#bat { margin-left: auto; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; color: #b9c2d0; font-size: 18px; font-weight: bold; }
+#bat svg { width: 30px; height: 18px; margin-right: 6px; }
+#bat.low { color: #ff7a70; }
+#bat.mid { color: #ffb347; }
+#hw { margin-left: 22px; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
 #hIco { width: 42px; height: 42px; margin-right: 8px; }
 #hIco svg, .big svg, .fi svg { width: 100%; height: 100%; display: block; }
 #hT { font-size: 36px; font-weight: bold; line-height: 1; margin-right: 10px; }
@@ -337,6 +341,7 @@ button:focus { outline: none; }
   <div id="top">
    <div id="clock">--:--</div><div id="date">&nbsp;</div><button type="button" class="pill bad" id="err" aria-label="Voir le diagnostic des erreurs"></button>
    
+   <div id="bat" style="display:none"><svg viewBox="0 0 28 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="2" width="22" height="12" rx="2.5"/><path d="M25 6v4" stroke-linecap="round" stroke-width="2.4"/><rect id="batF" x="3" y="4" width="0" height="8" rx="1" fill="currentColor" stroke="none"/></svg><span id="batT"></span></div>
    <div id="hw"><div id="hIco"></div><div id="hT"></div><div id="hP"></div></div>
    
   </div>
@@ -1206,7 +1211,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("266", 10) || 0, UI_NAME = "2.66 (beta)".charAt(0) === "_" ? "?" : "2.66 (beta)";
+  var UI_CODE = parseInt("267", 10) || 0, UI_NAME = "2.67 (beta)".charAt(0) === "_" ? "?" : "2.67 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1484,6 +1489,20 @@ button:focus { outline: none; }
     lumTmr = setTimeout(function () { lumCmd(v < 1 ? { id: L.id, on: false } : { id: L.id, bright: v }); }, 450);
   };
 
+  /* ---------------- batterie de la tablette ---------------- */
+  function batDraw() {
+    var r = "", a, p, ch, e = $("bat");
+    try { if (window.Native && window.Native.battery) { r = window.Native.battery(); } } catch (x) { r = ""; }
+    if (!r) { e.style.display = "none"; return; }
+    a = r.split(";"); p = parseInt(a[0], 10); ch = a[1] === "1";
+    if (isNaN(p)) { e.style.display = "none"; return; }
+    e.style.display = "-webkit-flex"; e.style.display = "flex";
+    e.className = ch ? "" : (p <= 15 ? "low" : (p <= 30 ? "mid" : ""));
+    $("batF").setAttribute("width", String(Math.max(0, Math.min(18, p * 18 / 100))));
+    $("batT").textContent = p + " %" + (ch ? " ⚡" : "");
+  }
+  batDraw(); setInterval(pw("Batterie", batDraw), 60000);
+
   /* ---------------- mode veille : écran noir, aucune animation, plus aucune actualisation sauf toutes les 5 min ---------------- */
   function slDraw() {
     var d = new Date(), rm = $("hRoom").textContent.match(/(-?[\d]+[,.]?[\d]*)\s*°/), w = wxLast, m;
@@ -1519,7 +1538,7 @@ button:focus { outline: none; }
     try { if (window.Native && window.Native.setSleep) { window.Native.setSleep(false); } } catch (e) { }
     $("slp").style.display = "none"; $("app").style.display = ""; $("bg").style.display = "";
     for (i = 0; i < IVS.length; i++) { IVS[i].id = _si.call(window, IVS[i].f, IVS[i].ms); }
-    lastMin = -1; tick(); pull(); loadLum(); loadWeather(); loadAgenda();
+    lastMin = -1; tick(); batDraw(); pull(); loadLum(); loadWeather(); loadAgenda();
   }
   (function () {
     var p = $("slp"), bar = $("slP"), t0 = 0, tm = 0;
