@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:297 TDBA:211-->
+<!--TDBV:298 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1062,6 +1062,7 @@ button:focus { outline: none; }
   /* ---------------- codes d'erreur et journal ---------------- */
   var CODES = {
     E01: "Pas de réponse : relais du PC injoignable (mode PC) ou opération trop longue.",
+    E99: "SIMULATION : erreur fictive créée avec le bouton « Simuler une erreur » dans Autre (rien n'est réellement en panne).",
     E02: "Le boîtier Airzone ne répond pas ou refuse l'ordre (vérifie son adresse dans Réglages et que la tablette est sur le même Wi-Fi).",
     E03: "Ordre refusé (valeur invalide).",
     E04: "Météo indisponible ou ancienne : Open-Meteo injoignable (Internet ?).",
@@ -1077,7 +1078,7 @@ button:focus { outline: none; }
   var LOG = [], ACT = { clim: null, wx: null, ag: null, lum: null, js: null }, OKT = { clim: 0, wx: 0, ag: 0, lum: 0 }, T0 = Date.now();
   function mk(code, msg) { var e = new Error(msg); e.code = code; return e; }
   function hms(t) { var d = new Date(t); return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()); }
-  var AREAS = { clim: ["Clim", "clim"], wx: ["Météo", "meteo"], ag: ["Agenda", "agenda"], lum: ["Lumières", "lum"], js: ["Page", "js"] };
+  var AREAS = { clim: ["Clim", "clim"], wx: ["Météo", "meteo"], ag: ["Agenda", "agenda"], lum: ["Lumières", "lum"], js: ["Page", "js"], sim: ["SIMULATION", "sim"] };
   function lastMsg(code, what) {
     var i;
     for (i = LOG.length - 1; i >= 0; i--) { if (LOG[i].c === code && LOG[i].w === what) { return LOG[i].m; } }
@@ -1085,7 +1086,6 @@ button:focus { outline: none; }
   }
   function drawErr() {
     var c = [], k, b = $("err"), groups = {}, order = [], code, i, txt = [], m, g, ban = $("ban");
-    if (window.TSIM) { ACT.clim = "E02"; }
     for (k in ACT) {
       if (ACT.hasOwnProperty(k) && ACT[k]) {
         c.push(ACT[k]); code = ACT[k];
@@ -1114,7 +1114,7 @@ button:focus { outline: none; }
   }
   function map(g) { var o = [], i; for (i = 0; i < g.length; i++) { o.push(AREAS[g[i]][0]); } return o.join(", "); }
   function noteErr(err, what) {
-    var last = LOG.length ? LOG[LOG.length - 1] : null, area = what.indexOf("meteo") === 0 ? "wx" : (what === "agenda" ? "ag" : (what === "lum" ? "lum" : (what === "js" ? "js" : "clim")));
+    var last = LOG.length ? LOG[LOG.length - 1] : null, area = what.indexOf("meteo") === 0 ? "wx" : (what === "agenda" ? "ag" : (what === "lum" ? "lum" : (what === "js" ? "js" : (what === "sim" ? "sim" : "clim"))));
     if (last && last.c === err.code && last.w === what && last.m === err.message) { last.n++; last.t = Date.now(); }
     else { LOG.push({ t: Date.now(), c: err.code, w: what, m: err.message, n: 1 }); if (LOG.length > 60) { LOG.shift(); } }
     ACT[area] = err.code; drawErr();
@@ -1290,7 +1290,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("297", 10) || 0, UI_NAME = "2.97 (beta) TEST".charAt(0) === "_" ? "?" : "2.97 (beta) TEST";
+  var UI_CODE = parseInt("298", 10) || 0, UI_NAME = "2.98 (beta) TEST".charAt(0) === "_" ? "?" : "2.98 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -1637,7 +1637,7 @@ button:focus { outline: none; }
   /* scène « Bonne nuit » : clim éteinte, toutes les lumières éteintes, puis veille */
   function bonneNuit() {
     if (LUM && LUM.lights && LUM.lights.length) { lumAll(false); }
-    setTimeout(function () { sleepOn(); }, 7000);
+    sleepOn();
   }
 
   /* ---------------- mode veille : écran noir, aucune animation, plus aucune actualisation sauf toutes les 5 min ---------------- */
@@ -2206,9 +2206,9 @@ button:focus { outline: none; }
     b.type = "button"; b.id = "simErr"; b.className = "xbtn sm"; b.style.marginTop = "12px"; b.textContent = "Simuler une erreur";
     b.onclick = function () {
       window.TSIM = window.TSIM ? 0 : 1;
-      if (!window.TSIM) { ACT.clim = ""; }
       b.textContent = window.TSIM ? "Arrêter la simulation d'erreur" : "Simuler une erreur";
-      drawErr();
+      if (window.TSIM) { noteErr(mk("E99", "Simulation lancée depuis Autre"), "sim"); $("fpsBar").style.display = "none"; }
+      else { ACT.sim = ""; drawErr(); }
     };
     lib.parentNode.insertBefore(b, lib.nextSibling);
   })();
@@ -2221,7 +2221,7 @@ button:focus { outline: none; }
     function loop() {
       var now = Date.now(), f, mn;
       if (SLEEP) { bar.style.display = "none"; setTimeout(function () { n = 0; t0 = last = Date.now(); worst = 0; loop(); }, 2000); return; }
-      bar.style.display = "block";
+      bar.style.display = window.TSIM ? "none" : "block";
       n++; if (now - last > worst) { worst = now - last; } last = now;
       if (now - t0 >= 1000) {
         f = Math.round(n * 1000 / (now - t0));
