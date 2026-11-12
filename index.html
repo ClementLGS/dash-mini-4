@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:302 TDBA:211-->
+<!--TDBV:303 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1064,6 +1064,7 @@ button:focus { outline: none; }
   var CODES = {
     E01: "Pas de réponse : relais du PC injoignable (mode PC) ou opération trop longue.",
     E99: "SIMULATION : erreur fictive créée avec le bouton « Simuler une erreur » dans Autre (rien n'est réellement en panne).",
+    E13: "Wi-Fi déconnecté : la tablette n'a aucun réseau (réactive le Wi-Fi dans les réglages Android).",
     E02: "Le boîtier Airzone ne répond pas ou refuse l'ordre (vérifie son adresse dans Réglages et que la tablette est sur le même Wi-Fi).",
     E03: "Ordre refusé (valeur invalide).",
     E04: "Météo indisponible ou ancienne : Open-Meteo injoignable (Internet ?).",
@@ -1112,7 +1113,7 @@ button:focus { outline: none; }
     evAct();
     for (k in ACT) {
       if (ACT.hasOwnProperty(k) && ACT[k]) {
-        c.push(ACT[k]); code = ACT[k];
+        if (c.indexOf(ACT[k]) < 0) { c.push(ACT[k]); } code = ACT[k];
         if (!groups[code]) { groups[code] = []; order.push(code); }
         groups[code].push(k);
       }
@@ -1142,6 +1143,7 @@ button:focus { outline: none; }
   }
   function map(g) { var o = [], i; for (i = 0; i < g.length; i++) { o.push(AREAS[g[i]][0]); } return o.join(", "); }
   function noteErr(err, what) {
+    if (navigator.onLine === false && /^E(01|02|04|08|10)$/.test(err.code)) { err = mk("E13", "pas de réseau (" + err.code + " : " + err.message + ")"); }
     var last = LOG.length ? LOG[LOG.length - 1] : null, area = what.indexOf("meteo") === 0 ? "wx" : (what === "agenda" ? "ag" : (what === "lum" ? "lum" : (what === "js" ? "js" : (what === "sim" ? "sim" : "clim"))));
     if (last && last.c === err.code && last.w === what && last.m === err.message) { last.n++; last.t = Date.now(); }
     else { LOG.push({ t: Date.now(), c: err.code, w: what, m: err.message, n: 1 }); if (LOG.length > 60) { LOG.shift(); } }
@@ -1324,7 +1326,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("302", 10) || 0, UI_NAME = "3.02 (beta) TEST".charAt(0) === "_" ? "?" : "3.02 (beta) TEST";
+  var UI_CODE = parseInt("303", 10) || 0, UI_NAME = "3.03 (beta) TEST".charAt(0) === "_" ? "?" : "3.03 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
