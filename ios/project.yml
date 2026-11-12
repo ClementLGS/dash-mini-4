@@ -1,0 +1,26 @@
+name: TableauDeBord
+options:
+  bundleIdPrefix: com.clement
+  deploymentTarget:
+    iOS: "15.0"
+  developmentLanguage: fr
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "2"
+targets:
+  TableauDeBord:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: TableauDeBord/Sources
+      - path: TableauDeBord/Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.clement.tableaudebord
+        INFOPLIST_FILE: TableauDeBord/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
