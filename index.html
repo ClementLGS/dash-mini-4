@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:299 TDBA:211-->
+<!--TDBV:300 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -262,6 +262,7 @@ button:focus { outline: none; }
 .bl{}
 #ban { -webkit-flex: none; flex: none; background: rgba(220, 53, 53, 0.6); border-bottom: 1px solid rgba(255, 120, 120, 0.7); color: #fff; padding: 7px 20px; font-size: 15px; font-weight: bold; line-height: 1.3; }
 .ed { display: none; position: fixed; z-index: 900; pointer-events: none; opacity: 0.2; }
+#errBar { display: none; position: fixed; left: 0; right: 0; top: 0; height: 22px; line-height: 22px; z-index: 100000; background: rgba(110, 16, 16, 0.92); color: #ffd9d6; font: bold 14px/22px "Roboto Mono", monospace; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 12px; }
 #edL, #edR { top: 0; bottom: 0; width: 85px; }
 #edT, #edB { left: 0; right: 0; height: 85px; }
 #edL { left: 0; background: -webkit-linear-gradient(left, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); background: linear-gradient(90deg, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); }
@@ -369,7 +370,7 @@ button:focus { outline: none; }
 
  <div id="main">
   <div id="ban" style="display:none" role="alert"></div>
-  <div id="edL" class="ed"></div><div id="edR" class="ed"></div><div id="edT" class="ed"></div><div id="edB" class="ed"></div>
+  <div id="edL" class="ed"></div><div id="edR" class="ed"></div><div id="edT" class="ed"></div><div id="edB" class="ed"></div><div id="errBar"></div>
   <div id="top">
    <div id="clock">--:--</div><div id="date">&nbsp;</div><button type="button" class="pill bad" id="err" aria-label="Voir le diagnostic des erreurs"></button>
    
@@ -1101,16 +1102,20 @@ button:focus { outline: none; }
       txt.push("<b>" + esc(map(g)) + "</b> · " + code + " " + esc((CODES[code] || "").split(/[:.]/)[0]) + (m ? " <span>(" + esc(m.length > 70 ? m.substr(0, 70) + "…" : m) + ")</span>" : ""));
     }
     ban.innerHTML = txt.join('<span>  &nbsp;|&nbsp;  </span>');
-    edgeSet(txt.length > 0);
+    var pl = [];
+    for (i = 0; i < order.length; i++) { pl.push(map(groups[order[i]]) + " · " + order[i] + " " + (order[i] === "E99" ? "erreur fictive créée pour tester l'affichage" : (CODES[order[i]] || "").split(/ \(|\./)[0])); }
+    edgeSet(txt.length > 0, pl.join("   |   "));
   }
   /* erreur : lueur rouge sur les bords de l'écran, qui pulse de 20 % à 60 % d'opacité (10 images/s, arrêtée en veille) */
-  var edOn = false, edT = 0, EDS = ["edL", "edR", "edT", "edB"];
-  function edTick() { var o = (0.4 - 0.2 * Math.cos(new Date().getTime() / 1500 * 3.14159)).toFixed(2); var k; for (k = 0; k < EDS.length; k++) { $(EDS[k]).style.opacity = o; } }
-  function edgeSet(on) {
+  var edOn = false, EDS = ["edL", "edR", "edT", "edB"];
+  function edgeSet(on, txt) {
+    var k;
+    if (on) { $("errBar").textContent = txt || ""; }
     if (on === edOn) { return; }
     edOn = on;
-    var k; for (k = 0; k < EDS.length; k++) { $(EDS[k]).style.display = on ? "block" : "none"; }
-    if (on) { edTick(); edT = setInterval(edTick, 100); } else { clearInterval(edT); }
+    for (k = 0; k < EDS.length; k++) { $(EDS[k]).style.display = on ? "block" : "none"; $(EDS[k]).style.opacity = 0.5; }
+    $("errBar").style.display = on ? "block" : "none";
+    if (on) { $("errBar").onclick = openDbg; }
   }
   function map(g) { var o = [], i; for (i = 0; i < g.length; i++) { o.push(AREAS[g[i]][0]); } return o.join(", "); }
   function noteErr(err, what) {
@@ -1291,7 +1296,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("298", 10) || 0, UI_NAME = "2.99 (beta) TEST".charAt(0) === "_" ? "?" : "2.99 (beta) TEST";
+  var UI_CODE = parseInt("300", 10) || 0, UI_NAME = "3.00 (beta) TEST".charAt(0) === "_" ? "?" : "3.00 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -2222,7 +2227,7 @@ button:focus { outline: none; }
     function loop() {
       var now = Date.now(), f, mn;
       if (SLEEP) { bar.style.display = "none"; setTimeout(function () { n = 0; t0 = last = Date.now(); worst = 0; loop(); }, 2000); return; }
-      bar.style.display = window.TSIM ? "none" : "block";
+      bar.style.display = (window.TSIM || edOn) ? "none" : "block";
       n++; if (now - last > worst) { worst = now - last; } last = now;
       if (now - t0 >= 1000) {
         f = Math.round(n * 1000 / (now - t0));
