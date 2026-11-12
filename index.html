@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:260 TDBA:208-->
+<!--TDBV:261 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -319,10 +319,13 @@ button:focus { outline: none; }
 .slI svg { width: 100%; height: 100%; display: block; }
 .slV { font-size: 54px; font-weight: bold; color: #8a919c; margin-top: 6px; }
 #slWI { opacity: 0.5; }
-#slTr { position: relative; -webkit-flex: none; flex: none; width: 230px; height: 46px; margin: 0 auto; border-radius: 23px; background: #232830; border: 1px solid #3a414c; }
-#slTt { position: absolute; left: 44px; right: 6px; top: 0; height: 46px; line-height: 46px; text-align: center; font-size: 15px; color: #6f7783; }
-#slth { position: absolute; left: 3px; top: 3px; width: 38px; height: 38px; border-radius: 19px; background: #d8dde6; color: #14171c; }
-#slth svg { width: 20px; height: 20px; display: block; }
+#top { position: relative; }
+#slBtn { -webkit-flex: none; flex: none; margin: 0 auto; width: 52px; height: 52px; padding: 0; border: 0; background: transparent; color: #d8dde6; }
+#slBtn svg { width: 32px; height: 32px; display: block; margin: 0 auto; }
+#slTr { display: none; position: absolute; left: 14px; right: 14px; top: 8px; bottom: 8px; border-radius: 28px; background: #232830; border: 1px solid #3a414c; z-index: 50; }
+#slTt { position: absolute; left: 70px; right: 20px; top: 0; bottom: 0; line-height: 50px; text-align: center; font-size: 17px; color: #8d95a3; }
+#slth { position: absolute; left: 4px; top: 50%; margin-top: -22px; width: 44px; height: 44px; border-radius: 22px; background: #d8dde6; color: #14171c; }
+#slth svg { width: 24px; height: 24px; display: block; }
 #slS { font-size: 30px; font-weight: bold; color: #8a919c; margin-bottom: 34px; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
@@ -338,8 +341,9 @@ button:focus { outline: none; }
   <div id="ban" style="display:none" role="alert"></div>
   <div id="top">
    <div id="clock">--:--</div><div id="date">&nbsp;</div><button type="button" class="pill bad" id="err" aria-label="Voir le diagnostic des erreurs"></button>
-   <div id="slTr"><span id="slTt">veille ›</span><div id="slth"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z"/></svg></span></div></div>
+   <button type="button" id="slBtn" aria-label="Veille"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z"/></svg></button>
    <div id="hw"><div id="hIco"></div><div id="hT"></div><div id="hP"></div></div>
+   <div id="slTr"><span id="slTt">Glisse vers la droite pour la veille ›</span><div id="slth"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z"/></svg></span></div></div>
   </div>
 
   <div id="pages">
@@ -1206,7 +1210,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("260", 10) || 0, UI_NAME = "2.60 (beta)".charAt(0) === "_" ? "?" : "2.60 (beta)";
+  var UI_CODE = parseInt("261", 10) || 0, UI_NAME = "2.61 (beta)".charAt(0) === "_" ? "?" : "2.61 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1506,15 +1510,17 @@ button:focus { outline: none; }
   }
   $("slp").onclick = sleepOff;
   (function () {
-    var k = $("slTr"), th = $("slth"), x0 = 0, drag = 0, mx = 0, cur = 0;
+    var k = $("slTr"), th = $("slth"), x0 = 0, drag = 0, mx = 0, cur = 0, tm = 0;
     function px(ev) { var t = ev.touches && ev.touches.length ? ev.touches[0] : (ev.changedTouches && ev.changedTouches.length ? ev.changedTouches[0] : ev); return t.clientX; }
-    function start(ev) { drag = 1; x0 = px(ev); mx = k.offsetWidth - th.offsetWidth - 8; cur = 0; if (ev.preventDefault) { ev.preventDefault(); } }
-    function move(ev) { if (!drag) { return; } cur = Math.max(0, Math.min(mx, px(ev) - x0)); th.style.left = (3 + cur) + "px"; if (ev.preventDefault) { ev.preventDefault(); } }
+    function show(on) { clearTimeout(tm); k.style.display = on ? "block" : "none"; th.style.left = "4px"; if (on) { tm = setTimeout(function () { show(false); }, 6000); } }
+    $("slBtn").onclick = function () { show(true); };
+    k.onclick = function (ev) { if (ev.target === k || ev.target === $("slTt")) { show(false); } };
+    function start(ev) { drag = 1; x0 = px(ev); mx = k.offsetWidth - th.offsetWidth - 8; cur = 0; clearTimeout(tm); if (ev.preventDefault) { ev.preventDefault(); } }
+    function move(ev) { if (!drag) { return; } cur = Math.max(0, Math.min(mx, px(ev) - x0)); th.style.left = (4 + cur) + "px"; if (ev.preventDefault) { ev.preventDefault(); } }
     function end() {
       if (!drag) { return; }
       drag = 0;
-      th.style.left = "3px";
-      if (cur >= mx * 0.85) { sleepOn(); }
+      if (cur >= mx * 0.85) { show(false); sleepOn(); } else { show(true); }
     }
     th.addEventListener("touchstart", start); th.addEventListener("mousedown", start);
     document.addEventListener("touchmove", move); document.addEventListener("mousemove", move);
