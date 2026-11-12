@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:307 TDBA:211-->
+<!--TDBV:308 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1336,7 +1336,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["diagrepo", "Dépôt de diagnostic (propriétaire/nom)", ""], ["diagtok", "Jeton du dépôt de diagnostic", "password"], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("307", 10) || 0, UI_NAME = "3.07 (beta) TEST".charAt(0) === "_" ? "?" : "3.07 (beta) TEST";
+  var UI_CODE = parseInt("308", 10) || 0, UI_NAME = "3.08 (beta) TEST".charAt(0) === "_" ? "?" : "3.08 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -2274,7 +2274,22 @@ button:focus { outline: none; }
       cb(null, j);
     });
   }
+  var DQ = [], DQB = false;
   function dgPut(path, obj, cb) {
+    DQ.push([path, obj, cb]);
+    if (!DQB) { dgNext(); }
+  }
+  function dgNext() {
+    var q;
+    if (!DQ.length) { DQB = false; return; }
+    DQB = true; q = DQ.shift();
+    dgPut1(q[0], q[1], function (err) {
+      if (err && /HTTP (409|422)/.test(err)) { return dgPut1(q[0], q[1], function (e2) { try { q[2](e2); } catch (x) { } dgNext(); }); }
+      try { q[2](err); } catch (x2) { }
+      dgNext();
+    });
+  }
+  function dgPut1(path, obj, cb) {
     dgGet(path, function (err, cur) {
       var c = dgCfg(), body;
       if (err) { return cb(err); }
@@ -2332,10 +2347,10 @@ button:focus { outline: none; }
   }
   function dgRun(o) {
     var cmd = String(o.cmd || "");
-    function res(r) { dgPut("tablet/result.json", { id: o.id, cmd: cmd, at: new Date().toISOString(), resultat: r }, function () { }); }
+    function res(r, then) { dgPut("tablet/result.json", { id: o.id, cmd: cmd, at: new Date().toISOString(), resultat: r }, function (e) { if (e) { evLog("Diagnostic", "résultat non enregistré (" + e + ")"); } if (then) { then(); } }); }
     evLog("Diagnostic", "commande reçue : " + cmd);
     if (cmd === "diag") { dgSend("commande " + o.id, function (e) { res(e ? { erreur: e } : "diagnostic envoyé"); }); }
-    else if (cmd === "tests") { dgTests(function (r) { res(r); dgSend("tests " + o.id); }); }
+    else if (cmd === "tests") { dgTests(function (r) { res(r, function () { dgSend("tests " + o.id); }); }); }
     else if (cmd === "reload") { res("rechargement de la page"); setTimeout(function () { window.location.reload(); }, 2500); }
     else { res("commande inconnue ou refusée : " + cmd); }
   }
