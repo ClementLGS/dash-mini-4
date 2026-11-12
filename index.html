@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:277 TDBA:211-->
+<!--TDBV:278 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -381,7 +381,7 @@ button:focus { outline: none; }
      <div class="tsl"><input type="range" id="tr" min="18" max="30" step="0.5" value="23" aria-label="Choisir la température"><div class="tsn"><span id="trL">18°</span><span id="trH">30°</span></div></div>
     </div>
     <div class="modes" id="modes"></div>
-    <div class="note" id="info">Le mode est commun à toute la maison.</div>
+    <div class="note" id="dem"></div><div class="note" id="info">Le mode est commun à toute la maison.</div>
    </section>
 
    <section class="page" id="p-lum">
@@ -520,8 +520,12 @@ button:focus { outline: none; }
     });
   }
   function view(z) {
+    /* « tourne vraiment » : l'Airzone indique la demande de la zone (air_demand, floor_demand, cold/heat_demand, étages) ; null si le boîtier ne le dit pas */
+    var keys = ["air_demand", "floor_demand", "cold_demand", "heat_demand", "coldStage", "heatStage"], dem = {}, has = false, i, run = null, any = false;
+    for (i = 0; i < keys.length; i++) { if (z[keys[i]] !== undefined && z[keys[i]] !== null) { dem[keys[i]] = z[keys[i]]; has = true; if (Number(z[keys[i]]) > 0 || z[keys[i]] === true) { any = true; } } }
+    if (has) { run = any; }
     return { name: z.name, on: !!z.on, mode: z.mode, setpoint: z.setpoint, roomTemp: z.roomTemp, humidity: z.humidity,
-             minTemp: z.minTemp, maxTemp: z.maxTemp, master: z.master_zoneID };
+             minTemp: z.minTemp, maxTemp: z.maxTemp, master: z.master_zoneID, run: run, dem: has ? dem : null };
   }
   function applyClim(cmd, cb) {
     var c = cfg(), sys = parseInt(c.system, 10) || 1, zid = parseInt(c.zone, 10) || 1, k, n = 0, ok = { on: 1, setpoint: 1, mode: 1 };
@@ -1232,7 +1236,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("277", 10) || 0, UI_NAME = "2.77 (beta) TEST".charAt(0) === "_" ? "?" : "2.77 (beta) TEST";
+  var UI_CODE = parseInt("278", 10) || 0, UI_NAME = "2.78 (beta) TEST".charAt(0) === "_" ? "?" : "2.78 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -1874,7 +1878,7 @@ button:focus { outline: none; }
     { t: "Déshum.", az: 5, c: "#d8dde6", svg: '<path d="M12 3C8.5 8 6.5 11 6.5 14a5.5 5.5 0 0 0 11 0C17.5 11 15.5 8 12 3z"/>' },
     { t: "Ventil.", az: 4, c: "#d8dde6", svg: '<path d="M12 12c0-4 1-7 4-7s3 4-4 7zM12 12c4 0 7 1 7 4s-4 3-7-4zM12 12c0 4-1 7-4 7s-3-4 4-7zM12 12c-4 0-7-1-7-4s4-3 7 4z"/>' }
   ];
-  var S = { mode: -1, temp: 22, on: false, linked: false, lo: 18, hi: 30 };
+  var S = { mode: -1, temp: 22, on: false, linked: false, lo: 18, hi: 30, run: null, dem: null };
   var lastUser = 0, sendTimer = 0, busy = false, modeBusy = false;
 
   function say(t, bad) { var m = $("info"); m.textContent = t; m.style.color = bad ? "#ff7a70" : ""; }
@@ -1908,11 +1912,17 @@ button:focus { outline: none; }
   function drawClim() {
     var txt, cls, i, ps = [$("cPill"), $("hPill")];
     if (!S.linked) { txt = "Injoignable"; cls = "pill bad"; }
-    else { txt = S.on ? "En marche" : "Éteinte"; cls = "pill" + (S.on ? " on" : ""); }
+    else if (!S.on) { txt = "Éteinte"; cls = "pill"; }
+    else if (S.run === false) { txt = "En veille"; cls = "pill"; }
+    else if (S.run === true) { txt = "En marche"; cls = "pill on"; }
+    else { txt = "Allumée"; cls = "pill on"; }
     for (i = 0; i < 2; i++) { ps[i].textContent = txt; ps[i].className = cls; }
     $("pw").className = $("pw2").className = "pw" + (S.on ? " on" : "");
     $("pwt").textContent = $("pw2t").textContent = S.on ? "Éteindre" : "Allumer";
-    $("navSub").textContent = S.linked ? fmt(S.temp) + "° · " + (S.on ? "en marche" : "éteinte") : "injoignable";
+    $("navSub").textContent = S.linked ? fmt(S.temp) + "° · " + (!S.on ? "éteinte" : (S.run === false ? "en veille" : (S.run === true ? "en marche" : "allumée"))) : "injoignable";
+    var dm = [], k, de = $("dem");
+    if (S.dem) { for (k in S.dem) { if (S.dem.hasOwnProperty(k)) { dm.push(k.replace("_demand", "") + " " + S.dem[k]); } } }
+    if (de) { de.textContent = S.linked && S.on ? (S.dem ? "Airzone indique : " + dm.join(" · ") : "Airzone n'indique pas si la clim tourne : état « allumée » seulement.") : ""; }
   }
   function pull() {
     if (Date.now() - lastUser < 6000) { return; }
@@ -1922,7 +1932,7 @@ button:focus { outline: none; }
         say("Clim injoignable [" + err.code + "] : " + err.message + ". Touche le badge rouge pour le diagnostic.", true);
         return;
       }
-      S.linked = true; S.on = !!z.on; OKT.clim = Date.now(); ACT.clim = null; drawErr();
+      S.linked = true; S.on = !!z.on; S.run = (z.run === true || z.run === false) ? z.run : null; S.dem = z.dem || null; OKT.clim = Date.now(); ACT.clim = null; drawErr();
       var mi = modeIndex(z.mode); if (mi >= 0) { S.mode = mi; }
       if (typeof z.minTemp === "number") { S.lo = Math.max(18, z.minTemp); }
       if (typeof z.maxTemp === "number") { S.hi = Math.min(30, z.maxTemp); }
