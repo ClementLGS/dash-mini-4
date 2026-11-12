@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:252 TDBA:208-->
+<!--TDBV:253 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -124,7 +124,10 @@ button:focus { outline: none; }
 .lbulb:disabled { opacity: 0.6; }
 .lcol { display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
 .lcap { color: #8f98a5; font-size: 14px; margin-bottom: 10px; }
-.lseg { display: -webkit-flex; display: flex; width: 340px; max-width: 100%; margin-bottom: 3vh; }
+.lseg { display: -webkit-flex; display: flex; width: 340px; max-width: 100%; margin-bottom: 3vh; position: relative; }
+.lrg { -webkit-appearance: none; appearance: none; position: absolute; left: 0; right: 5px; top: 50%; height: 56px; margin: -28px 0 0; background: transparent; outline: none; }
+.lrg::-webkit-slider-runnable-track { height: 56px; background: transparent; }
+.lrg::-webkit-slider-thumb { -webkit-appearance: none; width: 30px; height: 56px; border-radius: 10px; background: #fff; border: 3px solid #14171c; }
 .sgb { -webkit-flex: 1; flex: 1; height: 7vh; max-height: 46px; min-height: 30px; margin-right: 5px; border-radius: 6px; background: #232830; border: 0; }
 .sgb.o { background: #d8dde6; }
 .sgb:disabled { opacity: 0.6; }
@@ -1187,7 +1190,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("252", 10) || 0, UI_NAME = "2.52 (beta)".charAt(0) === "_" ? "?" : "2.52 (beta)";
+  var UI_CODE = parseInt("253", 10) || 0, UI_NAME = "2.53 (beta)".charAt(0) === "_" ? "?" : "2.53 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1361,8 +1364,8 @@ button:focus { outline: none; }
       } else {
         h += '<div class="lcol"><div class="lcap">Luminosité</div><div class="lseg">';
         n = Math.round(L.bright / 10);
-        for (j = 1; j <= 10; j++) { h += '<button type="button" class="sgb' + (j <= n ? " o" : "") + '" data-l="' + LSEL + '" data-a="s' + j + '"' + d + "></button>"; }
-        h += '</div><div class="lcap">Couleur</div><div class="lcg">';
+        for (j = 1; j <= 10; j++) { h += '<span class="sgb' + (j <= n ? " o" : "") + '"></span>'; }
+        h += '<input type="range" class="lrg" min="10" max="100" step="10" value="' + Math.max(10, n * 10) + '" data-l="' + LSEL + '" aria-label="Luminosité"' + d + '></div><div class="lcap">Couleur</div><div class="lcg">';
         for (j = 0; j < COLS.length; j++) {
           c = COLS[j]; sel = (L.known || L.assumed) && L.on && L.color[0] === c[1] && L.color[1] === c[2] && L.color[2] === c[3];
           h += '<button type="button" class="sw' + (sel ? " sel" : "") + '" style="background:rgb(' + c[1] + "," + c[2] + "," + c[3] + ')" data-l="' + LSEL + '" data-a="c' + j + '" aria-label="' + c[0] + '"' + d + "></button>";
@@ -1434,6 +1437,18 @@ button:focus { outline: none; }
     else if (a === "off") { lumCmd({ id: L.id, on: false }); }
     else if (a.charAt(0) === "s") { lumCmd({ id: L.id, bright: parseInt(a.substr(1), 10) * 10 }); }
     else if (a.charAt(0) === "c") { n = COLS[parseInt(a.substr(1), 10)]; if (n) { lumCmd({ id: L.id, color: [n[1], n[2], n[3]] }); } }
+  };
+  $("lumL").oninput = function (ev) {
+    var t = ev.target, sg, i, n;
+    if (!t || String(t.className).indexOf("lrg") < 0) { return; }
+    sg = t.parentNode.getElementsByClassName("sgb"); n = Math.round(parseInt(t.value, 10) / 10);
+    for (i = 0; i < sg.length; i++) { sg[i].className = "sgb" + (i < n ? " o" : ""); }
+  };
+  $("lumL").onchange = function (ev) {
+    var t = ev.target, L;
+    if (!t || String(t.className).indexOf("lrg") < 0 || !LUM) { return; }
+    L = LUM.lights[parseInt(t.getAttribute("data-l"), 10)];
+    if (L) { lumCmd({ id: L.id, bright: parseInt(t.value, 10) }); }
   };
   loadLum(); setInterval(pw("Lumières", loadLum), 30000);
   go("clim");
@@ -1617,7 +1632,7 @@ button:focus { outline: none; }
     hs = w7Hour >= 0 ? w7Hour : (w7Day === 0 ? nowH : 12);
     for (i = 0; i < hrs.length; i++) { if (hrs[i].h === hs) { hv = hrs[i][v[4]]; } }
     hx = hv === null || hv === undefined ? "pas de donnée" : ({ t: nv(hv, 10) + " °C", feel: "ressenti " + nv(hv, 10) + " °C", mm: nv(hv, 10) + " mm de pluie dans l'heure", wind: "vent " + nv(hv) + " km/h", hum: "humidité " + nv(hv) + " %", uv: "indice UV " + nv(hv, 10) })[w7Var];
-    sp += "</span><br><b>À " + hs + " h</b> : " + hx + '<span> · touche une barre pour voir une autre heure</span>';
+    sp += "</span><br><b>" + (w7Day === 0 && hs === nowH ? "Actuellement" : "À " + hs + " h") + "</b> : " + hx + '<span> · touche une barre pour voir une autre heure</span>';
     $("w7S").innerHTML = sp + "";
     for (i = 0; i < W7V.length; i++) { if (W7V[i][0] === w7Var) { v = W7V[i]; } }
     for (i = 0; i < hrs.length; i++) { vals.push(hrs[i][v[4]]); }
