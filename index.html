@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:249 TDBA:208-->
+<!--TDBV:251 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -153,7 +153,7 @@ button:focus { outline: none; }
 .w7k.sel { background: #d8dde6; border-color: #d8dde6; color: #14171c; }
 .w7S { -webkit-flex: none; flex: none; margin-top: 4px; font-size: 17px; line-height: 1.35; color: #eceff3; }
 .w7S span { color: #8f98a5; font-size: 15px; }
-.w7C { -webkit-flex: 1; flex: 1; min-height: 70px; display: -webkit-flex; display: flex; margin-top: 4px; border-bottom: 1px solid #2f353e; }
+.w7C { -webkit-flex: 1; flex: 1; min-height: 70px; display: -webkit-flex; display: flex; margin-top: 4px; padding-top: 22px; border-bottom: 1px solid #2f353e; }
 .w7c { -webkit-flex: 1 1 0; flex: 1 1 0; min-width: 0; position: relative; margin: 0 1px; }
 .w7c i { position: absolute; left: 12%; right: 12%; bottom: 0; border-radius: 4px 4px 0 0; }
 .w7c b { position: absolute; left: -6px; right: -6px; text-align: center; font-size: 13px; font-weight: bold; color: #d8dde6; }
@@ -1189,7 +1189,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("249", 10) || 0, UI_NAME = "2.49 (beta) TEST".charAt(0) === "_" ? "?" : "2.49 (beta) TEST";
+  var UI_CODE = parseInt("251", 10) || 0, UI_NAME = "2.51 (beta) TEST".charAt(0) === "_" ? "?" : "2.51 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1601,7 +1601,7 @@ button:focus { outline: none; }
     h = ""; x = "";
     for (i = 0; i < hrs.length; i++) {
       val = vals[i]; hh = hrs[i].h;
-      pc = val === null ? 0 : Math.max(3, (val - base) / (top - base) * 80);
+      pc = val === null ? 0 : Math.max(3, (val - base) / (top - base) * 100);
       lab = (val !== null && hh % 3 === 0) ? nv(val, w7Var === "mm" || w7Var === "uv" ? 10 : 1) : "";
       h += '<div class="w7c' + (w7Day === 0 && hh === nowH ? " now" : "") + '"><i style="height:' + pc.toFixed(1) + '%;background:' + v[3] + '"></i><b style="bottom:' + (pc + 1).toFixed(1) + '%">' + lab + "</b></div>";
       x += "<span>" + (hh % 3 === 0 ? hh + "h" : "") + "</span>";
