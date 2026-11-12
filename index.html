@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:254 TDBA:208-->
+<!--TDBV:255 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -124,10 +124,7 @@ button:focus { outline: none; }
 .lbulb:disabled { opacity: 0.6; }
 .lcol { display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
 .lcap { color: #8f98a5; font-size: 14px; margin-bottom: 10px; }
-.lseg { display: -webkit-flex; display: flex; width: 340px; max-width: 100%; margin-bottom: 3vh; position: relative; }
-.lrg { -webkit-appearance: none; appearance: none; position: absolute; left: 0; right: 5px; top: 50%; height: 56px; margin: -28px 0 0; background: transparent; outline: none; }
-.lrg::-webkit-slider-runnable-track { height: 56px; background: transparent; }
-.lrg::-webkit-slider-thumb { -webkit-appearance: none; width: 30px; height: 56px; border-radius: 10px; background: #fff; border: 3px solid #14171c; }
+.lseg { display: -webkit-flex; display: flex; width: 340px; max-width: 100%; margin-bottom: 3vh; }
 .sgb { -webkit-flex: 1; flex: 1; height: 7vh; max-height: 46px; min-height: 30px; margin-right: 5px; border-radius: 6px; background: #232830; border: 0; }
 .sgb.o { background: #d8dde6; }
 .sgb:disabled { opacity: 0.6; }
@@ -1190,7 +1187,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("254", 10) || 0, UI_NAME = "2.54 (beta)".charAt(0) === "_" ? "?" : "2.54 (beta)";
+  var UI_CODE = parseInt("255", 10) || 0, UI_NAME = "2.55 (beta)".charAt(0) === "_" ? "?" : "2.55 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1362,10 +1359,7 @@ button:focus { outline: none; }
       if (L.kind === "switch") {
         h += '<div class="lcol" style="max-width:330px"><div class="lcap">Relais tout ou rien</div><div class="note" style="font-size:15px">Pas de couleur ni de luminosité sur cet appareil.</div>' + (L.error ? '<div class="note" style="margin-top:12px;color:#ff7a70">' + esc(L.error) + "</div>" : (L.known ? "" : '<div class="note" style="margin-top:12px">État inconnu pour le moment.</div>')) + "</div>";
       } else {
-        h += '<div class="lcol"><div class="lcap">Luminosité · <span id="lrgV">' + Math.round(L.bright) + ' %</span></div><div class="lseg">';
-        n = Math.round(L.bright / 10);
-        for (j = 1; j <= 10; j++) { h += '<span class="sgb' + (j <= n ? " o" : "") + '"></span>'; }
-        h += '<input type="range" class="lrg" min="1" max="100" step="1" value="' + Math.max(1, Math.round(L.bright)) + '" data-l="' + LSEL + '" aria-label="Luminosité"' + d + '></div><div class="lcap">Couleur</div><div class="lcg">';
+        h += '<div class="lcol"><div class="lcap">Luminosité · <span id="lrgV">' + (on ? Math.round(L.bright) : 0) + ' %</span></div><div class="tsl" style="width:340px;max-width:100%;margin:0 0 3vh"><input type="range" class="lrs" min="0" max="100" step="1" value="' + (on ? Math.max(1, Math.round(L.bright)) : 0) + '" data-l="' + LSEL + '" aria-label="Luminosité"' + d + '><div class="tsn"><span>0 %</span><span>100 %</span></div></div><div class="lcap">Couleur</div><div class="lcg">';
         for (j = 0; j < COLS.length; j++) {
           c = COLS[j]; sel = (L.known || L.assumed) && L.on && L.color[0] === c[1] && L.color[1] === c[2] && L.color[2] === c[3];
           h += '<button type="button" class="sw' + (sel ? " sel" : "") + '" style="background:rgb(' + c[1] + "," + c[2] + "," + c[3] + ')" data-l="' + LSEL + '" data-a="c' + j + '" aria-label="' + c[0] + '"' + d + "></button>";
@@ -1374,7 +1368,7 @@ button:focus { outline: none; }
       }
     }
     h += '</div><div class="note" id="lumMsg" style="-webkit-flex:none;flex:none;' + (lumBad ? "color:#ff7a70" : "") + '">' + esc(lumTxt || "Un seul appareil Bluetooth à la fois : ferme l'appli LEDBLE sur le téléphone.") + "</div>";
-    if (h !== lumHtml) { lumHtml = h; $("lumL").innerHTML = h; lumFill(); }
+    if (h !== lumHtml) { lumHtml = h; $("lumL").innerHTML = h; }
   }
   function loadLum() {
     call("GET", "/api/lum", null, function (err, r) {
@@ -1438,27 +1432,16 @@ button:focus { outline: none; }
     else if (a.charAt(0) === "s") { lumCmd({ id: L.id, bright: parseInt(a.substr(1), 10) * 10 }); }
     else if (a.charAt(0) === "c") { n = COLS[parseInt(a.substr(1), 10)]; if (n) { lumCmd({ id: L.id, color: [n[1], n[2], n[3]] }); } }
   };
-  function lumFill() {
-    var t = document.querySelector("#lumL .lrg"), sg, i, w, x, p, v, sw, lv;
-    if (!t) { return; }
-    sg = t.parentNode.getElementsByClassName("sgb"); w = t.parentNode.offsetWidth || 340; v = parseInt(t.value, 10) || 1;
-    x = 15 + (v - 1) / 99 * (w - 5 - 30); sw = w / 10;
-    for (i = 0; i < sg.length; i++) {
-      p = Math.max(0, Math.min(100, (x - i * sw) / (sw - 5) * 100));
-      sg[i].style.background = p >= 99.5 ? "#d8dde6" : (p <= 0.5 ? "#232830" : "-webkit-linear-gradient(left,#d8dde6 " + p + "%,#232830 " + p + "%)");
-    }
-    lv = $("lrgV"); if (lv) { lv.textContent = v + " %"; }
-  }
   $("lumL").oninput = function (ev) {
-    var t = ev.target;
-    if (!t || String(t.className).indexOf("lrg") < 0) { return; }
-    lumFill();
+    var t = ev.target, lv;
+    if (!t || String(t.className).indexOf("lrs") < 0) { return; }
+    lv = $("lrgV"); if (lv) { lv.textContent = t.value + " %"; }
   };
   $("lumL").onchange = function (ev) {
-    var t = ev.target, L;
-    if (!t || String(t.className).indexOf("lrg") < 0 || !LUM) { return; }
-    L = LUM.lights[parseInt(t.getAttribute("data-l"), 10)];
-    if (L) { lumCmd({ id: L.id, bright: parseInt(t.value, 10) }); }
+    var t = ev.target, L, v;
+    if (!t || String(t.className).indexOf("lrs") < 0 || !LUM) { return; }
+    L = LUM.lights[parseInt(t.getAttribute("data-l"), 10)]; v = parseInt(t.value, 10);
+    if (L) { lumCmd(v < 1 ? { id: L.id, on: false } : { id: L.id, bright: v }); }
   };
   loadLum(); setInterval(pw("Lumières", loadLum), 30000);
   go("clim");
