@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:295 TDBA:211-->
+<!--TDBV:296 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,7 +34,7 @@ button:focus { outline: none; }
 #top { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; padding: 8px 20px; border-bottom: 1px solid #232830; min-height: 72px; }
 #clock { font-size: 50px; line-height: 1; font-weight: bold; color: #d8dde6; letter-spacing: 0.02em; }
 #date { margin-left: 18px; font-size: 17px; color: #8f98a5; }
-#bat { position: relative; left: 0; margin-left: auto; margin-right: auto; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; color: #b9c2d0; font-size: 18px; font-weight: bold; }
+#bat { position: relative; left: 0; margin-left: auto; margin-right: 22px; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; color: #b9c2d0; font-size: 18px; font-weight: bold; }
 #bat svg { width: 30px; height: 18px; margin-right: 6px; }
 #sw { position: relative; -webkit-flex: none; flex: none; width: 36px; height: 36px; margin-left: 24px; border-radius: 18px; background: rgba(26,30,36,0.7); border: 1px solid #2f353e; overflow: hidden; }
 #swF { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: -webkit-linear-gradient(left, #1b2147, #4a4aa8); background: linear-gradient(90deg, #1b2147, #4a4aa8); }
@@ -262,8 +262,8 @@ button:focus { outline: none; }
 .bl{}
 #ban { -webkit-flex: none; flex: none; background: rgba(220, 53, 53, 0.6); border-bottom: 1px solid rgba(255, 120, 120, 0.7); color: #fff; padding: 7px 20px; font-size: 15px; font-weight: bold; line-height: 1.3; }
 .ed { display: none; position: fixed; z-index: 900; pointer-events: none; opacity: 0.2; }
-#edL, #edR { top: 0; bottom: 0; width: 95px; }
-#edT, #edB { left: 0; right: 0; height: 95px; }
+#edL, #edR { top: 0; bottom: 0; width: 85px; }
+#edT, #edB { left: 0; right: 0; height: 85px; }
 #edL { left: 0; background: -webkit-linear-gradient(left, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); background: linear-gradient(90deg, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); }
 #edR { right: 0; background: -webkit-linear-gradient(right, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); background: linear-gradient(270deg, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); }
 #edT { top: 0; background: -webkit-linear-gradient(top, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); background: linear-gradient(180deg, rgba(230, 50, 50, 1) 0%, rgba(230, 50, 50, 0.35) 30%, rgba(230, 50, 50, 0) 100%); }
@@ -1289,7 +1289,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("295", 10) || 0, UI_NAME = "2.95 (beta) TEST".charAt(0) === "_" ? "?" : "2.95 (beta) TEST";
+  var UI_CODE = parseInt("296", 10) || 0, UI_NAME = "2.96 (beta) TEST".charAt(0) === "_" ? "?" : "2.96 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -1613,12 +1613,12 @@ button:focus { outline: none; }
   function swArm() { clearTimeout(swTm); swTm = setTimeout(function () { if (!swDrag && !swBusy) { swShut(); } }, 5000); }
   function swBack() {
     var n = 0;
-    (function step() { n++; swSet(swX * 0.55); if (swX > 1 && n < 14) { setTimeout(step, 16); } else { swSet(0); swArm(); } })();
+    (function step() { n++; swSet(swX * 0.55); if (swX > 1 && n < 14) { setTimeout(step, 16); } else { swSet(0); swShut(); } })();
   }
   function swEnd() {
     if (!swDrag) { return; }
     swDrag = false;
-    if (!swOpen) { if (!swMoved) { swOpen = true; swWidth(SWW); swArm(); } return; }
+    if (!swOpen) { return; }
     if (swX >= swMax() * 0.85 && !swBusy) {
       swBusy = true; swSet(swMax());
       bonneNuit();
@@ -1629,7 +1629,7 @@ button:focus { outline: none; }
     var k = $("swK");
     function px(e) { return e.touches && e.touches.length ? e.touches[0].clientX : (e.changedTouches && e.changedTouches.length ? e.changedTouches[0].clientX : e.clientX); }
     function dn(e) { if (swBusy || SLEEP) { return; } swDrag = true; swMoved = false; swPx0 = px(e); swX0 = swPx0 - swX; clearTimeout(swTm); if (e.preventDefault) { e.preventDefault(); } }
-    function mv(e) { if (!swDrag) { return; } if (Math.abs(px(e) - swPx0) > 6) { swMoved = true; } if (swOpen) { swSet(px(e) - swX0); } if (e.preventDefault) { e.preventDefault(); } }
+    function mv(e) { if (!swDrag) { return; } if (Math.abs(px(e) - swPx0) > 6) { swMoved = true; } if (!swOpen && px(e) - swPx0 > 6) { clearTimeout(swAn); swOpen = true; swW = SWW; $("sw").style.width = SWW + "px"; swX0 = swPx0; } if (swOpen) { swSet(px(e) - swX0); } if (e.preventDefault) { e.preventDefault(); } }
     k.addEventListener("touchstart", dn, false); document.addEventListener("touchmove", mv, false); document.addEventListener("touchend", swEnd, false); document.addEventListener("touchcancel", swEnd, false);
     k.addEventListener("mousedown", dn, false); document.addEventListener("mousemove", mv, false); document.addEventListener("mouseup", swEnd, false);
   })();
