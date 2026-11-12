@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:271 TDBA:208-->
+<!--TDBV:272 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -326,6 +326,9 @@ button:focus { outline: none; }
 #slp { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 #slP { display: none; position: absolute; left: 0; bottom: 0; height: 4px; width: 0; background: #3c424b; }
 #slS { font-size: 30px; font-weight: bold; color: #8a919c; margin-bottom: 34px; }
+#fpsBar { position: fixed; left: 0; right: 0; top: 0; height: 22px; line-height: 22px; z-index: 99999; background: rgba(0,0,0,0.78); color: #7CFC9A; font: bold 14px/22px monospace; text-align: center; pointer-events: none; }
+#fpsBar.mid { color: #ffb347; }
+#fpsBar.low { color: #ff7a70; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
  <div id="nav">
@@ -1219,7 +1222,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("271", 10) || 0, UI_NAME = "2.71 (beta) TEST".charAt(0) === "_" ? "?" : "2.71 (beta) TEST";
+  var UI_CODE = parseInt("272", 10) || 0, UI_NAME = "2.72 (beta) TEST".charAt(0) === "_" ? "?" : "2.72 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -2068,6 +2071,26 @@ button:focus { outline: none; }
     else if (a === "consoZ") { PF = {}; PWAIT = {}; PZ = pfNow(); consoDraw(); }
     else if (a === "wall") { WALL = v; xSet("wall", WALL); wallApply(); wallDraw(); }
   };
+
+  /* barre de FPS permanente (versions TEST seulement) */
+  (function () {
+    var bar = document.createElement("div"), raf = window.requestAnimationFrame || window.webkitRequestAnimationFrame || function (f) { return setTimeout(function () { f(Date.now()); }, 16); },
+      n = 0, t0 = Date.now(), last = t0, worst = 0, win = 0;
+    bar.id = "fpsBar"; bar.textContent = "FPS …"; document.body.appendChild(bar);
+    function loop() {
+      var now = Date.now(), f, mn;
+      if (SLEEP) { setTimeout(function () { n = 0; t0 = last = Date.now(); worst = 0; loop(); }, 2000); return; }
+      n++; if (now - last > worst) { worst = now - last; } last = now;
+      if (now - t0 >= 1000) {
+        f = Math.round(n * 1000 / (now - t0));
+        bar.textContent = "FPS " + f + " · pire image " + worst + " ms · TEST";
+        bar.className = f >= 50 ? "" : (f >= 30 ? "mid" : "low");
+        n = 0; t0 = now; worst = 0;
+      }
+      raf(loop);
+    }
+    raf(loop);
+  })();
 
   /* recharge la page après 6 h, quand personne ne touche l'écran */
   var lastTouch = Date.now();
