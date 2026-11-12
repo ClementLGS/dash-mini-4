@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:305 TDBA:211-->
+<!--TDBV:306 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -220,7 +220,7 @@ button:focus { outline: none; }
 .mod { width: 25%; height: 33.3%; min-height: 104px; max-height: 150px; padding: 5px; }
 .mi { width: 100%; height: 100%; border-radius: 18px; border: 2px dashed #2f353e; background: transparent; color: #5b636f; display: block; font-size: 16px; font-weight: bold; }
 .mi svg { width: 38px; height: 38px; margin-bottom: 8px; display: block; }
-.mi.on { border-style: solid; border-color: #d8dde6; background: rgba(26,30,36,0.5); color: #d8dde6; }
+.mi.on { border-style: solid; border-color: transparent; background: #1a1e24; color: #d8dde6; }
 .mi.on:active { background: #262b33; }
 .bk { height: 40px; padding: 0 16px; margin-right: 14px; border-radius: 20px; background: #232830; border: 1px solid #2f353e; font-size: 16px; font-weight: bold; }
 .ver { padding: 6px 4px; }
@@ -1333,7 +1333,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("305", 10) || 0, UI_NAME = "3.05 (beta) TEST".charAt(0) === "_" ? "?" : "3.05 (beta) TEST";
+  var UI_CODE = parseInt("306", 10) || 0, UI_NAME = "3.06 (beta) TEST".charAt(0) === "_" ? "?" : "3.06 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
