@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:306 TDBA:211-->
+<!--TDBV:307 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -469,7 +469,7 @@ button:focus { outline: none; }
 </div>
 
 <div id="slp"><div id="slC">--:--</div><div id="slD"></div><div id="slR"><div class="slb"><div class="slI" id="slWI"></div><div class="slV" id="slWT"></div></div><div class="slb"><div class="slI" id="slMI"></div><div class="slV" id="slT"></div></div></div><div id="slS"></div><div id="slP"></div></div>
-<div id="dbg"><div class="bar"><h2>Diagnostic</h2><span><button type="button" id="dbgClr">Vider le journal</button><button type="button" id="dbgX">Fermer</button></span></div>
+<div id="dbg"><div class="bar"><h2>Diagnostic</h2><span><button type="button" id="dbgSend">Envoyer le diagnostic</button><button type="button" id="dbgClr">Vider le journal</button><button type="button" id="dbgX">Fermer</button></span></div>
  <div class="cols"><div class="box" id="dbgL"></div><div class="box" id="dbgR"></div></div></div>
 
 <script>
@@ -507,7 +507,7 @@ button:focus { outline: none; }
 
   /* ---------- réglages ---------- */
   var DEF = { airzone: "", system: "1", zone: "1", lat: "44.9", lon: "-0.72", ical: "",
-              lum: "", lum2: "", tyregion: "eu", tyid: "", tysecret: "", tydevice: "", tycode: "switch_1", tyname: "Lego", wxurl: "", updurl: "https://raw.githubusercontent.com/ClementLGS/dash-mini-4/main" };
+              lum: "", lum2: "", tyregion: "eu", tyid: "", tysecret: "", tydevice: "", tycode: "switch_1", tyname: "Lego", wxurl: "", diagrepo: "ClementLGS/diag-mini-tab-4", diagtok: "", updurl: "https://raw.githubusercontent.com/ClementLGS/dash-mini-4/main" };
   /*TESTCFG*/
   function cfg() {
     var o = {}, k, s = {};
@@ -1015,6 +1015,7 @@ button:focus { outline: none; }
   window.LOCAL = {
     cfg: cfg, DEF: DEF,
     apkInstall: function (url, meta, cb) { var id = nid(function (st, tx, er) { cb(er || null); }); try { N.apkInstallSigned(id, url, meta.vj, meta.sig); } catch (e) { delete cbs[id]; cb(String(e && e.message || e)); } },
+    rest: function (method, url, headers, body, timeout, cb) { http(method, url, headers, body, timeout, cb); },
     postJson: function (url, headers, body, timeout, cb) { http("POST", url, headers, body, timeout, cb); },
     getText: function (url, timeout, cb, extra) { var hd = { "User-Agent": "tableau-de-bord" }, k; if (extra) { for (k in extra) { if (extra.hasOwnProperty(k)) { hd[k] = extra[k]; } } } http("GET", url, hd, "", timeout, function (err, st, tx) { if (err) { return cb(err); } if (st < 200 || st >= 300) { return cb("HTTP " + st); } cb(null, tx); }); },
     reset: function () { wxS = {}; w7S = {}; agS = {}; ty.token = null; ty.state = null; ty.at = 0; lumInit = false; },
@@ -1101,7 +1102,7 @@ button:focus { outline: none; }
       } else { evLog(nm, "retour à la normale"); }
     }
   }
-  window.netHook = function (d) { evLog("Réseau", d ? "réseau inaccessible (Wi-Fi coupé ou déconnecté)" : "réseau de nouveau accessible"); };
+  window.netHook = function (d) { evLog("Réseau", d ? "réseau inaccessible (Wi-Fi coupé ou déconnecté)" : "réseau de nouveau accessible"); if (!d && window.dgAuto) { setTimeout(function () { if (dgCfg() && !DG.busy) { dgSend("réseau rétabli"); } }, 3000); } };
   evLog("App", "démarrage de la page");
   evLog("Réseau", navigator.onLine === false ? "hors ligne au démarrage" : "en ligne au démarrage");
   window.addEventListener("online", function () { evLog("Réseau", "connexion rétablie (Wi-Fi reconnecté)"); }, false);
@@ -1136,6 +1137,7 @@ button:focus { outline: none; }
     var pl = [];
     for (i = 0; i < order.length; i++) { pl.push(map(groups[order[i]]) + " · " + order[i] + " " + (order[i] === "E99" ? "erreur fictive créée pour tester l'affichage" : (CODES[order[i]] || "").split(/ \(|\./)[0])); }
     edgeSet(txt.length > 0, pl.join("   |   "));
+    if (txt.length > 0 && window.dgAuto) { window.dgAuto(); }
   }
   /* erreur : lueur rouge sur les bords de l'écran, qui pulse de 20 % à 60 % d'opacité (10 images/s, arrêtée en veille) */
   var edOn = false, EDS = ["edL", "edR", "edT", "edB"];
@@ -1232,6 +1234,7 @@ button:focus { outline: none; }
     h += "<p>Écran : " + window.innerWidth + "×" + window.innerHeight + "</p>";
     h += "<p>Réseau : " + ((navigator.onLine === false || window.NETDOWN) ? '<span class="e">hors ligne (réseau inaccessible)</span>' : '<span class="ok">en ligne</span>') + "</p>";
     h += "<p>Bluetooth : " + (BA === null ? "inconnu" : (BA ? '<span class="ok">activé</span>' : '<span class="e">désactivé ou indisponible</span>')) + "</p>";
+    h += "<p>Diagnostic distant : " + (dgCfg() ? DG.msg : "non configuré (Réglages)") + "</p>";
     h += "<h3>Événements (récent en haut)</h3>";
     if (!EV.length) { h += "<p>Rien pour l'instant.</p>"; }
     for (i = EV.length - 1, k = 0; i >= 0 && k < 40; i--, k++) { h += "<p>" + hms(EV[i].t) + " · <b>" + esc(EV[i].k) + "</b> · " + esc(EV[i].m) + "</p>"; }
@@ -1330,10 +1333,10 @@ button:focus { outline: none; }
   $("nowBox").onclick = function () { openW7(0); };
 
   /* ---------------- réglages (appli autonome) ---------------- */
-  var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
+  var SETF = [["updurl", "Adresse des mises à jour", ""], ["diagrepo", "Dépôt de diagnostic (propriétaire/nom)", ""], ["diagtok", "Jeton du dépôt de diagnostic", "password"], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("306", 10) || 0, UI_NAME = "3.06 (beta) TEST".charAt(0) === "_" ? "?" : "3.06 (beta) TEST";
+  var UI_CODE = parseInt("307", 10) || 0, UI_NAME = "3.07 (beta) TEST".charAt(0) === "_" ? "?" : "3.07 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -2250,6 +2253,107 @@ button:focus { outline: none; }
     else if (a === "consoZ") { PF = {}; PWAIT = {}; PZ = pfNow(); consoDraw(); }
     else if (a === "wall") { WALL = v; xSet("wall", WALL); wallApply(); wallDraw(); }
   };
+
+  /* ---------------- diagnostic à distance : la tablette dépose son état dans un dépôt GitHub PRIVÉ et lit des commandes simples (liste fermée) ---------------- */
+  var DG = { cmdId: xGet("dgcmd", ""), sentAt: 0, msg: "pas encore envoyé", busy: false };
+  function dgCfg() { var c = window.LOCAL ? window.LOCAL.cfg() : {}; return (c.diagrepo && c.diagtok) ? { repo: c.diagrepo, tok: c.diagtok } : null; }
+  function dgHd(c) { return { "Authorization": "token " + c.tok, "Accept": "application/vnd.github+json", "User-Agent": "tableau-de-bord", "Content-Type": "application/json" }; }
+  function b64(s) { return window.btoa(unescape(encodeURIComponent(s))); }
+  function unb64(s) { return decodeURIComponent(escape(window.atob(String(s).replace(/\s/g, "")))); }
+  function dgUrl(c, path) { return "https://api.github.com/repos/" + c.repo + "/contents/" + path; }
+  function dgGet(path, cb) {
+    var c = dgCfg();
+    if (!c) { return cb("non configuré"); }
+    window.LOCAL.rest("GET", dgUrl(c, path) + "?t=" + Date.now(), dgHd(c), "", 15000, function (err, st, tx) {
+      var j;
+      if (err) { return cb(String(err)); }
+      if (st === 404) { return cb(null, null); }
+      if (st === 401 || st === 403) { return cb("accès refusé (jeton faux, expiré ou sans droit sur le dépôt)"); }
+      if (st < 200 || st >= 300) { return cb("HTTP " + st); }
+      try { j = JSON.parse(tx); } catch (e) { return cb("réponse illisible"); }
+      cb(null, j);
+    });
+  }
+  function dgPut(path, obj, cb) {
+    dgGet(path, function (err, cur) {
+      var c = dgCfg(), body;
+      if (err) { return cb(err); }
+      body = { message: "tablette " + new Date().toISOString(), content: b64(JSON.stringify(obj, null, 1)) };
+      if (cur && cur.sha) { body.sha = cur.sha; }
+      window.LOCAL.rest("PUT", dgUrl(c, path), dgHd(c), JSON.stringify(body), 20000, function (e2, st) {
+        if (e2) { return cb(String(e2)); }
+        if (st < 200 || st >= 300) { return cb("HTTP " + st); }
+        cb(null);
+      });
+    });
+  }
+  function dgScrub(t) { return String(t).replace(/https:\/\/[^\s)"']+/g, "[url]"); }
+  function dgSnap(reason) {
+    var c = window.LOCAL.cfg(), k, sv = {}, bat = "", ble = null, err = [], ev = [], i;
+    for (k in ACT) { if (ACT.hasOwnProperty(k)) { sv[k] = { erreur: ACT[k] || "", derniereReponseOkIlYaS: OKT[k] ? Math.round((Date.now() - OKT[k]) / 1000) : null }; } }
+    try { bat = window.Native.battery(); } catch (e1) { }
+    try { ble = !!window.Native.bleAvailable(); } catch (e2) { }
+    for (i = Math.max(0, LOG.length - 30); i < LOG.length; i++) { err.push({ t: new Date(LOG[i].t).toISOString(), code: LOG[i].c, zone: LOG[i].w, msg: dgScrub(LOG[i].m), n: LOG[i].n }); }
+    for (i = Math.max(0, EV.length - 60); i < EV.length; i++) { ev.push({ t: new Date(EV[i].t).toISOString(), type: EV[i].k, msg: dgScrub(EV[i].m) }); }
+    return { at: new Date().toISOString(), raison: reason, version: UI_NAME, ui: UI_CODE, appli: (function () { try { return window.Native.appCode(); } catch (e3) { return 0; } })(),
+      navigateur: navigator.userAgent, ecran: window.innerWidth + "x" + window.innerHeight, ouvertDepuisMin: Math.round((Date.now() - T0) / 60000),
+      navigatorOnLine: navigator.onLine, reseauInaccessible: !!window.NETDOWN, veille: !!SLEEP, modeLeger: !!PERF, batterie: bat, bluetoothDisponible: ble,
+      services: sv, clim: { liee: !!S.linked, allumee: !!S.on },
+      reglages: { airzone: c.airzone || "(vide)", lumiereBluetooth: c.lum ? "renseignée" : "vide", agenda: c.ical ? "renseigné" : "vide", tuya: c.tyid ? "renseigné" : "vide", miseAJour: c.updurl },
+      erreurs: err, evenements: ev };
+  }
+  function dgSend(reason, cb) {
+    var c = dgCfg();
+    if (!c) { DG.msg = "non configuré (Réglages : dépôt et jeton)"; if (cb) { cb(DG.msg); } return; }
+    if (DG.busy) { if (cb) { cb("envoi déjà en cours"); } return; }
+    DG.busy = true;
+    dgPut("tablet/diag.json", dgSnap(reason), function (err) {
+      DG.busy = false;
+      DG.msg = err ? "échec : " + err : "envoyé à " + hms(Date.now());
+      if (!err) { DG.sentAt = Date.now(); }
+      evLog("Diagnostic", err ? "envoi échoué (" + err + ")" : "envoyé (" + reason + ")");
+      if (cb) { cb(err ? DG.msg : null); }
+    });
+  }
+  function dgTests(cb) {
+    var out = {}, c = window.LOCAL.cfg(), n = 0, need = 2, t0;
+    function fin() { n++; if (n >= need) { cb(out); } }
+    t0 = Date.now();
+    if (!c.airzone) { out.airzone = "adresse vide"; fin(); }
+    else {
+      window.LOCAL.rest("POST", "http://" + c.airzone + "/api/v1/hvac", { "Content-Type": "application/json", "Accept": "*/*" }, JSON.stringify({ systemID: parseInt(c.system, 10) || 1, zoneID: parseInt(c.zone, 10) || 1 }), 6000, function (err, st) {
+        out.airzone = { adresse: c.airzone, ms: Date.now() - t0, statut: err ? 0 : st, erreur: err ? String(err) : "" }; fin();
+      });
+    }
+    var t1 = Date.now();
+    window.LOCAL.rest("GET", "https://api.open-meteo.com/v1/forecast?latitude=44.9&longitude=-0.72&current=temperature_2m", { "User-Agent": "tableau-de-bord" }, "", 10000, function (err, st) {
+      out.internet = { ms: Date.now() - t1, statut: err ? 0 : st, erreur: err ? String(err) : "" }; fin();
+    });
+  }
+  function dgRun(o) {
+    var cmd = String(o.cmd || "");
+    function res(r) { dgPut("tablet/result.json", { id: o.id, cmd: cmd, at: new Date().toISOString(), resultat: r }, function () { }); }
+    evLog("Diagnostic", "commande reçue : " + cmd);
+    if (cmd === "diag") { dgSend("commande " + o.id, function (e) { res(e ? { erreur: e } : "diagnostic envoyé"); }); }
+    else if (cmd === "tests") { dgTests(function (r) { res(r); dgSend("tests " + o.id); }); }
+    else if (cmd === "reload") { res("rechargement de la page"); setTimeout(function () { window.location.reload(); }, 2500); }
+    else { res("commande inconnue ou refusée : " + cmd); }
+  }
+  function dgPoll() {
+    if (!dgCfg() || SLEEP) { return; }
+    dgGet("commands/cmd.json", function (err, j) {
+      var o;
+      if (err || !j || !j.content) { return; }
+      try { o = JSON.parse(unb64(j.content)); } catch (e) { return; }
+      if (!o || !o.id || String(o.id) === DG.cmdId) { return; }
+      DG.cmdId = String(o.id); xSet("dgcmd", DG.cmdId);
+      dgRun(o);
+    });
+  }
+  window.dgAuto = function () { if (dgCfg() && Date.now() - DG.sentAt > 300000 && !DG.busy && !window.NETDOWN) { dgSend("erreur affichée"); } };
+  setInterval(pw("Diag", dgPoll), 120000);
+  setTimeout(dgPoll, 20000);
+  $("dbgSend").onclick = function () { var b = $("dbgSend"); b.textContent = "Envoi…"; dgSend("bouton", function (e) { b.textContent = e ? "Échec (voir l'état)" : "Envoyé ✓"; setTimeout(function () { b.textContent = "Envoyer le diagnostic"; if ($("dbg").style.display !== "none") { drawDbg(); } }, 2500); }); };
 
   /* bouton « Simuler une erreur » dans Autre (versions TEST seulement, jamais dans main) */
   (function () {
