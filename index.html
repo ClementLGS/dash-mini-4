@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:313 TDBA:211-->
+<!--TDBV:314 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -236,6 +236,10 @@ button:focus { outline: none; }
   .mSu { font-size: 13px; color: #8f98a5; margin-top: 1px; }
   .mBt { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
   .mBt svg { width: 26px; height: 26px; margin-left: 24px; color: #8f98a5; }
+  .mArt img { width: 100%; height: 100%; border-radius: inherit; display: block; }
+  .spB { display: inline-block; margin: 0 8px 8px 0; padding: 10px 16px; border-radius: 12px; border: 1px solid #262b33; background: #1a1e24; color: #d8dde6; font-size: 15px; }
+  .spB.on { border-color: #1db954; color: #1db954; }
+  .spVol { width: 100%; height: 44px; }
 @media (max-aspect-ratio: 1/1) {
   #app { -webkit-flex-direction: column; flex-direction: column; }
   #nav { width: auto; height: 84px; -webkit-flex-direction: row; flex-direction: row; border-right: 0; border-bottom: 1px solid #232830; }
@@ -385,9 +389,9 @@ button:focus { outline: none; }
    <section class="page" id="p-home">
     <div class="ttl"><h2>Accueil</h2></div>
     <div class="hMus">
-     <div class="mArt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
-     <div class="mTx"><div class="mLb">Lecture en cours</div><div class="mTi">Aucune lecture</div><div class="mSu">Bientôt : AirPlay / Spotify</div></div>
-     <div class="mBt"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5l11 7L4 19z"/></svg></div>
+     <div class="mArt" id="hmArt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
+     <div class="mTx"><div class="mLb">Lecture en cours</div><div class="mTi" id="hmTi">Aucune lecture</div><div class="mSu" id="hmSu">Spotify non connecté</div></div>
+     <div class="mBt"><svg id="hmPrev" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg><svg id="hmPlay" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg><svg id="hmPause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg><svg id="hmNext" viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5l11 7L4 19z"/></svg></div>
     </div>
     <div class="hRow">
      <div class="tile hClim">
@@ -1337,7 +1341,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["diagrepo", "Dépôt de diagnostic (propriétaire/nom)", ""], ["diagtok", "Jeton du dépôt de diagnostic", "password"], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("313", 10) || 0, UI_NAME = "3.13 (beta) TEST".charAt(0) === "_" ? "?" : "3.13 (beta) TEST";
+  var UI_CODE = parseInt("314", 10) || 0, UI_NAME = "3.14 (beta) TEST".charAt(0) === "_" ? "?" : "3.14 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -2241,15 +2245,31 @@ button:focus { outline: none; }
     if (!consoTm) { consoTm = setInterval(function () { if (xMod !== "conso" || $("xV").style.display === "none") { clearInterval(consoTm); consoTm = 0; return; } consoDraw(); }, 2000); }
   }
   function musiDraw() {
-    var ic = '<svg viewBox="0 0 24 24" fill="currentColor" style="width:34px;height:34px;color:#8f98a5;margin:0 22px"';
-    $("xB").innerHTML = '<div class="hMus" style="height:130px;margin:0 0 14px"><div class="mArt" style="width:96px;height:96px;border-radius:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:46px;height:46px"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div><div class="mTx" style="margin-left:22px"><div class="mLb">Lecture en cours</div><div class="mTi" style="font-size:26px">Aucune source connectée</div><div class="mSu" style="font-size:15px">Choisis une source pour afficher et contrôler la musique.</div></div><div class="mBt">' + ic + '><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>' + ic + '><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>' + ic + '><path d="M16 5h2v14h-2zM4 5l11 7L4 19z"/></svg></div></div><p class="note">Sources à connecter (à choisir ensemble) : Spotify (lecture en cours + commandes), Last.fm (lecture en cours seulement, tous services), Bluetooth/AirPlay.</p>';
+    var st = SP.st, h, i, d, ic = '<svg viewBox="0 0 24 24" fill="currentColor" style="width:38px;height:38px;color:#d8dde6;margin:0 22px"';
+    if (!SP.rt) {
+      $("xB").innerHTML = '<div class="hMus" style="height:130px;margin:0 0 14px"><div class="mTx"><div class="mLb">Spotify</div><div class="mTi" style="font-size:24px">Non connecté</div><div class="mSu" style="font-size:15px">La connexion se fait à distance (à demander à Claude).</div></div></div>';
+      return;
+    }
+    h = '<div class="hMus" style="height:130px;margin:0 0 14px"><div class="mArt" style="width:96px;height:96px;border-radius:16px">' + spArt(st, 46) + '</div><div class="mTx" style="margin-left:22px"><div class="mLb">' + (st && st.playing ? "Lecture en cours" : "En pause") + '</div><div class="mTi" style="font-size:26px">' + esc(st ? st.title : "Aucune lecture") + '</div><div class="mSu" style="font-size:15px">' + esc(st ? st.artist : (SP.msg || "Lance un titre sur un appareil Spotify")) + '</div></div><div class="mBt">'
+      + '<span data-sp="prev">' + ic + '><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></span>'
+      + '<span data-sp="pp">' + ic + '><path d="' + (st && st.playing ? "M6 4h4v16H6zM14 4h4v16h-4z" : "M7 4v16l13-8z") + '"/></svg></span>'
+      + '<span data-sp="next">' + ic + '><path d="M16 5h2v14h-2zM4 5l11 7L4 19z"/></svg></span></div></div>';
+    if (st && st.vol !== null && st.volOk) {
+      h += '<div class="mLb" style="margin:6px 0 4px">Volume</div><div class="xrow2"><button type="button" class="spB" data-sp="vd">−</button><span style="display:inline-block;min-width:60px;text-align:center;font-size:18px">' + st.vol + ' %</span><button type="button" class="spB" data-sp="vu">+</button></div>';
+    }
+    h += '<div class="mLb" style="margin:10px 0 6px">Appareils</div>';
+    for (i = 0; i < SP.devs.length; i++) { d = SP.devs[i]; h += '<span class="spB' + (d.is_active ? " on" : "") + '" data-sp="dev" data-id="' + esc(d.id) + '">' + esc(d.name) + '</span>'; }
+    if (!SP.devs.length) { h += '<p class="note">Aucun appareil Spotify ouvert. Ouvre Spotify sur ton téléphone ou ton PC.</p>'; }
+    h += '<p class="note" style="margin-top:8px">' + (SP.msg ? esc(SP.msg) + " · " : "") + 'Spotify · mise à jour toutes les 8 s.</p>';
+    $("xB").innerHTML = h;
   }
   function xDraw() { if (xMod === "musique") { musiDraw(); } else if (xMod === "fonds") { wallDraw(); } else if (xMod === "conso") { consoDraw(); } else { dispDraw(); } }
   function xOpen(m) { xMod = m || "affichage"; appView("x"); xDraw(); }
   $("xB").onclick = function (ev) {
     var t = ev.target, a, v;
-    while (t && t !== this && !(t.getAttribute && t.getAttribute("data-x"))) { t = t.parentNode; }
+    while (t && t !== this && !(t.getAttribute && (t.getAttribute("data-x") || t.getAttribute("data-sp")))) { t = t.parentNode; }
     if (!t || t === this) { return; }
+    if (t.getAttribute("data-sp")) { spAct(t.getAttribute("data-sp"), t.getAttribute("data-id")); return; }
     a = t.getAttribute("data-x"); v = t.getAttribute("data-a");
     if (a === "ico") { ICO = ICO === 1 ? 2 : (ICO === 2 ? 0 : 1); xSet("ico", ICO); icoApply(); if (wxLast) { drawWeather(wxLast); } dispDraw(); }
     else if (a === "perf") { PERF = PERF ? 0 : 1; xSet("perf", PERF); perfApply(); dispDraw(); }
@@ -2356,6 +2376,7 @@ button:focus { outline: none; }
     evLog("Diagnostic", "commande reçue : " + cmd);
     if (cmd === "diag") { dgSend("commande " + o.id, function (e) { res(e ? { erreur: e } : "diagnostic envoyé"); }); }
     else if (cmd === "tests") { dgTests(function (r) { res(r, function () { dgSend("tests " + o.id); }); }); }
+    else if (cmd === "spotify") { if (o.cid && o.rt) { window.spSet(String(o.cid), String(o.rt)); res("Spotify enregistré"); } else { res("Spotify : paramètres manquants"); } }
     else if (cmd === "reload") { res("rechargement de la page"); setTimeout(function () { window.location.reload(); }, 2500); }
     else { res("commande inconnue ou refusée : " + cmd); }
   }
@@ -2374,6 +2395,96 @@ button:focus { outline: none; }
   setInterval(pw("Diag", dgPoll), 120000);
   setTimeout(dgPoll, 20000);
   $("dbgSend").onclick = function () { var b = $("dbgSend"); b.textContent = "Envoi…"; dgSend("bouton", function (e) { b.textContent = e ? "Échec (voir l'état)" : "Envoyé ✓"; setTimeout(function () { b.textContent = "Envoyer le diagnostic"; if ($("dbg").style.display !== "none") { drawDbg(); } }, 2500); }); };
+
+  /* ---------------- Spotify (Web API, connexion PKCE faite à distance) ---------------- */
+  var SP = { cid: "", rt: "", at: "", exp: 0, st: null, msg: "", devs: [], last: 0, busy: false };
+  (function () { var o = xGet("spo", null); if (o && o.rt) { SP.cid = o.cid; SP.rt = o.rt; SP.at = o.at || ""; SP.exp = o.exp || 0; } })();
+  function spSave() { xSet("spo", SP.rt ? { cid: SP.cid, rt: SP.rt, at: SP.at, exp: SP.exp } : null); }
+  function spToken(cb) {
+    if (SP.at && SP.exp > Date.now() + 60000) { return cb(null, SP.at); }
+    window.LOCAL.rest("POST", "https://accounts.spotify.com/api/token", { "Content-Type": "application/x-www-form-urlencoded" }, "grant_type=refresh_token&refresh_token=" + encodeURIComponent(SP.rt) + "&client_id=" + encodeURIComponent(SP.cid), 15000, function (err, st, tx) {
+      var j;
+      if (err) { return cb(String(err)); }
+      try { j = JSON.parse(tx); } catch (e) { j = null; }
+      if (st === 400 && j && j.error === "invalid_grant") { SP.msg = "connexion Spotify expirée, à refaire"; evLog("Spotify", "jeton refusé (invalid_grant)"); return cb("expirée"); }
+      if (st < 200 || st >= 300 || !j || !j.access_token) { return cb("jeton HTTP " + st); }
+      SP.at = j.access_token; SP.exp = Date.now() + (j.expires_in || 3600) * 1000;
+      if (j.refresh_token) { SP.rt = j.refresh_token; }
+      spSave(); cb(null, SP.at);
+    });
+  }
+  function spApi(method, path, body, cb, again) {
+    spToken(function (e, t) {
+      if (e) { return cb(e); }
+      window.LOCAL.rest(method, "https://api.spotify.com/v1" + path, { "Authorization": "Bearer " + t, "Content-Type": "application/json" }, body || "", 10000, function (err, st, tx) {
+        var j = null;
+        if (err) { return cb(String(err)); }
+        if (st === 401 && !again) { SP.at = ""; SP.exp = 0; return spApi(method, path, body, cb, true); }
+        try { j = tx ? JSON.parse(tx) : null; } catch (x) { j = null; }
+        cb(null, st, j);
+      });
+    });
+  }
+  function spArt(st, sz) {
+    if (st && st.art) { return '<img src="' + esc(st.art) + '" alt="" onerror="this.style.display=\'none\'">'; }
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:' + sz + 'px;height:' + sz + 'px"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>';
+  }
+  function spRender() {
+    var st = SP.st, ti = $("hmTi"), su = $("hmSu"), ar = $("hmArt");
+    if (!ti) { return; }
+    if (!SP.rt) { ti.textContent = "Aucune lecture"; su.textContent = "Spotify non connecté"; }
+    else if (!st) { ti.textContent = "Aucune lecture"; su.textContent = SP.msg || "Ouvre Spotify sur un appareil"; }
+    else { ti.textContent = st.title; su.textContent = st.artist; }
+    ar.innerHTML = spArt(st, 30);
+    $("hmPlay").style.display = (st && st.playing) ? "none" : "";
+    $("hmPause").style.display = (st && st.playing) ? "" : "none";
+    if (xMod === "musique" && $("xV").style.display !== "none") { musiDraw(); }
+  }
+  function spPoll() {
+    var arr = [];
+    if (!SP.rt || SP.busy || SLEEP || window.NETDOWN) { return; }
+    SP.busy = true;
+    spApi("GET", "/me/player", "", function (err, st, j) {
+      var it, im, a, i;
+      SP.busy = false;
+      if (err) { SP.msg = "Spotify injoignable"; SP.st = null; return spRender(); }
+      if (st === 204 || !j || !j.device) { SP.st = null; SP.msg = ""; }
+      else if (st === 200) {
+        it = j.item || {};
+        im = it.album && it.album.images ? it.album.images : [];
+        if (it.artists) { for (i = 0; i < it.artists.length; i++) { arr.push(it.artists[i].name); } }
+        a = it.show ? it.show.publisher : arr.join(", ");
+        SP.st = { playing: !!j.is_playing, title: it.name || "Titre inconnu", artist: a || "", art: im.length ? im[im.length - 1].url : "", vol: j.device.volume_percent, volOk: j.device.supports_volume !== false, dev: j.device.name };
+        SP.msg = "";
+      } else { SP.msg = "Spotify : erreur " + st; SP.st = null; evLog("Spotify", "lecture : HTTP " + st); }
+      SP.last = Date.now();
+      spRender();
+    });
+    if (xMod === "musique" && $("xV").style.display !== "none") {
+      spApi("GET", "/me/player/devices", "", function (e, st, j) { if (!e && st === 200 && j && j.devices) { SP.devs = j.devices; spRender(); } });
+    }
+  }
+  function spAct(a, id) {
+    var pl = SP.st && SP.st.playing, m, p, b = "{}", v;
+    if (a === "dev") { m = "PUT"; p = "/me/player"; b = JSON.stringify({ device_ids: [id], play: true }); }
+    else if (a === "pp") { m = "PUT"; p = pl ? "/me/player/pause" : "/me/player/play"; }
+    else if (a === "next") { m = "POST"; p = "/me/player/next"; }
+    else if (a === "prev") { m = "POST"; p = "/me/player/previous"; }
+    else if (a === "vu" || a === "vd") { v = Math.max(0, Math.min(100, (SP.st ? SP.st.vol : 50) + (a === "vu" ? 10 : -10))); m = "PUT"; p = "/me/player/volume?volume_percent=" + v; if (SP.st) { SP.st.vol = v; spRender(); } }
+    else { return; }
+    if (SP.st && a === "pp") { SP.st.playing = !pl; spRender(); }
+    spApi(m, p, b, function (err, st) {
+      if (err || (st !== 200 && st !== 202 && st !== 204)) { SP.msg = err ? "Spotify injoignable" : (st === 404 ? "aucun appareil actif : choisis-en un" : "commande refusée (HTTP " + st + ")"); evLog("Spotify", "commande " + a + " : " + (err || st)); spRender(); }
+      setTimeout(spPoll, 700);
+    });
+  }
+  $("hmPrev").onclick = function () { spAct("prev"); };
+  $("hmNext").onclick = function () { spAct("next"); };
+  $("hmPlay").onclick = function () { spAct("pp"); };
+  $("hmPause").onclick = function () { spAct("pp"); };
+  setInterval(pw("Spotify", spPoll), 8000);
+  setTimeout(spPoll, 3000);
+  window.spSet = function (cid, rt) { SP.cid = cid; SP.rt = rt; SP.at = ""; SP.exp = 0; SP.msg = ""; spSave(); evLog("Spotify", "connexion enregistrée"); spPoll(); };
 
   /* bouton « Simuler une erreur » dans Autre (versions TEST seulement, jamais dans main) */
   (function () {
