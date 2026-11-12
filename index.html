@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:269 TDBA:208-->
+<!--TDBV:270 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -108,7 +108,7 @@ button:focus { outline: none; }
 .wRow { -webkit-flex: 1; flex: 1; min-height: 0; display: -webkit-flex; display: flex; }
 .wNow { -webkit-flex: 1 1 0; flex: 1 1 0; margin-right: 14px; padding: 18px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; text-align: center; }
 .big { width: 130px; height: 130px; }
-.nowT { font-size: 76px; line-height: 1; font-weight: bold; margin-top: 6px; }
+.nowT { font-size: 76px; line-height: 1; font-weight: bold; margin-top: 22px; }
 .nowP { font-size: 20px; margin-top: 4px; }
 .nowD { font-size: 14px; color: #8f98a5; margin-top: 6px; }
 .wCast { -webkit-flex: 1 1 0; flex: 1 1 0; padding: 12px 18px; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
@@ -1219,7 +1219,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("269", 10) || 0, UI_NAME = "2.69 (beta)".charAt(0) === "_" ? "?" : "2.69 (beta)";
+  var UI_CODE = parseInt("270", 10) || 0, UI_NAME = "2.70 (beta)".charAt(0) === "_" ? "?" : "2.70 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
