@@ -57,26 +57,7 @@
   }
 
   /* ---- interface identique au pont Android ---- */
-  /* appel synchrone vers la coque : prompt() intercepté par l'appli, qui répond tout de suite */
-  function sync(m, a) {
-    try { var r = window.prompt("__tdb", JSON.stringify({ m: m, a: a })); return r === null ? "err:pont indisponible" : String(r); }
-    catch (e) { return "err:pont indisponible"; }
-  }
-  /* envoie l'interface par morceaux (sans couper une paire de substitution), puis demande la validation */
-  function otaSend(html, vj, sig) {
-    var i = 0, j, c;
-    html = String(html || "");
-    if (sync("ota.begin", []) !== "ok") { return "err:pont indisponible"; }
-    while (i < html.length) {
-      j = Math.min(i + 60000, html.length);
-      c = html.charCodeAt(j - 1);
-      if (j < html.length && c >= 0xD800 && c <= 0xDBFF) { j--; }
-      if (sync("ota.chunk", [html.substring(i, j)]) !== "ok") { return "err:transfert interrompu"; }
-      i = j;
-    }
-    return sync("ota.commit", [String(vj || ""), String(sig || "")]);
-  }
-  var NO_OTA = "err:mise à jour non signée refusée";
+  var NO_OTA = "err:mises à jour de l'interface désactivées sur iPad : recompile et réinstalle l'appli";
   window.Native = {
     http: function (id, method, url, headers, body, timeout) { post("http", [id, method, url, headers, body, timeout]); },
     sha256Hex: function (s) { return hex(sha256(bytes(s))); },
@@ -89,8 +70,8 @@
     setSleep: function (on) { post("setSleep", [!!on]); return "lum:ok;eco:non (iPad)"; },
     appCode: function () { return ST.appCode; },
     otaSave: function () { return NO_OTA; },
-    otaSaveSigned: function (html, vj, sig) { return otaSend(html, vj, sig); },
-    otaClear: function () { post("otaClear", []); },
+    otaSaveSigned: function () { return NO_OTA; },
+    otaClear: function () { },
     reloadUi: function () { post("reloadUi", []); },
     readDropped: function () { return ""; },
     readFile: function (rel) {

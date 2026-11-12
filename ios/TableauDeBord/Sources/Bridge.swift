@@ -223,30 +223,8 @@ final class Bridge {
             applyBrightness(sleeping)
         case "reloadUi":
             DispatchQueue.main.async { reloadPage() }
-        case "otaClear":
-            Ota.clear()
         default:
             break
-        }
-    }
-
-    /// Appels qui doivent répondre tout de suite : la page les envoie par prompt() et la coque répond ici.
-    func handleSync(_ text: String) -> String {
-        guard let data = text.data(using: .utf8),
-              let d = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let m = d["m"] as? String, let a = d["a"] as? [Any] else { return "err:appel invalide" }
-        switch m {
-        case "ota.begin":
-            Ota.begin()
-            return "ok"
-        case "ota.chunk":
-            Ota.chunk(str(a.first))
-            return "ok"
-        case "ota.commit":
-            guard a.count >= 2 else { return "err:appel invalide" }
-            return Ota.commit(versionJson: str(a[0]), signatureB64: str(a[1]))
-        default:
-            return "err:appel inconnu"
         }
     }
 

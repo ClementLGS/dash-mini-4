@@ -3,7 +3,7 @@
 Même interface que la version Android (le `index.html` de la branche), dans une appli iOS (WKWebView) qui fournit le pont `window.Native` : réseau (Airzone en HTTP local, météo, GitHub, Tuya), réglages, batterie, veille, Bluetooth (lumière LED).
 
 **État : appli 0.2 — compile sur GitHub Actions (Xcode 26, cible iPadOS 15.0). Pas encore essayée sur un vrai iPad.**
-Faits : étapes 1 (coque), 2 (HTTP + réglages), 3 (Bluetooth), 4 (mises à jour signées de l'interface), import automatique des réglages. Pas fait : étape 5 (signature automatisée, mise en place sur l'iPad).
+Faits : étapes 1 (coque), 2 (HTTP + réglages), 3 (Bluetooth), import automatique des réglages. Retiré : étape 4 (mises à jour signées). Pas fait : étape 5 (signature automatisée, mise en place sur l'iPad).
 
 ## Récupérer l'appli
 1. GitHub > dépôt `dash-mini-4` > onglet **Actions** > dernier passage de « iPad (IPA non signé) » (branche `test`).
@@ -34,11 +34,9 @@ L'IPA n'est **pas signé** : il faut le signer avec ton identifiant Apple au mom
 - Le fichier reste sur l'iPad, avec tes clés dedans : ne le laisse pas ailleurs que dans ce dossier, et ne le mets jamais sur GitHub.
 
 ## Mises à jour de l'interface
-- Même principe qu'Android : Autre > Réglages > champ **Adresse des mises à jour** (`updurl`), puis la page vérifie seule 30 s après le lancement et toutes les 6 h, ou à la main avec « Mettre à jour » / « Version précédente ».
-- L'appli n'accepte une interface que si `version.json` est **signé** avec ta clé (RSA-3072 / SHA-256, clé publique dans `Sig.swift`) et si l'empreinte du fichier reçu est celle qui est signée. Sinon : refus, rien n'est enregistré.
-- L'interface mise à jour est gardée dans l'appli et remplace celle livrée dans l'IPA. Si tu installes un nouvel IPA dont l'interface livrée est différente, la mise à jour précédente est écartée et la page se remet à jour toute seule ensuite.
-- Une interface qui exige un pont plus récent que l'iPad (marqueur `TDBA` supérieur à 211) est refusée avec un message : il faut alors recompiler et ré-installer l'appli.
-- Pas d'installation d'appli (APK) sur iPad : la partie « nouvelle appli » reste Android.
+- **Pas de mise à jour automatique sur iPad** (le code de vérification de signature a été retiré à ta demande ; il reste dans l'historique du dépôt, commit `2e6a978`). L'interface est celle livrée dans l'appli.
+- Pour la changer : GitHub > Actions > « iPad (IPA non signé) » > Run workflow (branche `test`), télécharger le nouvel IPA, le ré-installer avec Sideloadly. Tes réglages restent.
+- Dans Réglages, le bouton « Mettre à jour » répond que les mises à jour sont désactivées sur iPad.
 
 ## Différences avec Android
 - Pas d'économie d'énergie automatique ni de mode « Accès guidé » depuis l'appli : iOS ne le permet pas (Accès guidé : triple clic sur le bouton principal, à faire à la main). La veille met la luminosité au minimum et l'écran reste allumé.

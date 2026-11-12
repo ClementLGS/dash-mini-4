@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 /// Import automatique des réglages : lit le texte de reglages.txt / ical.txt / tuya.txt et le fusionne dans les réglages.
 /// Fonction pure (sans interface) pour pouvoir la tester sur GitHub Actions.
@@ -18,7 +19,11 @@ enum SettingsImport {
 
     /// Empreinte du contenu des trois fichiers : permet de ne ré-importer que s'ils ont changé.
     static func digest(ical: String?, tuya: String?, reglages: String?) -> String {
-        return Sig.sha256Hex(Data(("ical:" + (ical ?? "") + "\ntuya:" + (tuya ?? "") + "\nreglages:" + (reglages ?? "")).utf8))
+        return sha256Hex(Data(("ical:" + (ical ?? "") + "\ntuya:" + (tuya ?? "") + "\nreglages:" + (reglages ?? "")).utf8))
+    }
+
+    static func sha256Hex(_ data: Data) -> String {
+        return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }
 
     static func parsePairs(_ text: String) -> [(key: String, value: String)] {

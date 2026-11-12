@@ -46,24 +46,14 @@ final class DashboardViewController: UIViewController, WKNavigationDelegate, WKU
         ucc.addUserScript(WKUserScript(source: bridge.shimSource(), injectionTime: .atDocumentStart, forMainFrameOnly: true))
     }
 
-    /// Charge l'interface : la version mise à jour (si elle existe et qu'elle est valide), sinon celle fournie avec l'appli.
+    /// Charge l'interface fournie avec l'appli.
     func loadPage() {
         installShim()
-        guard let p = Ota.page() else {
+        guard let url = Bundle.main.url(forResource: "index", withExtension: "html") else {
             webView.loadHTMLString("<body style='background:#0f1114;color:#ff7a70;font:20px sans-serif;padding:40px'>index.html introuvable dans l'appli.</body>", baseURL: nil)
             return
         }
-        webView.loadFileURL(p.page, allowingReadAccessTo: p.readAccess)
-    }
-
-    // Appels synchrones du pont : la page les envoie par prompt("__tdb", json).
-    func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?,
-                 initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
-        if prompt == "__tdb", frame.isMainFrame, let t = defaultText {
-            completionHandler(bridge.handleSync(t))
-        } else {
-            completionHandler(nil)
-        }
+        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
