@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:289 TDBA:211-->
+<!--TDBV:290 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -36,9 +36,9 @@ button:focus { outline: none; }
 #date { margin-left: 18px; font-size: 17px; color: #8f98a5; }
 #bat { position: relative; left: 0; margin-left: auto; margin-right: auto; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; color: #b9c2d0; font-size: 18px; font-weight: bold; }
 #bat svg { width: 30px; height: 18px; margin-right: 6px; }
-#sw { position: relative; -webkit-flex: none; flex: none; width: 210px; height: 36px; margin-left: 24px; border-radius: 18px; background: rgba(26,30,36,0.7); border: 1px solid #2f353e; overflow: hidden; }
+#sw { position: relative; -webkit-flex: none; flex: none; width: 36px; height: 36px; margin-left: 24px; border-radius: 18px; background: rgba(26,30,36,0.7); border: 1px solid #2f353e; overflow: hidden; }
 #swF { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: -webkit-linear-gradient(left, #1b2147, #4a4aa8); background: linear-gradient(90deg, #1b2147, #4a4aa8); }
-#swT { position: absolute; left: 0; right: 0; top: 0; line-height: 34px; text-align: center; font-size: 14px; font-weight: bold; padding-left: 34px; color: rgba(143,152,165,1); white-space: nowrap; }
+#swH { position: absolute; right: 18px; top: 10px; width: 48px; height: 16px; color: rgba(143,152,165,1); }
 #swK { position: absolute; left: 1px; top: 1px; width: 32px; height: 32px; border-radius: 16px; background: #d8dde6; color: #14171c; }
 #swK svg { display: block; width: 18px; height: 18px; margin: 7px; }
 #sw.go #swK { background: #ffd60a; }
@@ -356,7 +356,7 @@ button:focus { outline: none; }
   <div id="top">
    <div id="clock">--:--</div><div id="date">&nbsp;</div><button type="button" class="pill bad" id="err" aria-label="Voir le diagnostic des erreurs"></button>
    
-   <div id="sw" aria-label="Glisser vers la droite pour lancer Bonne nuit"><div id="swF"></div><span id="swT">Bonne nuit</span><div id="swK"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></div></div>
+   <div id="sw" aria-label="Glisser vers la droite pour lancer Bonne nuit"><div id="swF"></div><svg id="swH" viewBox="0 0 48 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5M20 3l5 5-5 5M34 3l5 5-5 5"/></svg><div id="swK"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></div></div>
    <div id="bat" style="display:none"><svg viewBox="0 0 28 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="2" width="22" height="12" rx="2.5"/><path d="M25 6v4" stroke-linecap="round" stroke-width="2.4"/><rect id="batF" x="3" y="4" width="0" height="8" rx="1" fill="currentColor" stroke="none"/></svg><span id="batT"></span></div>
    <div id="hw"><div id="hIco"></div><div id="hT"></div><div id="hP"></div></div>
    
@@ -1258,7 +1258,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("289", 10) || 0, UI_NAME = "2.89 (beta) TEST".charAt(0) === "_" ? "?" : "2.89 (beta) TEST";
+  var UI_CODE = parseInt("290", 10) || 0, UI_NAME = "2.90 (beta) TEST".charAt(0) === "_" ? "?" : "2.90 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -1558,36 +1558,47 @@ button:focus { outline: none; }
   }
   batDraw(); setInterval(pw("Batterie", batDraw), 60000);
 
-  /* ---------------- curseur « Bonne nuit » : glisser la lune vers la droite ---------------- */
-  var swX = 0, swDrag = false, swX0 = 0, swBusy = false;
-  function swMax() { return $("sw").clientWidth - 34; }
+  /* ---------------- curseur « Bonne nuit » : un appui sur la lune ouvre la piste, puis on glisse vers la droite ---------------- */
+  var SWW = 210, swX = 0, swDrag = false, swX0 = 0, swBusy = false, swOpen = false, swW = 36, swTm = 0, swAn = 0, swMoved = false, swPx0 = 0;
+  function swMax() { return swW - 34; }
   function swSet(x) {
-    var m = swMax(), r, a;
+    var m = Math.max(1, swMax()), r, a;
     swX = Math.max(0, Math.min(m, x)); r = swX / m;
     $("swK").style.left = (1 + swX) + "px";
     $("swF").style.width = (swX + 34) + "px";
     a = Math.max(0, 1 - r * 1.6);
-    $("swT").style.color = "rgba(143,152,165," + a + ")";
-    $("sw").className = r >= 0.85 ? "go" : "";
+    $("swH").style.color = "rgba(143,152,165," + a + ")";
+    $("sw").className = r >= 0.85 && swOpen ? "go" : "";
   }
+  function swWidth(to, done) {
+    clearTimeout(swAn);
+    (function step() {
+      var d = to - swW;
+      if (Math.abs(d) < 2) { swW = to; $("sw").style.width = to + "px"; if (done) { done(); } return; }
+      swW += d * 0.35; $("sw").style.width = Math.round(swW) + "px"; swAn = setTimeout(step, 16);
+    })();
+  }
+  function swShut() { clearTimeout(swTm); if (!swOpen) { return; } swOpen = false; swSet(0); swWidth(36); }
+  function swArm() { clearTimeout(swTm); swTm = setTimeout(function () { if (!swDrag && !swBusy) { swShut(); } }, 5000); }
   function swBack() {
     var n = 0;
-    (function step() { n++; swSet(swX * 0.55); if (swX > 1 && n < 14) { setTimeout(step, 16); } else { swSet(0); $("swT").textContent = "Bonne nuit"; } })();
+    (function step() { n++; swSet(swX * 0.55); if (swX > 1 && n < 14) { setTimeout(step, 16); } else { swSet(0); swArm(); } })();
   }
   function swEnd() {
     if (!swDrag) { return; }
     swDrag = false;
+    if (!swOpen) { if (!swMoved) { swOpen = true; swWidth(SWW); swArm(); } return; }
     if (swX >= swMax() * 0.85 && !swBusy) {
-      swBusy = true; swSet(swMax()); $("swT").textContent = ""; $("swT").style.color = "#eceff3"; $("swT").textContent = "Bonne nuit…";
+      swBusy = true; swSet(swMax());
       bonneNuit();
-      setTimeout(function () { swBusy = false; swBack(); }, 9000);
+      setTimeout(function () { swBusy = false; swShut(); }, 9000);
     } else { swBack(); }
   }
   (function () {
     var k = $("swK");
     function px(e) { return e.touches && e.touches.length ? e.touches[0].clientX : (e.changedTouches && e.changedTouches.length ? e.changedTouches[0].clientX : e.clientX); }
-    function dn(e) { if (swBusy || SLEEP) { return; } swDrag = true; swX0 = px(e) - swX; if (e.preventDefault) { e.preventDefault(); } }
-    function mv(e) { if (!swDrag) { return; } swSet(px(e) - swX0); if (e.preventDefault) { e.preventDefault(); } }
+    function dn(e) { if (swBusy || SLEEP) { return; } swDrag = true; swMoved = false; swPx0 = px(e); swX0 = swPx0 - swX; clearTimeout(swTm); if (e.preventDefault) { e.preventDefault(); } }
+    function mv(e) { if (!swDrag) { return; } if (Math.abs(px(e) - swPx0) > 6) { swMoved = true; } if (swOpen) { swSet(px(e) - swX0); } if (e.preventDefault) { e.preventDefault(); } }
     k.addEventListener("touchstart", dn, false); document.addEventListener("touchmove", mv, false); document.addEventListener("touchend", swEnd, false); document.addEventListener("touchcancel", swEnd, false);
     k.addEventListener("mousedown", dn, false); document.addEventListener("mousemove", mv, false); document.addEventListener("mouseup", swEnd, false);
   })();
