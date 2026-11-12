@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:279 TDBA:211-->
+<!--TDBV:280 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -381,7 +381,7 @@ button:focus { outline: none; }
      <div class="tsl"><input type="range" id="tr" min="18" max="30" step="0.5" value="23" aria-label="Choisir la température"><div class="tsn"><span id="trL">18°</span><span id="trH">30°</span></div></div>
     </div>
     <div class="modes" id="modes"></div>
-    <div class="note" id="dem"></div><div class="note" id="info">Le mode est commun à toute la maison.</div>
+    <div class="note" id="info">Le mode est commun à toute la maison.</div>
    </section>
 
    <section class="page" id="p-lum">
@@ -1246,7 +1246,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("279", 10) || 0, UI_NAME = "2.79 (beta) TEST".charAt(0) === "_" ? "?" : "2.79 (beta) TEST";
+  var UI_CODE = parseInt("280", 10) || 0, UI_NAME = "2.80 (beta) TEST".charAt(0) === "_" ? "?" : "2.80 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
@@ -1930,9 +1930,6 @@ button:focus { outline: none; }
     $("pw").className = $("pw2").className = "pw" + (S.on ? " on" : "");
     $("pwt").textContent = $("pw2t").textContent = S.on ? "Éteindre" : "Allumer";
     $("navSub").textContent = S.linked ? fmt(S.temp) + "° · " + (!S.on ? "éteinte" : (S.act ? ACTT[S.act].toLowerCase() : "allumée")) : "injoignable";
-    var dm = [], k, de = $("dem");
-    if (S.dem) { for (k in S.dem) { if (S.dem.hasOwnProperty(k)) { dm.push(k.replace("_demand", "") + " " + S.dem[k]); } } }
-    if (de) { de.textContent = S.linked && S.on ? "Consigne " + fmt(S.temp) + "° · pièce " + (typeof S.rt === "number" ? fmt(S.rt) + "°" : "?") + (S.dem ? " · Airzone : " + dm.join(", ") : " · Airzone n'envoie pas de demande") : ""; }
   }
   function pull() {
     if (Date.now() - lastUser < 6000) { return; }
