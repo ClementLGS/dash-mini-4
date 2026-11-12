@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:291 TDBA:211-->
+<!--TDBV:292 TDBA:211-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -227,6 +227,15 @@ button:focus { outline: none; }
 .ver { position: absolute; right: 12px; bottom: 3px; font-size: 11px; color: #8f98a5; opacity: 0.5; }
 
 /* tablette tenue en portrait : menu en haut */
+  .hMus { display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; height: 90px; margin: 6px 0 12px; padding: 0 18px; background: #1a1e24; border: 1px solid #262b33; border-radius: 18px; }
+  .mArt { -webkit-flex: none; flex: none; width: 62px; height: 62px; border-radius: 12px; background: -webkit-linear-gradient(315deg, #5b4bd6, #2a2f7a); background: linear-gradient(135deg, #5b4bd6, #2a2f7a); color: #e8e6ff; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
+  .mArt svg { width: 30px; height: 30px; }
+  .mTx { -webkit-flex: 1; flex: 1; min-width: 0; margin-left: 16px; }
+  .mLb { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #8f98a5; }
+  .mTi { font-size: 18px; font-weight: 600; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mSu { font-size: 13px; color: #8f98a5; margin-top: 1px; }
+  .mBt { -webkit-flex: none; flex: none; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; }
+  .mBt svg { width: 26px; height: 26px; margin-left: 24px; color: #8f98a5; }
 @media (max-aspect-ratio: 1/1) {
   #app { -webkit-flex-direction: column; flex-direction: column; }
   #nav { width: auto; height: 84px; -webkit-flex-direction: row; flex-direction: row; border-right: 0; border-bottom: 1px solid #232830; }
@@ -366,6 +375,11 @@ button:focus { outline: none; }
 
    <section class="page" id="p-home">
     <div class="ttl"><h2>Accueil</h2></div>
+    <div class="hMus">
+     <div class="mArt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></div>
+     <div class="mTx"><div class="mLb">Lecture en cours</div><div class="mTi">Aucune lecture</div><div class="mSu">Bientôt : AirPlay / Spotify</div></div>
+     <div class="mBt"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5l11 7L4 19z"/></svg></div>
+    </div>
     <div class="hRow">
      <div class="tile hClim">
       <span class="pill" id="hPill">Connexion…</span>
@@ -1258,7 +1272,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("291", 10) || 0, UI_NAME = "2.91 (beta) TEST".charAt(0) === "_" ? "?" : "2.91 (beta) TEST";
+  var UI_CODE = parseInt("292", 10) || 0, UI_NAME = "2.92 (beta) TEST".charAt(0) === "_" ? "?" : "2.92 (beta) TEST";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   /* mises à jour signées : version.json est signé (clé privée de Clément) et contient l'empreinte de l'interface et de l'appli */
   function getSig(base, cb) { window.LOCAL.getText(base + "/version.sig?t=" + Date.now(), 15000, function (e, t) { cb(e ? "" : String(t || "").replace(/\s/g, "")); }); }
