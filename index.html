@@ -5,7 +5,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
 <title>Tableau de bord chambre</title>
-<!--TDBV:259 TDBA:208-->
+<!--TDBV:260 TDBA:208-->
 <style>
 /* Samsung mini 0.2 bêta (Android 4.4) : flexbox + marges uniquement, pas de grille, de variables CSS ni de "gap". */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -319,15 +319,11 @@ button:focus { outline: none; }
 .slI svg { width: 100%; height: 100%; display: block; }
 .slV { font-size: 54px; font-weight: bold; color: #8a919c; margin-top: 6px; }
 #slWI { opacity: 0.5; }
-#slBtn { -webkit-flex: none; flex: none; margin-left: auto; width: 46px; height: 46px; border-radius: 23px; background: #232830; border: 1px solid #2f353e; color: #d8dde6; padding: 0; }
-#slBtn svg { width: 24px; height: 24px; display: block; }
-#slw { display: none; position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 3500; background: rgba(0,0,0,0.78); -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
-#slk { position: relative; width: 440px; max-width: 86%; height: 76px; border-radius: 38px; background: #232830; border: 1px solid #3a414c; }
-#slkT { position: absolute; left: 80px; right: 20px; top: 0; height: 76px; line-height: 76px; text-align: center; font-size: 20px; color: #8d95a3; }
-#slth { position: absolute; left: 6px; top: 6px; width: 64px; height: 64px; border-radius: 32px; background: #d8dde6; color: #14171c; }
-#slth svg { width: 30px; height: 30px; display: block; }
-#slS { font-size: 20px; margin-bottom: 40px; }
-#slH { position: absolute; bottom: 12px; left: 0; right: 0; font-size: 13px; color: #3c424b; }
+#slTr { position: relative; -webkit-flex: none; flex: none; width: 230px; height: 46px; margin: 0 auto; border-radius: 23px; background: #232830; border: 1px solid #3a414c; }
+#slTt { position: absolute; left: 44px; right: 6px; top: 0; height: 46px; line-height: 46px; text-align: center; font-size: 15px; color: #6f7783; }
+#slth { position: absolute; left: 3px; top: 3px; width: 38px; height: 38px; border-radius: 19px; background: #d8dde6; color: #14171c; }
+#slth svg { width: 20px; height: 20px; display: block; }
+#slS { font-size: 30px; font-weight: bold; color: #8a919c; margin-bottom: 34px; }
 </style></head><body><div id="bg"><i class="al" style="left:150px;top:-120px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(143,163,189,0.37) 0%,rgba(0,0,0,0) 68%)"></i><i class="bl" style="left:700px;top:250px;width:900px;height:700px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(111,127,149,0.34) 0%,rgba(0,0,0,0) 68%)"></i><i class="al" style="left:-200px;top:350px;width:700px;height:600px;border-radius:50%;background:-webkit-radial-gradient(center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%);background:radial-gradient(circle at center,rgba(160,173,191,0.24) 0%,rgba(0,0,0,0) 68%)"></i></div>
 <div id="app">
  <div id="nav">
@@ -342,7 +338,7 @@ button:focus { outline: none; }
   <div id="ban" style="display:none" role="alert"></div>
   <div id="top">
    <div id="clock">--:--</div><div id="date">&nbsp;</div><button type="button" class="pill bad" id="err" aria-label="Voir le diagnostic des erreurs"></button>
-   <button type="button" id="slBtn" aria-label="Mettre en veille"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z"/></svg></span></button>
+   <div id="slTr"><span id="slTt">veille ›</span><div id="slth"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z"/></svg></span></div></div>
    <div id="hw"><div id="hIco"></div><div id="hT"></div><div id="hP"></div></div>
   </div>
 
@@ -429,8 +425,7 @@ button:focus { outline: none; }
  </div>
 </div>
 
-<div id="slp"><div id="slC">--:--</div><div id="slD"></div><div id="slR"><div class="slb"><div class="slI" id="slWI"></div><div class="slV" id="slWT"></div></div><div class="slb"><div class="slI" id="slMI"></div><div class="slV" id="slT"></div></div></div><div id="slS"></div><div id="slH">Touche l'écran pour réveiller</div></div>
-<div id="slw"><div id="slk"><span id="slkT">Glisse pour mettre en veille</span><div id="slth"><span class="bw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z"/></svg></span></div></div></div>
+<div id="slp"><div id="slC">--:--</div><div id="slD"></div><div id="slR"><div class="slb"><div class="slI" id="slWI"></div><div class="slV" id="slWT"></div></div><div class="slb"><div class="slI" id="slMI"></div><div class="slV" id="slT"></div></div></div><div id="slS"></div></div>
 <div id="dbg"><div class="bar"><h2>Diagnostic</h2><span><button type="button" id="dbgClr">Vider le journal</button><button type="button" id="dbgX">Fermer</button></span></div>
  <div class="cols"><div class="box" id="dbgL"></div><div class="box" id="dbgR"></div></div></div>
 
@@ -1211,7 +1206,7 @@ button:focus { outline: none; }
   var SETF = [["updurl", "Adresse des mises à jour", ""], ["airzone", "Airzone (adresse:port)", ""], ["system", "Système Airzone", ""], ["zone", "Zone de la chambre", ""], ["lat", "Latitude", ""], ["lon", "Longitude", ""],
     ["ical", "Lien iCal Google Agenda", ""], ["lum", "Lumière LED : adresse Bluetooth", ""], ["lum2", "2e lumière (optionnel)", ""],
     ["tyname", "Nom du relais Tuya", ""], ["tyregion", "Région Tuya (eu, eu-w, us…)", ""], ["tyid", "Tuya Access ID", ""], ["tysecret", "Tuya Access Secret", "password"], ["tydevice", "Tuya Device ID", ""], ["tycode", "Tuya : code (switch_1)", ""]];
-  var UI_CODE = parseInt("259", 10) || 0, UI_NAME = "2.59 (beta)".charAt(0) === "_" ? "?" : "2.59 (beta)";
+  var UI_CODE = parseInt("260", 10) || 0, UI_NAME = "2.60 (beta)".charAt(0) === "_" ? "?" : "2.60 (beta)";
   (function () { var e = $("ver"); if (e && UI_NAME !== "?") { e.textContent = e.textContent.replace(/Version [^(]*\(beta\)/, "Version " + UI_NAME); } })();
   function updUi(html, say, doApk) {
     var r = window.Native.otaSave(html);
@@ -1479,11 +1474,11 @@ button:focus { outline: none; }
     var d = new Date(), rm = $("hRoom").textContent.match(/(-?[\d]+[,.]?[\d]*)\s*°/), w = wxLast, m;
     $("slC").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes());
     $("slD").textContent = DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()];
-    $("slT").textContent = rm ? rm[1] + "°" : "--";
+    $("slT").textContent = S.linked && S.on ? fmt(S.temp) + "°" : "--";
     $("slMI").innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#8a919c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (S.linked && S.on && S.mode >= 0 ? MODES[S.mode].svg : '<path d="M12 3v8M6.3 6.8a8 8 0 1 0 11.4 0"/>') + "</svg>";
     if (w && w.now) { m = wmo(w.now.code, w.now.day); $("slWI").innerHTML = ICONS[m.k]; $("slWT").textContent = (typeof w.now.temp === "number" ? rnd(w.now.temp) + "°" : "--"); }
     else { $("slWI").innerHTML = ""; $("slWT").textContent = "--"; }
-    $("slS").textContent = !S.linked ? "Clim non jointe" : (S.on ? "Clim en marche · consigne " + fmt(S.temp) + "°" : "Clim éteinte");
+    $("slS").textContent = "Temp : " + (rm ? rm[1] + "°" : "--");
   }
   function slTick() {
     if (!SLEEP) { return; }
@@ -1511,17 +1506,15 @@ button:focus { outline: none; }
   }
   $("slp").onclick = sleepOff;
   (function () {
-    var k = $("slk"), th = $("slth"), w = $("slw"), x0 = 0, drag = 0, mx = 0, tm = 0, cur = 0;
+    var k = $("slTr"), th = $("slth"), x0 = 0, drag = 0, mx = 0, cur = 0;
     function px(ev) { var t = ev.touches && ev.touches.length ? ev.touches[0] : (ev.changedTouches && ev.changedTouches.length ? ev.changedTouches[0] : ev); return t.clientX; }
-    function show(on) { w.style.display = on ? "-webkit-flex" : "none"; if (on) { w.style.display = "flex"; } clearTimeout(tm); if (on) { th.style.left = "6px"; tm = setTimeout(function () { show(false); }, 8000); } }
-    $("slBtn").onclick = function () { show(true); };
-    w.onclick = function (ev) { if (ev.target === w) { show(false); } };
-    function start(ev) { drag = 1; x0 = px(ev); mx = k.offsetWidth - th.offsetWidth - 12; cur = 0; clearTimeout(tm); if (ev.preventDefault) { ev.preventDefault(); } }
-    function move(ev) { if (!drag) { return; } cur = Math.max(0, Math.min(mx, px(ev) - x0)); th.style.left = (6 + cur) + "px"; if (ev.preventDefault) { ev.preventDefault(); } }
+    function start(ev) { drag = 1; x0 = px(ev); mx = k.offsetWidth - th.offsetWidth - 8; cur = 0; if (ev.preventDefault) { ev.preventDefault(); } }
+    function move(ev) { if (!drag) { return; } cur = Math.max(0, Math.min(mx, px(ev) - x0)); th.style.left = (3 + cur) + "px"; if (ev.preventDefault) { ev.preventDefault(); } }
     function end() {
       if (!drag) { return; }
       drag = 0;
-      if (cur >= mx * 0.85) { show(false); sleepOn(); } else { th.style.left = "6px"; tm = setTimeout(function () { show(false); }, 6000); }
+      th.style.left = "3px";
+      if (cur >= mx * 0.85) { sleepOn(); }
     }
     th.addEventListener("touchstart", start); th.addEventListener("mousedown", start);
     document.addEventListener("touchmove", move); document.addEventListener("mousemove", move);
